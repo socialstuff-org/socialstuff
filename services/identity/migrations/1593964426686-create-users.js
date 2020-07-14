@@ -1,4 +1,4 @@
-const { createConnection } = require('../db-util');
+const { createConnection } = require('../lib/db-util');
 
 module.exports.up = async next => {
   const db = await createConnection();

@@ -1,14 +1,14 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+import express from 'express';
+import bodyParser from 'body-parser';
 
-const register = require('./register');
+import register from './register';
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/register', register);
+app.post('/register', register);
 
 app.listen(3000, '0.0.0.0', err => {
   if (err) {
