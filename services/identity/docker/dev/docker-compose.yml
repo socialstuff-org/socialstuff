@@ -14,13 +14,16 @@ services:
       - socialstuff_identity_mysql_dev
     volumes:
     - ../..:/app
+    environment:
+      MYSQL_DATABASE: socialstuff_identity_dev
+      MYSQL_HOST: socialstuff_identity_mysql_dev
 
   socialstuff_identity_mysql_dev:
     container_name: socialstuff_identity_mysql_dev
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: socialstuff_identity
+      MYSQL_DATABASE: socialstuff_identity_dev
     networks:
       - socialstuff_identity_network_dev
 

@@ -1,13 +1,16 @@
 
 
-dev-up: base-image
+up: base-image
 	docker-compose --project-directory docker/dev up -d --build
 
-dev-down:
+down:
 	docker-compose --project-directory docker/dev down
 
-dev-stop:
+stop:
 	docker-compose --project-directory docker/dev stop
 
+prod: base-image
+	docker-compose --project-directory docker/prod build
+
 base-image:
-	docker build . -t socialstuff-identity:dev
+	docker build . -t socialstuff-identity:base
