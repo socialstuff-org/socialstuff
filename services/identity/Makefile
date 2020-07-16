@@ -1,13 +1,13 @@
 
 
 up: base-image
-	docker-compose --project-directory docker/dev up -d --build
+	cd docker/dev && docker-compose up -d --build
 
 down:
-	docker-compose --project-directory docker/dev down
+	cd docker/dev && docker-compose down
 
 stop:
-	docker-compose --project-directory docker/dev stop
+	cd docker/dev && docker-compose stop
 
 prod: base-image
 	docker-compose --project-directory docker/prod build
