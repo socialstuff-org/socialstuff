@@ -5,10 +5,10 @@ const mysql = require('mysql2/promise');
  */
 export function createConnection() {
   return mysql.createConnection({
-    host: process.env.MYSQL_HOST,
+    host: process.env.MYSQL_HOST || '127.0.0.1',
     user: 'root',
     password: 'root',
-    database: process.env.MYSQL_DATABASE,
+    database: process.env.MYSQL_DATABASE || 'socialstuff',
   });
 }
 
