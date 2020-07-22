@@ -1,13 +1,14 @@
 
+COMPASE_DEV_COMMAND=docker-compose -f docker/dev/docker-compose.yml
 
 up: base-image
-	cd docker/dev && docker-compose up -d --build
+	$(COMPASE_DEV_COMMAND) up --build --force-recreate -d
 
 down:
-	cd docker/dev && docker-compose down
+	$(COMPASE_DEV_COMMAND) down --remove-orphans
 
 stop:
-	cd docker/dev && docker-compose stop
+	$(COMPASE_DEV_COMMAND) stop
 
 prod: base-image
 	docker-compose --project-directory docker/prod build
