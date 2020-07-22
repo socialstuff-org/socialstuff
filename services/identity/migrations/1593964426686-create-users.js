@@ -13,5 +13,5 @@ module.exports.up = async next => {
 
 module.exports.down = async next => {
   const db = await createConnection();
-  await db.query('DROP TABLE users CASCADE;');
+  await db.query('DROP TABLE IF EXISTS users CASCADE;');
 };
