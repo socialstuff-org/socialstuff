@@ -33,17 +33,20 @@ async function register(req, res) {
   const token = await generateToken();
   const tokenHash = await hashHmac(Buffer.from(token, 'base64'));
   await db.beginTransaction();
+
+  // Added expires_at into token table. 
+  // Gives an automatic interval of 1 day which can not be modified by the user. If should be done by user, please add as TODO comment
+  // Is based on server time NOT client time (DISCUSSION NEEDED what would be better).
+  // IF CORRECTED: delete comments and let us know what was done or add TODO for better solution
+
   const sql = `
 SET @user_id := uuid();
 INSERT INTO users (id, username, password, public_key) VALUES (@user_id, ?, ?, ?);
-INSERT INTO tokens (id_user, token) VALUES (@user_id, ?);
+INSERT INTO tokens (id_user, token, expires_at) VALUES (@user_id, ?, DATE_ADD(NOW(), INTERVAL 1 DAY));
 `;
   try {
     await db.query(sql, [req.body.username, passwordHash, req.body.public_key, tokenHash]);
     await db.commit();
-
-    // TODO add expires_at with proper time limit
-
     res.status(201).json({data: {message: 'Registered successfully!', token}});
   } catch (e) {
     console.error(e);
