@@ -5,7 +5,7 @@ module.exports.up = async next => {
   await db.query(`CREATE TABLE users(
     id char(36) unique primary key,
     username varchar(64) unique not null,
-    password varchar(192) not null,
+    password text not null,
     public_key text not null,
     mfa_seed varchar(64)
   );`);
