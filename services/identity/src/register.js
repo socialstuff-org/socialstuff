@@ -1,11 +1,9 @@
-import express                   from 'express';
-import {body}                    from 'express-validator';
-import {sharedConnection}        from './db-util';
-import {rejectOnValidationError} from './express-util';
-import argon                     from 'argon2';
-import {generateToken}           from './token-helper';
-import crypto                 from 'crypto';
-import {hashHmac, hashUnique} from './security-helper';
+import express                    from 'express';
+import {body}                     from 'express-validator';
+import {sharedConnection}         from './db-util';
+import {rejectOnValidationError}  from './express-util';
+import {generateToken}            from './token-helper';
+import {hashHmac, hashUnique}     from './security-helper';
 
 const middleware = [
   body('username').isString().isLength({min: 2}).withMessage('The username should be at least 2 characters long!'),
@@ -21,7 +19,7 @@ const middleware = [
   }),
   body('password').isString().matches(/[a-zA-Z0-9]{10,}/).withMessage('Please choose a suitable password!'),
   body('public_key').isString().isLength({min: 128}),
-  rejectOnValidationError,
+  rejectOnValidationError
 ];
 
 /**
@@ -43,11 +41,13 @@ INSERT INTO tokens (id_user, token) VALUES (@user_id, ?);
   try {
     await db.query(sql, [req.body.username, passwordHash, req.body.public_key, tokenHash]);
     await db.commit();
+
     // TODO add expires_at with proper time limit
+
     res.status(201).json({data: {message: 'Registered successfully!', token}});
   } catch (e) {
-    await db.rollback();
     console.error(e);
+    await db.rollback();
     res.status(500).end();
   }
 }

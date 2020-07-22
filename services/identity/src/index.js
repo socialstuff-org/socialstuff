@@ -1,9 +1,9 @@
-import express    from 'express';
-import bodyParser from 'body-parser';
-import register   from './register';
-import customEnv  from 'custom-env';
-import util       from 'util';
-import { sharedConnection } from './db-util';
+import express            from 'express';
+import bodyParser         from 'body-parser';
+import register           from './register';
+import customEnv          from 'custom-env';
+import util               from 'util';
+import {sharedConnection} from './db-util';
 
 const ENV = process.env.NODE_ENV || 'dev';
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
@@ -17,16 +17,18 @@ customEnv.env(ENV);
       await sharedConnection();
       break;
     } catch (e) {
+      console.error(e);
     }
   }
 
   if (ENV === 'dev') {
     const migrate = require('migrate');
-    console.log('setting up database...');
+    console.log('Setting up database...');
     await util.promisify(migrate.load)({stateStore: '.migrate'})
-      .then(set => util.promisify(set.down.bind(set))().then(() => set))
+      .then(set => util.promisify(set.down.bind(set))()
+      .then(() => set))
       .then(set => util.promisify(set.up.bind(set))());
-    console.log('done');
+    console.log('Database ready for use!');
   }
 
   const app = express();

@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator');
+const {validationResult} = require('express-validator');
 
 /**
  * 
@@ -11,6 +11,6 @@ export function rejectOnValidationError(req, res, next) {
   if (errors.isEmpty()) {
     next();
   } else {
-    res.status(400).json({ errors: errors.mapped() });
+    res.status(400).json({errors: errors.mapped()});
   }
 }

@@ -1,4 +1,3 @@
-
 COMPASE_DEV_COMMAND=docker-compose -f docker/dev/docker-compose.yml
 
 up: base-image
