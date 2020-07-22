@@ -8,7 +8,7 @@ console.log(crypto.getCiphers())
 
 /** @var {Buffer} */
 let _appSecretBytes;
-
+/** @var {(arg1: number) => Promise<Buffer>} randomBytes */
 export const randomBytes = util.promisify(crypto.randomBytes);
 
 export function appSecretBytes() {
