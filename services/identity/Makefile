@@ -2,7 +2,7 @@
 COMPASE_DEV_COMMAND=docker-compose -f docker/dev/docker-compose.yml
 
 up: base-image
-	$(COMPASE_DEV_COMMAND) up --build --force-recreate -d
+	$(COMPASE_DEV_COMMAND) up --build -d
 
 down:
 	$(COMPASE_DEV_COMMAND) down --remove-orphans
