@@ -2,10 +2,11 @@ import express    from 'express';
 import bodyParser from 'body-parser';
 import register   from './register';
 import customEnv  from 'custom-env';
-import util               from 'util';
-import {decrypt, encrypt} from './security-helper';
+import util       from 'util';
 
 const ENV = process.env.NODE_ENV || 'dev';
+const APP_PORT = parseInt(process.env.APP_PORT || '3000');
+const APP_HOST = process.env.APP_HOST || '0.0.0.0';
 
 customEnv.env(ENV);
 
@@ -19,8 +20,6 @@ customEnv.env(ENV);
     console.log('done');
   }
 
-  await encrypt('foobar').then(decrypt).then(console.log);
-
   const app = express();
 
   app.use(bodyParser.json());
@@ -28,11 +27,11 @@ customEnv.env(ENV);
 
   app.post('/register', register);
 
-  app.listen(3000, '0.0.0.0', err => {
+  app.listen(APP_PORT, APP_HOST, err => {
     if (err) {
       console.error(err);
       process.exit(1);
     }
-    console.log('Social Stuff Identity service running on port 3000.');
+    console.log(`Social Stuff Identity service running on ${APP_HOST}:${APP_PORT}.`);
   });
 })();
