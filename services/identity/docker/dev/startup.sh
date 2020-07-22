@@ -1,5 +1,3 @@
 #!/bin/sh
-ls
-npm run build
-npx migrate
-npm start
+cd /app || exit
+npm run dev
