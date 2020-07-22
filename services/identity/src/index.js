@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import register   from './register';
 import customEnv  from 'custom-env';
 import util       from 'util';
+import { sharedConnection } from './db-util';
 
 const ENV = process.env.NODE_ENV || 'dev';
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
@@ -11,6 +12,14 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
 customEnv.env(ENV);
 
 (async () => {
+  while (true) {
+    try {
+      await sharedConnection();
+      break;
+    } catch (e) {
+    }
+  }
+
   if (ENV === 'dev') {
     const migrate = require('migrate');
     console.log('setting up database...');
