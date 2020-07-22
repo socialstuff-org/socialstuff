@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node .",
-    "dev": "nodemon --exec babel-node .",
+    "dev": "nodemon --exec babel-node src/ -- --unhandled-rejections=strict",
     "build": "babel src -d lib"
   },
   "author": "Jörn Neumeyer",
