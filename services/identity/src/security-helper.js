@@ -4,8 +4,6 @@ import util   from 'util';
 
 const ENCRYPTION_ALGORITHM = 'aes-256-cbc';
 
-console.log(crypto.getCiphers())
-
 /** @var {Buffer} */
 let _appSecretBytes;
 /** @var {(arg1: number) => Promise<Buffer>} randomBytes */
