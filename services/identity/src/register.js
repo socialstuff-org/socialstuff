@@ -8,6 +8,9 @@ import {hashHmac, hashUnique}     from './security-helper';
 const middleware = [
   body('username').isString().isLength({min: 2}).withMessage('The username should be at least 2 characters long!'),
   body('username').custom(async username => {
+
+    // Isnt this one unnecessary since we are already checking if it is a string and if so it returns?
+    
     if (!username) {
       return;
     }
