@@ -1,6 +1,7 @@
 import express            from 'express';
 import bodyParser         from 'body-parser';
 import register           from './register';
+import login              from './login';
 import customEnv          from 'custom-env';
 import util               from 'util';
 import {sharedConnection} from './db-util';
@@ -37,6 +38,7 @@ customEnv.env(ENV);
   app.use(bodyParser.urlencoded({extended: true}));
 
   app.post('/register', register);
+  app.post('/login', login);
 
   app.listen(APP_PORT, APP_HOST, err => {
     if (err) {
