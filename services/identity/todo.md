@@ -1,0 +1,5 @@
+- test register endpoint
+- test login endpoint
+- test hashing logic
+- implement and test verification of public keys
+- two step registration with public key verification
