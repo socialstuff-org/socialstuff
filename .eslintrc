@@ -1,0 +1,31 @@
+{
+  "extends": "eslint:recommended",
+  "rules": {
+    "semi": [
+      "error",
+      "always"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "camelcase": "warn",
+    "comma-style": [
+      "error",
+      "first"
+    ],
+    "constructor-super": "warn",
+    "global-require": "warn",
+    "indent": [
+      "error",
+      2
+    ],
+    "sort-imports": "warn",
+    "valid-typeof": "warn",
+    "strict": ["error", "global"],
+    "eqeqeq": ["error", "always"],
+    "linebreak-style": ["error", "unix"],
+    "prefer-const": "error",
+    "max-nested-callbacks": ["warn", 3]
+  }
+}
