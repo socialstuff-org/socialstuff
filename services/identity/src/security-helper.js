@@ -84,6 +84,11 @@ export function decodeBase64ToString(data) {
   return Buffer.from(data, 'base64').toString('utf-8');
 }
 
+export async function verifyHashUnique(h, plain) {
+  const {hash, salt} = JSON.parse(decodeBase64ToString(h));
+  return argon.verify(hash, plain, { secret: appSecretBytes(), salt });
+}
+
 export async function hashUnique(data) {
   const salt = crypto.randomBytes(64);
   const hash = await argon.hash(data, {secret: appSecretBytes(), salt});
