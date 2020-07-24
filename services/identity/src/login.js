@@ -3,15 +3,11 @@ import {body}                     from 'express-validator';
 import {sharedConnection}         from './db-util';
 import {rejectOnValidationError}  from './express-util';
 import {generateToken}            from './token-helper';
-import {hashHmac, hashUnique}     from './security-helper';
+import {hashHmac, hashUnique, verifyHashUnique} from './security-helper';
 
 const middleware = [
-  // Add maximum AND minimum numbers of characters for username and password? Thought about possible sql injections...
-
   body('username').isString().isLength({min: 2}).withMessage('This is not a valid username.'),
   body('password').isString().isLength({min: 2}).withMessage('This is not a valid password.'),
-
-  // I do not make use of userExists here, because otherwise someone could take notes which usernames are registered and which not.
 
   rejectOnValidationError
 ];
@@ -24,17 +20,32 @@ const middleware = [
 async function login(req, res) {
   const db = await sharedConnection();
 
-  const sql = `
-    SELECT users.id, users.username, users.password, tokens.token, tokens.expires_at
-    FROM users u
-    INNER JOIN tokens t ON u.id = t.id_user;
-  `;
+  const sql = 'SELECT id,password as passwordHash FROM users WHERE username LIKE ?;';
 
-  // TODO: Now when token is expired create a new one and if not sned it in response?
+  const [userRow] = await db.query(sql, [req.body.username]);
 
-  // If userExists is checked before, remove "User does not exist..."
+  if (!userRow.length) {
+    // TODO username does not exist
+    return;
+  }
 
-  console.log('User does not exist or credentials are wrong.');
+  const [{id,passwordHash}] = userRow;
+  const passwordsMatch = await verifyHashUnique(passwordHash, req.body.password);
+  if (!passwordsMatch) {
+
+    return;
+  }
+
+  const token = generateToken();
+  const addTokenSql = 'INSERT INTO tokens (value, id_user, expires_at) VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 DAY));';
+  try {
+    await db.query(addTokenSql, [hashHmac(token), id]);
+  } catch (e) {
+    res.status(500).json({ errors: [{message: 'Internal login error!'}] }).end();
+    return;
+  }
+
+  res.status(200).json({data:{token}});
 }
 
 export default [middleware, login];
