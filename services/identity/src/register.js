@@ -6,14 +6,8 @@ import {generateToken}            from './token-helper';
 import {hashHmac, hashUnique}     from './security-helper';
 
 const middleware = [
-
-  // Add maximum AND minimum numbers of characters for username and password? Thought about possible sql injections...
-
   body('username').isString().isLength({min: 2}).withMessage('The username should be at least 2 characters long!'),
   body('username').custom(async username => {
-
-    // Isnt this one unnecessary since we are already checking if it is a string and if not it returns?
-
     if (!username) {
       return;
     }
@@ -23,13 +17,14 @@ const middleware = [
       return Promise.reject('Username is already taken!');
     }
   }),
-  body('password').isString().matches(/[a-zA-Z0-9]{10,}/).withMessage('Please choose a suitable password!'),
+  body('password').isString().matches(/.{10,}/).withMessage('Please choose a suitable password!'),
 
-  // Add a maximum length?
+  // TODO Add a maximum length?
 
   body('public_key').isString().isLength({min: 128}),
   rejectOnValidationError
 ];
+
 
 /**
  *
@@ -43,10 +38,7 @@ async function register(req, res) {
   const tokenHash = await hashHmac(Buffer.from(token, 'base64'));
   await db.beginTransaction();
 
-  // Added expires_at into token table. 
-  // Gives an automatic interval of 1 day which can not be modified by the user. If should be done by user, please add as TODO comment
-  // Is based on server time NOT client time (DISCUSSION NEEDED what would be better).
-  // IF CORRECTED: delete comments and let us know what was done or add TODO for better solution
+  // TODO fix container issues
 
   const sql = `
     SET @user_id := uuid();
