@@ -4,7 +4,7 @@
   "description": "The SocialStuff authentication service.",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node .",
     "dev": "nodemon --exec babel-node src/ -- --unhandled-rejections=strict",
     "build": "babel src -d lib"
@@ -26,8 +26,10 @@
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.10.4",
     "@types/express": "^4.17.7",
+    "@types/jest": "^26.0.7",
     "@types/node": "^14.0.14",
     "eslint": "^7.5.0",
+    "jest": "^26.1.0",
     "nodemon": "^2.0.4"
   }
 }
