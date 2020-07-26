@@ -100,7 +100,7 @@ export async function encrypt(data) {
   return encryptPromise;
 }
 
-export function decrypt(data) {
+export function decrypt2(data) {
   const {iv, value} = JSON.parse(decodeBase64ToString(data));
   const ivBuffer = Buffer.from(iv, 'base64');
   const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, appSecretBytes(), ivBuffer);

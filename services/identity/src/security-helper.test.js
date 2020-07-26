@@ -1,4 +1,4 @@
-import {decrypt, encrypt, hashUnique, passwordIssues, verifyHashUnique} from './security-helper';
+import {decrypt2, encrypt, hashUnique, passwordIssues, verifyHashUnique} from './security-helper';
 
 describe('security-helper', () => {
   describe('hashUnique', () => {
@@ -28,7 +28,7 @@ describe('security-helper', () => {
   describe('decrypt', () => {
     test('properly decrypts encrypted data', async () => {
       const crypt = await encrypt('foobar');
-      const decrypt = await decrypt(crypt);
+      const decrypt = await decrypt2(crypt);
       expect(decrypt).toBe('foobar');
     });
   });
