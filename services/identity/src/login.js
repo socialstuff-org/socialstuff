@@ -1,15 +1,14 @@
-import express                    from 'express';
-import {body}                     from 'express-validator';
-import {sharedConnection}         from './db-util';
-import {rejectOnValidationError}  from './express-util';
-import {generateToken}            from './token-helper';
+import express                                  from 'express';
+import {body}                                   from 'express-validator';
+import {sharedConnection}                       from './db-util';
+import {rejectOnValidationError}                from './express-util';
+import {generateToken}                          from './token-helper';
 import {hashHmac, hashUnique, verifyHashUnique} from './security-helper';
 
 const middleware = [
-  body('username').isString().isLength({min: 2}).withMessage('This is not a valid username.'),
-  body('password').isString().isLength({min: 2}).withMessage('This is not a valid password.'),
-
-  rejectOnValidationError
+  body('username').isString().isLength({min: 5, max: 20}).withMessage('This is not a valid username.'),
+  body('password').isString().isLength({min: 10, max: 40}).withMessage('This is not a valid password.'),
+  rejectOnValidationError,
 ];
 
 /**
@@ -25,14 +24,14 @@ async function login(req, res) {
   const [userRow] = await db.query(sql, [req.body.username]);
 
   if (!userRow.length) {
-    // TODO username does not exist
+    res.status(400).json({errors: [{message: 'Invalid credentials!'}]}).end();
     return;
   }
+  const [{id, passwordHash}] = userRow;
 
-  const [{id,passwordHash}] = userRow;
   const passwordsMatch = await verifyHashUnique(passwordHash, req.body.password);
   if (!passwordsMatch) {
-
+    res.status(400).json({errors: [{message: 'Invalid credentials!'}]}).end();
     return;
   }
 
@@ -41,11 +40,11 @@ async function login(req, res) {
   try {
     await db.query(addTokenSql, [hashHmac(token), id]);
   } catch (e) {
-    res.status(500).json({ errors: [{message: 'Internal login error!'}] }).end();
+    res.status(500).json({errors: [{message: 'Internal login error!'}]}).end();
     return;
   }
 
-  res.status(200).json({data:{token}});
+  res.status(200).json({data: {token}});
 }
 
 export default [middleware, login];
