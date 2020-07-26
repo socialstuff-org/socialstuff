@@ -4,6 +4,51 @@ import util   from 'util';
 
 const ENCRYPTION_ALGORITHM = 'aes-256-cbc';
 
+export const USERNAME_REGEX = /[\w\d_.]{5,20}/.compile();
+
+const LOWER_WORD_CHARS = 'abcdefghijklmnopqrstuvwxyz';
+const UPPER_WORD_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const NUMBER_CHARS = '1234567890';
+const SPECIAL_CHARS = '!@#$%^&*()-_=+[]{};\'":,.<>/?`~€';
+export const REQUIRED_PASSWORD_LENGTH = {min: 10, max: 40};
+
+export function passwordIssues(password) {
+  let hasLower = false;
+  let hasUpper = false;
+  let hasNumber = false;
+  let hasSpecial = false;
+  for (const c of password) {
+    if (LOWER_WORD_CHARS.includes(c)) {
+      hasLower = true;
+    } else if (UPPER_WORD_CHARS.includes(c)) {
+      hasUpper = true;
+    } else if (NUMBER_CHARS.includes(c)) {
+      hasNumber = true;
+    } else if (SPECIAL_CHARS.includes(c)) {
+      hasSpecial = true;
+    }
+  }
+  const result = {};
+  if (!hasSpecial) {
+    result.special = 'Missing special character!';
+  }
+  if (!hasLower) {
+    result.lower = 'Missing lower case character!';
+  }
+  if (!hasUpper) {
+    result.upper = 'Missing upper case character!';
+  }
+  if (!hasNumber) {
+    result.number = 'Missing number!';
+  }
+  if (password.length < REQUIRED_PASSWORD_LENGTH.min) {
+    result.length = 'Password is too short!';
+  } else if (password.length > REQUIRED_PASSWORD_LENGTH.max) {
+    result.length = 'Password is too long!';
+  }
+  return result;
+}
+
 /** @var {Buffer} */
 let _appSecretBytes;
 /** @var {(arg1: number) => Promise<Buffer>} randomBytes */
@@ -86,7 +131,7 @@ export function decodeBase64ToString(data) {
 
 export async function verifyHashUnique(h, plain) {
   const {hash, salt} = JSON.parse(decodeBase64ToString(h));
-  return argon.verify(hash, plain, { secret: appSecretBytes(), salt });
+  return argon.verify(hash, plain, {secret: appSecretBytes(), salt});
 }
 
 export async function hashUnique(data) {
