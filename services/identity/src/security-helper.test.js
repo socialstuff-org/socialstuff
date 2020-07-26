@@ -1,4 +1,4 @@
-import {hashUnique} from './security-helper';
+import {hashUnique, verifyHashUnique} from './security-helper';
 
 describe('security-helper', () => {
   describe('hashUnique', () => {
@@ -7,5 +7,13 @@ describe('security-helper', () => {
       const hash2 = await hashUnique('foobar');
       expect(hash1).not.toBe(hash2);
     });
-  })
+  });
+
+  describe('verifyHashUnique', () => {
+    test('properly verifies a unique hash', async () => {
+      const hash = await hashUnique('foobar');
+      const hashVerified = await verifyHashUnique(hash, 'foobar');
+      expect(hashVerified).toBe(true);
+    });
+  });
 });
