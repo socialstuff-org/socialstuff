@@ -3,8 +3,8 @@ import bodyParser         from 'body-parser';
 import register           from './register';
 import login              from './login';
 import customEnv          from 'custom-env';
-import util               from 'util';
-import {sharedConnection} from './db-util';
+import util                                from 'util';
+import {rebuildDatabase, sharedConnection} from './db-util';
 
 const ENV = process.env.NODE_ENV || 'dev';
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
@@ -23,12 +23,8 @@ customEnv.env(ENV);
   }
 
   if (ENV === 'dev') {
-    const migrate = require('migrate');
     console.log('Setting up database...');
-    await util.promisify(migrate.load)({stateStore: '.migrate'})
-      .then(set => util.promisify(set.down.bind(set))()
-      .then(() => set))
-      .then(set => util.promisify(set.up.bind(set))());
+    await rebuildDatabase();
     console.log('Database ready for use!');
   }
 

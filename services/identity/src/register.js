@@ -2,11 +2,11 @@ import express                    from 'express';
 import {body}                     from 'express-validator';
 import {sharedConnection}         from './db-util';
 import {rejectOnValidationError}  from './express-util';
-import {generateToken}            from './token-helper';
-import {hashHmac, hashUnique}     from './security-helper';
+import {generateToken}                                        from './token-helper';
+import {hashHmac, hashUnique, passwordIssues, USERNAME_REGEX} from './security-helper';
 
 const middleware = [
-  body('username').isString().isLength({min: 2}).withMessage('The username should be at least 2 characters long!'),
+  body('username').isString().matches(USERNAME_REGEX).withMessage('Please pick a username containing regular characters (a-zA-Z), numbers, and \'_\' and \'.\', with a length between 5 and 20 characters!'),
   body('username').custom(async username => {
     if (!username) {
       return;
@@ -17,11 +17,17 @@ const middleware = [
       return Promise.reject('Username is already taken!');
     }
   }),
-  body('password').isString().matches(/.{10,}/).withMessage('Please choose a suitable password!'),
+  body('password').custom(async password => {
+    if (!password) {
+      return;
+    }
+    const issues = passwordIssues(password);
+    if (issues !== {}) {
+      return Promise.reject(issues);
+    }
+  }),
 
-  // TODO Add a maximum length?
-
-  body('public_key').isString().isLength({min: 128}),
+  body('public_key').isString().isLength({min: 128}), // TODO key verification
   rejectOnValidationError
 ];
 
@@ -37,8 +43,6 @@ async function register(req, res) {
   const token = await generateToken();
   const tokenHash = await hashHmac(Buffer.from(token, 'base64'));
   await db.beginTransaction();
-
-  // TODO fix container issues
 
   const sql = `
     SET @user_id := uuid();
