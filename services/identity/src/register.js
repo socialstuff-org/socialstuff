@@ -1,7 +1,7 @@
-import express                    from 'express';
-import {body}                     from 'express-validator';
-import {sharedConnection}         from './db-util';
-import {rejectOnValidationError}  from './express-util';
+import express                                                from 'express';
+import {body}                                                 from 'express-validator';
+import {sharedConnection}                                     from './db-util';
+import {rejectOnValidationError}                              from './express-util';
 import {generateToken}                                        from './token-helper';
 import {hashHmac, hashUnique, passwordIssues, USERNAME_REGEX} from './security-helper';
 
