@@ -3,3 +3,8 @@
 - test hashing logic
 - implement and test verification of public keys
 - two step registration with public key verification
+- appSecretBytes, encodeStringToBase64, decodeBase64ToString needs a test?
+- check async / await - correctness in encrypt-/decrypt function and also in tests
+- implement logout
+- think about token removal from DB and whitelisting
+- db-util.js: spacings in createConnection on purpose?
