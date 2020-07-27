@@ -8,44 +8,49 @@ export const USERNAME_REGEX = /[\w\d_.]{5,20}/.compile();
 
 const LOWER_WORD_CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const UPPER_WORD_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const NUMBER_CHARS = '1234567890';
+const NUMERIC_CHARS = '1234567890';
 const SPECIAL_CHARS = '!@#$%^&*()-_=+[]{};\'":,.<>/?`~€';
 export const REQUIRED_PASSWORD_LENGTH = {min: 10, max: 40};
 
 export function passwordIssues(password) {
   let hasLower = false;
   let hasUpper = false;
-  let hasNumber = false;
+  let hasNumeric = false;
   let hasSpecial = false;
+
   for (const c of password) {
     if (LOWER_WORD_CHARS.includes(c)) {
       hasLower = true;
     } else if (UPPER_WORD_CHARS.includes(c)) {
       hasUpper = true;
-    } else if (NUMBER_CHARS.includes(c)) {
-      hasNumber = true;
+    } else if (NUMERIC_CHARS.includes(c)) {
+      hasNumeric = true;
     } else if (SPECIAL_CHARS.includes(c)) {
       hasSpecial = true;
     }
   }
+
   const result = {};
+
   if (!hasSpecial) {
     result.special = 'Missing special character!';
   }
   if (!hasLower) {
-    result.lower = 'Missing lower case character!';
+    result.lower = 'Missing lowercase character!';
   }
   if (!hasUpper) {
-    result.upper = 'Missing upper case character!';
+    result.upper = 'Missing uppercase character!';
   }
-  if (!hasNumber) {
-    result.number = 'Missing number!';
+  if (!hasNumeric) {
+    result.numeric = 'Missing numeric character!';
   }
+
   if (password.length < REQUIRED_PASSWORD_LENGTH.min) {
-    result.length = 'Password is too short!';
+    result.short = 'Password is too short!';
   } else if (password.length > REQUIRED_PASSWORD_LENGTH.max) {
-    result.length = 'Password is too long!';
+    result.long = 'Password is too long!';
   }
+  
   return result;
 }
 
