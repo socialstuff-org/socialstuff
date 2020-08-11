@@ -12,7 +12,7 @@
     "camelcase": "warn",
     "comma-style": [
       "error",
-      "first"
+      "last"
     ],
     "constructor-super": "warn",
     "global-require": "warn",
@@ -20,12 +20,38 @@
       "error",
       2
     ],
-    "sort-imports": "warn",
+    "sort-imports": [
+      "error",
+      {
+        "ignoreCase": true,
+        "ignoreDeclarationSort": false,
+        "ignoreMemberSort": true,
+        "memberSyntaxSortOrder": [
+          "none",
+          "all",
+          "multiple",
+          "single"
+        ],
+        "allowSeparatedGroups": false
+      }
+    ],
     "valid-typeof": "warn",
-    "strict": ["error", "global"],
-    "eqeqeq": ["error", "always"],
-    "linebreak-style": ["error", "unix"],
+    "strict": [
+      "error",
+      "global"
+    ],
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
     "prefer-const": "error",
-    "max-nested-callbacks": ["warn", 3]
+    "max-nested-callbacks": [
+      "warn",
+      3
+    ]
   }
 }
