@@ -1,9 +1,8 @@
-import express                    from 'express';
-import {body}                     from 'express-validator';
-import {sharedConnection}         from './db-util';
-import {rejectOnValidationError}  from './express-util';
+import {USERNAME_REGEX, hashHmac, hashUnique, passwordIssues} from './security-helper';
+import {body}                                                 from 'express-validator';
 import {generateToken}                                        from './token-helper';
-import {hashHmac, hashUnique, passwordIssues, USERNAME_REGEX} from './security-helper';
+import {rejectOnValidationError}                              from './express-util';
+import {sharedConnection}                                     from './db-util';
 
 const middleware = [
   body('username').isString().matches(USERNAME_REGEX).withMessage('Please pick a username containing regular characters (a-zA-Z), numbers, and \'_\' and \'.\', with a length between 5 and 20 characters!'),
@@ -11,37 +10,38 @@ const middleware = [
     if (!username) {
       return;
     }
-    const db = await sharedConnection();
+    const db               = await sharedConnection();
     const [[{userExists}]] = await db.query('SELECT COUNT(*) as `userExists` FROM users WHERE username LIKE ?;', [username]);
     if (userExists) {
       return Promise.reject('Username is already taken!');
     }
   }),
-  body('password').custom(async password => {
+  body('password').isString().custom(async password => {
     if (!password) {
       return;
     }
     const issues = passwordIssues(password);
-    if (issues !== {}) {
+    if (Object.keys(issues).length) {
       return Promise.reject(issues);
     }
+    return Promise.resolve();
   }),
 
   body('public_key').isString().isLength({min: 128}), // TODO key verification
-  rejectOnValidationError
+  rejectOnValidationError,
 ];
 
 
 /**
  *
- * @param {express.Request} req
- * @param {express.Response} res
+ * @param {Request} req
+ * @param {Response} res
  */
 async function register(req, res) {
-  const db = await sharedConnection();
+  const db           = await sharedConnection();
   const passwordHash = await hashUnique(req.body.password);
-  const token = await generateToken();
-  const tokenHash = await hashHmac(Buffer.from(token, 'base64'));
+  const token        = await generateToken();
+  const tokenHash    = await hashHmac(Buffer.from(token, 'base64'));
   await db.beginTransaction();
 
   const sql = `
