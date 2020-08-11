@@ -3,6 +3,7 @@ import {body}                                                 from 'express-vali
 import {generateToken}                                        from './token-helper';
 import {rejectOnValidationError}                              from './express-util';
 import {sharedConnection}                                     from './db-util';
+import { v1 as v1uuid } from 'uuid';
 
 const middleware = [
   body('username').isString().matches(USERNAME_REGEX).withMessage('Please pick a username containing regular characters (a-zA-Z), numbers, and \'_\' and \'.\', with a length between 5 and 20 characters!'),
@@ -44,13 +45,12 @@ async function register(req, res) {
   const tokenHash    = await hashHmac(Buffer.from(token, 'base64'));
   await db.beginTransaction();
 
-  const sql = `
-    SET @user_id := uuid();
-    INSERT INTO users (id, username, password, public_key) VALUES (@user_id, ?, ?, ?);
-    INSERT INTO tokens (id_user, token, expires_at) VALUES (@user_id, ?, DATE_ADD(NOW(), INTERVAL 1 DAY));
-  `;
+  const id = v1uuid().replace(/-/g, '');
+  const addUserSql = 'INSERT INTO users (id, username, password, public_key) VALUES (unhex(?), ?, ?, ?);';
+  const addLoginTokenSql = 'INSERT INTO tokens (id_user, token, expires_at) VALUES (unhex(?), ?, DATE_ADD(NOW(), INTERVAL 1 DAY));';
   try {
-    await db.query(sql, [req.body.username, passwordHash, req.body.public_key, tokenHash]);
+    await db.query(addUserSql, [id, req.body.username, passwordHash, req.body.public_key]);
+    await db.query(addLoginTokenSql, [id, tokenHash]);
     await db.commit();
     res.status(201).json({data: {message: 'Registered successfully!', token}});
   } catch (e) {
