@@ -5,7 +5,7 @@ module.exports.up = async next => {
   await db.query(`CREATE TABLE tokens(
     token varchar(255) not null unique,
     expires_at date default null,
-    id_user char(64) not null,
+    id_user BINARY(16) not null,
     foreign key (id_user) references users(id)
   );`);
 };
