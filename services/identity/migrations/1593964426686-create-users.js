@@ -2,7 +2,7 @@ const { createConnection } = require('../lib/db-util');
 
 module.exports.up = async next => {
   const db = await createConnection();
-  await db.query(`CREATE TABLE users(
+  await db.query(`CREATE TABLE IF NOT EXISTS users(
     id BINARY(16) unique primary key,
     username varchar(64) unique not null,
     password text not null,
