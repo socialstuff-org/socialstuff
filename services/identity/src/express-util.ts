@@ -1,12 +1,8 @@
+import {NextFunction, Request, Response} from 'express';
+
 const {validationResult} = require('express-validator');
 
-/**
- * 
- * @param {Express.Request} req 
- * @param {import('express').Response} res 
- * @param {Function} next 
- */
-export function rejectOnValidationError(req, res, next) {
+export function rejectOnValidationError(req: Request, res: Response, next: NextFunction) {
   const errors = validationResult(req);
   if (errors.isEmpty()) {
     next();

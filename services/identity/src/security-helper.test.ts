@@ -28,8 +28,8 @@ describe('security-helper', () => {
   describe('decrypt', () => {
     test('properly decrypts encrypted data', async () => {
       const crypt = await encrypt('foobar');
-      const decrypt = await decrypt(crypt);
-      expect(decrypt).toBe('foobar');
+      const d = await decrypt(crypt);
+      expect(d).toBe('foobar');
     });
   });
 

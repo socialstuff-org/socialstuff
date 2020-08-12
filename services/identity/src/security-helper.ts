@@ -12,7 +12,7 @@ const NUMBER_CHARS = '1234567890';
 const SPECIAL_CHARS = '!@#$%^&*()-_=+[]{};\'":,.<>/?`~€';
 export const REQUIRED_PASSWORD_LENGTH = {min: 10, max: 40};
 
-export function passwordIssues(password) {
+export function passwordIssues(password: string) {
   let hasLower = false;
   let hasUpper = false;
   let hasNumber = false;
@@ -28,7 +28,7 @@ export function passwordIssues(password) {
       hasSpecial = true;
     }
   }
-  const result = {};
+  const result: { [key: string]: string } = {};
   if (!hasSpecial) {
     result.special = 'Missing special character!';
   }
@@ -50,20 +50,20 @@ export function passwordIssues(password) {
 }
 
 /** @var {Buffer} */
-let _appSecretBytes;
+let _appSecretBytes: Buffer;
 /** @var {(arg1: number) => Promise<Buffer>} randomBytes */
 export const randomBytes = util.promisify(crypto.randomBytes);
 
 export function appSecretBytes() {
   if (!_appSecretBytes) {
     const h = crypto.createHash('sha256');
-    h.update(process.env.APP_SECRET);
+    h.update(process.env.APP_SECRET as string);
     _appSecretBytes = h.digest();
   }
   return _appSecretBytes;
 }
 
-export function hashHmac(data) {
+export function hashHmac(data: any) {
   const hmac = crypto.createHmac('sha512', appSecretBytes());
   hmac.write(data);
   const hashPromise = new Promise(res => {
@@ -75,24 +75,20 @@ export function hashHmac(data) {
   return hashPromise;
 }
 
-export function verifyPublicKey(pk, signedData) {
-  const foo = crypto.createVerify('');
-}
-
-export async function encrypt(data) {
+export async function encrypt(data: any) {
   const iv = await randomBytes(16);
   const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, appSecretBytes(), iv);
-  const encrypted = [];
+  const encrypted: string[] = [];
   cipher.on('readable', () => {
     let chunk;
     while (null !== (chunk = cipher.read())) {
       encrypted.push(chunk.toString('hex'));
     }
   });
-  const encryptPromise = new Promise(res => {
+  const encryptPromise = new Promise<string>(res => {
     cipher.on('end', () => {
-      const cryptText = JSON.stringify({iv: encodeStringToBase64(iv), value: encrypted.join('')});
-      res(encodeStringToBase64(cryptText));
+      const cryptText = JSON.stringify({iv: iv.toString('base64'), value: encrypted.join('')});
+      res(base64encode(cryptText));
     });
   });
   cipher.write(data);
@@ -100,18 +96,18 @@ export async function encrypt(data) {
   return encryptPromise;
 }
 
-export function decrypt(data) {
-  const {iv, value} = JSON.parse(decodeBase64ToString(data));
+export function decrypt(data: string) {
+  const {iv, value} = JSON.parse(base64decode(data));
   const ivBuffer = Buffer.from(iv, 'base64');
   const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, appSecretBytes(), ivBuffer);
-  let decrypted = [];
+  let decrypted: string[] = [];
   decipher.on('readable', () => {
     let chunk;
     while (null !== (chunk = decipher.read())) {
       decrypted.push(chunk.toString('utf8'));
     }
   });
-  const decryptPromise = new Promise(res => {
+  const decryptPromise = new Promise<string>(res => {
     decipher.on('end', () => {
       res(decrypted.join(''));
     });
@@ -121,22 +117,22 @@ export function decrypt(data) {
   return decryptPromise;
 }
 
-export function encodeStringToBase64(data) {
+export function base64encode(data: string) {
   return Buffer.from(data, 'utf-8').toString('base64');
 }
 
-export function decodeBase64ToString(data) {
+export function base64decode(data: string) {
   return Buffer.from(data, 'base64').toString('utf-8');
 }
 
-export async function verifyHashUnique(h, plain) {
-  const {hash, salt} = JSON.parse(decodeBase64ToString(h));
+export async function verifyHashUnique(h: string, plain: string) {
+  const {hash, salt} = JSON.parse(base64decode(h));
   return argon.verify(hash, plain, {secret: appSecretBytes(), salt});
 }
 
-export async function hashUnique(data) {
+export async function hashUnique(data: any) {
   const salt = crypto.randomBytes(64);
   const hash = await argon.hash(data, {secret: appSecretBytes(), salt});
   const hashString = JSON.stringify({hash, salt});
-  return encodeStringToBase64(hashString);
+  return base64encode(hashString);
 }
