@@ -1,9 +1,8 @@
-import express                                  from 'express';
-import {body}                                   from 'express-validator';
-import {sharedConnection}                       from './db-util';
-import {rejectOnValidationError}                from './express-util';
-import {generateToken}                          from './token-helper';
-import {hashHmac, hashUnique, verifyHashUnique} from './security-helper';
+import {Request, Response}          from 'express';
+import {body}                       from 'express-validator';
+import {sharedConnection}           from './db-util';
+import {rejectOnValidationError}    from './express-util';
+import {hashHmac, verifyHashUnique} from './security-helper';
 
 const middleware = [
   body('username').isString().isLength({min: 5, max: 20}).withMessage('This is not a valid username.'),
@@ -11,12 +10,7 @@ const middleware = [
   rejectOnValidationError,
 ];
 
-/**
- *
- * @param {express.Request} req
- * @param {express.Response} res
- */
-async function login(req, res) {
+async function login(req: Request, res: Response) {
   const db = await sharedConnection();
 
   const sql = 'SELECT id,password as passwordHash FROM users WHERE username LIKE ?;';
@@ -35,7 +29,8 @@ async function login(req, res) {
     return;
   }
 
-  const token = generateToken();
+  const token = '';
+  // TODO generate uuid as token
   const addTokenSql = 'INSERT INTO tokens (value, id_user, expires_at) VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 DAY));';
   try {
     await db.query(addTokenSql, [hashHmac(token), id]);
@@ -47,4 +42,5 @@ async function login(req, res) {
   res.status(200).json({data: {token}});
 }
 
-export default [middleware, login];
+
+export default [...middleware, login];

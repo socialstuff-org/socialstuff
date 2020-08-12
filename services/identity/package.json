@@ -2,11 +2,11 @@
   "name": "@socialstuff/identity",
   "version": "0.1.0",
   "description": "The SocialStuff authentication service.",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "jest",
     "start": "node .",
-    "dev": "nodemon --exec babel-node src/ -- --unhandled-rejections=strict",
+    "dev": "nodemon --exec babel-node src/ --ext ts -- --extensions \".ts\" --unhandled-rejections=strict",
     "build": "babel src -d lib"
   },
   "author": "Jörn Neumeyer",
@@ -19,6 +19,7 @@
     "express-validator": "^6.6.0",
     "migrate": "^1.7.0",
     "mysql2": "^2.1.0",
+    "nodemailer": "^6.4.11",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
@@ -26,9 +27,12 @@
     "@babel/core": "^7.10.5",
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.10.4",
+    "@babel/preset-typescript": "^7.10.4",
     "@types/express": "^4.17.7",
-    "@types/jest": "^26.0.7",
+    "@types/jest": "^26.0.9",
+    "@types/mysql2": "github:types/mysql2",
     "@types/node": "^14.0.14",
+    "@types/nodemailer": "^6.4.0",
     "@types/uuid": "^8.0.1",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.1.0",
@@ -40,6 +44,7 @@
     "verbose": true,
     "setupFiles": [
       "./jest.init.js"
-    ]
+    ],
+    "testRegex": "\\.test\\.ts$"
   }
 }

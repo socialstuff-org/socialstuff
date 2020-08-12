@@ -1,10 +1,8 @@
-import util    from 'util';
-import mysql   from 'mysql2/promise';
-import migrate from 'migrate';
+import * as util  from 'util';
+import * as mysql from 'mysql2/promise';
+// @ts-ignore
+import migrate    from 'migrate';
 
-/**
- * @returns {Promise<mysql.PromiseConnection>}
- */
 export function createConnection() {
   return mysql.createConnection({
     host:     process.env.MYSQL_HOST,
@@ -14,12 +12,8 @@ export function createConnection() {
   });
 }
 
-let _sharedConnection;
+let _sharedConnection: Promise<mysql.Connection>|undefined;
 
-/**
- *
- * @returns {Promise<mysql.PromiseConnection>}
- */
 export function sharedConnection() {
   if (!_sharedConnection) {
     _sharedConnection = createConnection();
@@ -30,6 +24,8 @@ export function sharedConnection() {
 export async function rebuildDatabase() {
   await util
     .promisify(migrate.load.bind(migrate))({stateStore: '.migrate'})
+    // @ts-ignore
     .then(set => util.promisify(set.down.bind(set))().then(() => set))
+    // @ts-ignore
     .then(set => util.promisify(set.up.bind(set))());
 }
