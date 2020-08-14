@@ -1,4 +1,5 @@
 import {USERNAME_REGEX, hashUnique, passwordIssues} from './security-helper';
+import crypto                                       from 'crypto';
 import {body, ValidationChain}                      from 'express-validator';
 import {rejectOnValidationError}                    from './express-util';
 import {sharedConnection}                           from './db-util';
@@ -30,13 +31,20 @@ const middleware: ValidationChain[] = [
     }
     const issues = passwordIssues(password);
     if (Object.keys(issues).length) {
-      return Promise.reject(issues);
+      throw issues;
     }
-    return Promise.resolve();
   }),
   body('public_key')
     .isString()
-    .isLength({min: 128}), // TODO key verification
+    .custom(async pk => {
+      try {
+        crypto.createPublicKey(pk);
+        return;
+      } catch (e) {
+        console.error(e.message);
+        throw new Error('Invalid public key!');
+      }
+    }),
   rejectOnValidationError as any,
 ];
 
@@ -54,7 +62,9 @@ async function register(req: Request, res: Response) {
     await db.commit();
     const response = {data: {message: 'Registered successfully!'}};
     if (token) {
-      (response.data as any).token = token;
+      const key = crypto.createPublicKey(req.body.public_key);
+      const encryptedToken = crypto.publicEncrypt(key, Buffer.from(token, 'utf-8')).toString('base64');
+      (response.data as any).token = encryptedToken;
     }
     res.status(201).json(response);
   } catch (e) {
