@@ -12,10 +12,10 @@ An online password and document manager.
 An online contact book for secure storing of contact data.
 
 ## Notes
-An online not taking applicattion.
+An online note taking applicattion.
 
 ## Calendar
 An online calendar for appointment planning.
 
 ## Talk
-An online application to make calls to otther users.
+An online application to make calls to other users.
