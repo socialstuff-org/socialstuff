@@ -3,3 +3,4 @@
 - test hashing logic
 - implement and test verification of public keys
 - two step registration with public key verification
+- mfa authentication via temporary codes (via an authenticator app)
