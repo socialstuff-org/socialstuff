@@ -12,7 +12,7 @@ An online password and document manager.
 An online contact book for secure storing of contact data.
 
 ## Notes
-An online note taking applicattion.
+An online note taking application.
 
 ## Calendar
 An online calendar for appointment planning.
