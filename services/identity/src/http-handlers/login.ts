@@ -1,8 +1,8 @@
 import {Request, Response}          from 'express';
 import {body}                       from 'express-validator';
-import {sharedConnection}           from './db-util';
-import {rejectOnValidationError}    from './express-util';
-import {hashHmac, verifyHashUnique} from './security-helper';
+import {sharedConnection}           from '../utilities/mysql';
+import {rejectOnValidationError}    from '../utilities/express';
+import {hashHmac, verifyHashUnique} from '../utilities/security';
 
 const middleware = [
   body('username').isString().isLength({min: 5, max: 20}).withMessage('This is not a valid username.'),

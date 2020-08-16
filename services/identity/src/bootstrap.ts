@@ -1,5 +1,5 @@
 import customEnv                           from 'custom-env';
-import {createConnection, rebuildDatabase} from './db-util';
+import {createConnection, rebuildDatabase} from './utilities/mysql';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env(ENV);

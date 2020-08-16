@@ -1,13 +1,13 @@
-import {USERNAME_REGEX, hashUnique, passwordIssues} from './security-helper';
+import {USERNAME_REGEX, hashUnique, passwordIssues} from '../utilities/security';
 import crypto                                       from 'crypto';
 import {body, ValidationChain}                      from 'express-validator';
-import {rejectOnValidationError}                    from './express-util';
-import {sharedConnection}                           from './db-util';
+import {rejectOnValidationError}                    from '../utilities/express';
+import {sharedConnection}                           from '../utilities/mysql';
 import {v1 as v1uuid}                               from 'uuid';
 import {Request, Response}                          from 'express';
 import {RowDataPacket}                              from 'mysql2/promise';
-import {registrationChallenge}                      from './registration-challenge';
-import {registrationChallengeMode}                  from './constants';
+import {registrationChallenge}                      from '../utilities/registration-challenge';
+import {registrationChallengeMode}                  from '../constants';
 
 const middleware: ValidationChain[] = [
   body('username')

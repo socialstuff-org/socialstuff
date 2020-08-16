@@ -1,4 +1,4 @@
-import {decrypt, encrypt, hashUnique, passwordIssues, verifyHashUnique} from './security-helper';
+import {decrypt, encrypt, hashUnique, passwordIssues, verifyHashUnique} from './security';
 
 describe('security-helper', () => {
   describe('hashUnique', () => {

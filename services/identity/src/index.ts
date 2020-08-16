@@ -1,8 +1,8 @@
 import './bootstrap';
 import bodyParser from 'body-parser';
 import express    from 'express';
-import login      from './login';
-import register   from './register';
+import login      from './http-handlers/login';
+import register   from './http-handlers/register';
 import util       from 'util';
 
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
