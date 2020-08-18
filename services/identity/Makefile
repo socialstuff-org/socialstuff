@@ -9,6 +9,12 @@ down:
 stop:
 	$(COMPASE_DEV_COMMAND) stop
 
+login-web:
+	docker exec -ti socialstuff_identity_web_dev /bin/bash
+
+login-db:
+	docker exec -ti socialstuff_identity_mysql_dev mysql -u root -proot --database=socialstuff_identity_dev
+
 prod: base-image
 	docker-compose --project-directory docker/prod build
 
