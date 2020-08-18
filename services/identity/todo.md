@@ -4,3 +4,5 @@
 - implement and test verification of public keys
 - two step registration with public key verification
 - mfa authentication via temporary codes (via an authenticator app)
+- add registration restriction via invite
+- mfa authentication via security key
