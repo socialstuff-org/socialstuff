@@ -1,7 +1,7 @@
-import {registrationChallengeMode}   from '../constants';
-import {v1 as v1uuid}                from 'uuid';
 import nodemailer, {SendMailOptions} from 'nodemailer';
+import {registrationChallengeMode}   from '../constants';
 import {sharedConnection}            from './mysql';
+import {v1 as v1uuid}                from 'uuid';
 
 const transporter = nodemailer.createTransport({
   from:     'root@' + process.env.APP_HOSTNAME,
@@ -23,12 +23,13 @@ function sendMail(options: SendMailOptions) {
   });
 }
 
-export async function registrationChallenge(userInfo: { email: string, userId: string } | undefined) {
+export async function registrationConfirmationChallenge(userInfo: { email: string, userId: string } | undefined) {
   const token = v1uuid();
   switch (registrationChallengeMode) {
   case 'response':
     return token;
   case 'email':
+  {
     if (!userInfo) {
       throw new Error('Missing user info for email registration confirmation!');
     }
@@ -41,8 +42,9 @@ export async function registrationChallenge(userInfo: { email: string, userId: s
       html: `Please confirm your registration by visiting this link <a href="${link}">${link}</a>.`,
     };
     await db.query(addRegistrationConfirmationSql, [token, userInfo.userId]);
-    sendMail(mailOptions);
+    sendMail(mailOptions); // TODO fix no mail error
     return;
+  }
   }
   throw new Error(`Invalid challenge mode '${registrationChallengeMode}'!`);
 }
