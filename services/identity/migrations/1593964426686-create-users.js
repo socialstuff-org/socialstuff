@@ -7,7 +7,6 @@ module.exports.up = async next => {
     username varchar(64) unique not null,
     password text not null,
     public_key text not null,
-    expires_at date,
     mfa_seed varchar(64)
   );`);
 };
