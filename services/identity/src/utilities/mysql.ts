@@ -1,7 +1,7 @@
-import * as util  from 'util';
-import * as mysql from 'mysql2/promise';
+import * as mysql  from 'mysql2/promise';
 // @ts-ignore
-import migrate    from 'migrate';
+import migrate     from 'migrate';
+import {promisify} from 'util';
 
 export function createConnection() {
   return mysql.createConnection({
@@ -12,7 +12,7 @@ export function createConnection() {
   });
 }
 
-let _sharedConnection: Promise<mysql.Connection>|undefined;
+let _sharedConnection: Promise<mysql.Connection> | undefined;
 
 export function sharedConnection() {
   if (!_sharedConnection) {
@@ -22,10 +22,7 @@ export function sharedConnection() {
 }
 
 export async function rebuildDatabase() {
-  await util
-    .promisify(migrate.load.bind(migrate))({stateStore: '.migrate'})
-    // @ts-ignore
-    .then(set => util.promisify(set.down.bind(set))().then(() => set))
-    // @ts-ignore
-    .then(set => util.promisify(set.up.bind(set))());
+  const set = await promisify(migrate.load.bind(migrate))({stateStore: '.migrate'});
+  await promisify(set.down.bind(set))();
+  await promisify(set.up.bind(set))();
 }
