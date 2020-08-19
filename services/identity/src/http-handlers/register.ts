@@ -1,13 +1,17 @@
-import {USERNAME_REGEX, hashUnique, passwordIssues} from '../utilities/security';
-import crypto                                       from 'crypto';
+import {DataResponse}                               from '../types/data-response';
+import {RegisterResponseBody}                                from '../types/register-response-body';
+import {USERNAME_REGEX, hashUnique, passwordIssues, encrypt} from '../utilities/security';
+import crypto                                                from 'crypto';
 import {body, ValidationChain}                      from 'express-validator';
 import {rejectOnValidationError}                    from '../utilities/express';
 import {sharedConnection}                           from '../utilities/mysql';
 import {v1 as v1uuid}                               from 'uuid';
 import {Request, Response}                          from 'express';
 import {RowDataPacket}                              from 'mysql2/promise';
-import {registrationChallenge}                      from '../utilities/registration-challenge';
+import {registrationConfirmationChallenge}          from '../utilities/registration-confirmation-challenge';
 import {registrationChallengeMode}                  from '../constants';
+// import asn1                                         from 'asn1';
+import speakeasy                                    from 'speakeasy';
 
 const middleware: ValidationChain[] = [
   body('username')
@@ -36,13 +40,22 @@ const middleware: ValidationChain[] = [
   }),
   body('public_key')
     .isString()
-    .custom(async pk => {
+    .custom(async (pk: string | undefined) => {
+      if (!pk) {
+        return;
+      }
       try {
         crypto.createPublicKey(pk);
-        return;
       } catch (e) {
         console.error(e.message);
         throw new Error('Invalid public key!');
+      }
+      const base64key = pk.replace(/\n/g, '').replace(/-+[A-Z ]+-+/g, '');
+      const keyBuffer = Buffer.from(base64key, 'base64');
+      // TODO determine the actual key length via ASN.1
+      // https://crypto.stackexchange.com/questions/18031/how-to-find-modulus-from-a-rsa-public-key
+      if (keyBuffer.length < 256) {
+        throw new Error('Please generate an RSA key pair with a length of at least 2048 bits!');
       }
     }),
   rejectOnValidationError as any,
@@ -53,18 +66,27 @@ async function register(req: Request, res: Response) {
   const passwordHash = await hashUnique(req.body.password);
 
   const id = v1uuid().replace(/-/g, '');
-  const addUserSql = 'INSERT INTO users (id, username, password, public_key) VALUES (unhex(?), ?, ?, ?);';
+  const addUserSql = 'INSERT INTO users (id, username, password, public_key, mfa_seed) VALUES (unhex(?), ?, ?, ?, ?);';
+  const response: DataResponse<RegisterResponseBody> = {data: {message: 'Registered successfully!'}};
+  const addUserSqlParams = [id, req.body.username, passwordHash, req.body.public_key];
+  if (process.env.MFA === 'TOTP') {
+    const mfa = speakeasy.generateSecret({length: 64});
+    const encryptedSecret = await encrypt(mfa.base32);
+    addUserSqlParams.push(encryptedSecret);
+    response.data.mfa_seed = mfa.otpauth_url;
+  } else {
+    addUserSqlParams.push(null);
+  }
 
   await db.beginTransaction();
   try {
-    await db.query(addUserSql, [id, req.body.username, passwordHash, req.body.public_key]);
-    const token = await registrationChallenge({ userId: id, email: req.body.email });
+    await db.query(addUserSql, addUserSqlParams);
+    const token = await registrationConfirmationChallenge({userId: id, email: req.body.email});
     await db.commit();
-    const response = {data: {message: 'Registered successfully!'}};
     if (token) {
       const key = crypto.createPublicKey(req.body.public_key);
       const encryptedToken = crypto.publicEncrypt(key, Buffer.from(token, 'utf-8')).toString('base64');
-      (response.data as any).token = encryptedToken;
+      response.data.token = encryptedToken;
     }
     res.status(201).json(response);
   } catch (e) {
