@@ -21,12 +21,13 @@ import {body, ValidationChain}                               from 'express-valid
 import {rejectOnValidationError}                             from '../utilities/express';
 import {sharedConnection}                                    from '../utilities/mysql';
 import {v1 as v1uuid}                                        from 'uuid';
-import {Request, Response, Handler}                          from 'express';
+import {Request, Response}                                   from 'express';
 import {RowDataPacket}                                       from 'mysql2/promise';
-import {registrationConfirmationChallenge}                   from '../utilities/registration-confirmation-challenge';
+import {hasChallenge}                                        from '../utilities/registration-confirmation-challenge';
 import {registrationChallengeMode, registrationChallenges}   from '../constants';
 // import asn1                                         from 'asn1';
 import speakeasy                                             from 'speakeasy';
+import {ComposedHandler}                                     from '../types/composed-handler';
 
 const middleware: ValidationChain[] = [
   body('username')
@@ -73,34 +74,17 @@ const middleware: ValidationChain[] = [
         throw new Error('Please generate an RSA key pair with a length of at least 2048 bits!');
       }
     }),
-  body('invite')
-    .custom(async inviteCode => {
-      if (!process.env.REGISTRATION_CHALLENGES?.includes(registrationChallenges.invite)) {
-        return;
-      }
-      if (!inviteCode) {
-        throw new Error('Registrations are only allowed using invites!');
-      }
-      const db = await sharedConnection();
-      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM registration_invites WHERE expires_at < NOW();';
-      try {
-        const [row] = await db.query(checkInviteCodeSql) as RowDataPacket[][];
-        if (row.length === 0) {
-          throw new Error();
-        }
-      } catch (e) {
-        throw new Error('Please provide a valid invite code!');
-      }
-    }),
-  rejectOnValidationError as any,
 ];
+
+const addUserSql = 'INSERT INTO users (id, username, password, public_key, mfa_seed) VALUES (unhex(?), ?, ?, ?, ?);';
+const saveRegistrationConfirmationTokenSql = 'INSERT INTO registration_confirmations (expires_at, secret, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY), ?, unhex(?));';
+const removeUsedInviteCodeSql = 'DELETE FROM registration_invites WHERE secret = unhex(?);';
 
 async function register(req: Request, res: Response) {
   const db = await sharedConnection();
   const passwordHash = await hashUnique(req.body.password);
 
   const id = v1uuid().replace(/-/g, '');
-  const addUserSql = 'INSERT INTO users (id, username, password, public_key, mfa_seed) VALUES (unhex(?), ?, ?, ?, ?);';
   const response: DataResponse<RegisterResponseBody> = {data: {message: 'Registered successfully!'}};
   const addUserSqlParams = [id, req.body.username, passwordHash, req.body.public_key];
   if (process.env.MFA === 'TOTP') {
@@ -115,14 +99,19 @@ async function register(req: Request, res: Response) {
   await db.beginTransaction();
   try {
     await db.query(addUserSql, addUserSqlParams);
-    const token = await registrationConfirmationChallenge({userId: id, email: req.body.email});
-    await db.commit();
-    if (token) {
-      const key = crypto.createPublicKey(req.body.public_key);
-      const encryptedToken = crypto.publicEncrypt(key, Buffer.from(token, 'utf-8')).toString('base64');
+    const challengeToken = v1uuid().replace(/-/g, '');
+    const key = crypto.createPublicKey(req.body.public_key);
+    const encryptedToken = crypto.publicEncrypt(key, Buffer.from(challengeToken, 'utf-8')).toString('base64');
+    if (hasChallenge(registrationChallenges.email)) {
+      // TODO send registration email
+    } else {
       response.data.token = encryptedToken;
-      // TODO! save confirmation token in database!
     }
+    if (hasChallenge(registrationChallenges.invite)) {
+      await db.query(removeUsedInviteCodeSql, [req.body.invite]);
+    }
+    await db.query(saveRegistrationConfirmationTokenSql, [challengeToken, id]);
+    await db.commit();
     res.status(201).json(response);
   } catch (e) {
     await db.rollback();
@@ -130,11 +119,31 @@ async function register(req: Request, res: Response) {
   }
 }
 
-const final: (ValidationChain | Handler)[] = [];
+const final: ComposedHandler[] = [];
 if (registrationChallengeMode === 'email') {
   final.push(body('email').isEmail());
 }
 
-final.push(...middleware, register);
+if (hasChallenge(registrationChallenges.invite)) {
+  const checkInviteCode = body('invite')
+    .custom(async inviteCode => {
+      if (!inviteCode) {
+        throw new Error('Registrations are only allowed using invites!');
+      }
+      const db = await sharedConnection();
+      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM registration_invites WHERE expires_at < NOW();';
+      try {
+        const [[{validInvite}]] = await db.query(checkInviteCodeSql) as RowDataPacket[][];
+        if (validInvite === 0) {
+          throw new Error();
+        }
+      } catch (e) {
+        throw new Error('Please provide a valid invite code!');
+      }
+    });
+  final.push(checkInviteCode);
+}
+
+final.push(...middleware, rejectOnValidationError, register);
 
 export default final;
