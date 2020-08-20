@@ -1,7 +1,7 @@
-const { createConnection } = require('../lib/db-util');
+const { sharedConnection } = require('../lib/db-util');
 
 module.exports.up = async next => {
-  const db = await createConnection();
+  const db = await sharedConnection();
   // TODO add index for `token` column
   await db.query(`CREATE TABLE IF NOT EXISTS tokens(
     token binary(16) not null unique,
@@ -12,6 +12,6 @@ module.exports.up = async next => {
 };
 
 module.exports.down = async next => {
-  const db = await createConnection();
+  const db = await sharedConnection();
   await db.query('DROP TABLE IF EXISTS tokens CASCADE;');
 };
