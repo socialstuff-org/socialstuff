@@ -14,8 +14,9 @@
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
 import {Request, Response} from 'express';
+import {ValidationChain}   from 'express-validator';
 
-const middleware = [
+const middleware: ValidationChain[] = [
 
 ];
 
