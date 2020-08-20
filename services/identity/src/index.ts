@@ -1,4 +1,4 @@
-import './bootstrap';
+import bootstrap  from './bootstrap';
 import bodyParser from 'body-parser';
 import express    from 'express';
 import login      from './http-handlers/login';
@@ -9,6 +9,7 @@ const APP_PORT = parseInt(process.env.APP_PORT || '3000');
 const APP_HOST = process.env.APP_HOST || '0.0.0.0';
 
 (async () => {
+  await bootstrap;
   const app = express();
 
   app.use(bodyParser.json());
@@ -26,4 +27,3 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
   }
   console.log(`Social Stuff Identity service running on ${APP_HOST}:${APP_PORT}.`);
 })();
-
