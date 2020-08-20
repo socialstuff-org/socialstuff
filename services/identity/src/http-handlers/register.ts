@@ -9,7 +9,7 @@ import {v1 as v1uuid}                                        from 'uuid';
 import {Request, Response, Handler}                          from 'express';
 import {RowDataPacket}                                       from 'mysql2/promise';
 import {registrationConfirmationChallenge}                   from '../utilities/registration-confirmation-challenge';
-import {registrationChallengeMode}                           from '../constants';
+import {registrationChallengeMode, registrationChallenges}   from '../constants';
 // import asn1                                         from 'asn1';
 import speakeasy                                             from 'speakeasy';
 
@@ -58,6 +58,25 @@ const middleware: ValidationChain[] = [
         throw new Error('Please generate an RSA key pair with a length of at least 2048 bits!');
       }
     }),
+  body('invite')
+    .custom(async inviteCode => {
+      if (!process.env.REGISTRATION_CHALLENGES?.includes(registrationChallenges.invite)) {
+        return;
+      }
+      if (!inviteCode) {
+        throw new Error('Registrations are only allowed using invites!');
+      }
+      const db = await sharedConnection();
+      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM registration_invites WHERE expires_at < NOW();';
+      try {
+        const [row] = await db.query(checkInviteCodeSql) as RowDataPacket[][];
+        if (row.length === 0) {
+          throw new Error();
+        }
+      } catch (e) {
+        throw new Error('Please provide a valid invite code!');
+      }
+    }),
   rejectOnValidationError as any,
 ];
 
@@ -87,6 +106,7 @@ async function register(req: Request, res: Response) {
       const key = crypto.createPublicKey(req.body.public_key);
       const encryptedToken = crypto.publicEncrypt(key, Buffer.from(token, 'utf-8')).toString('base64');
       response.data.token = encryptedToken;
+      // TODO! save confirmation token in database!
     }
     res.status(201).json(response);
   } catch (e) {
