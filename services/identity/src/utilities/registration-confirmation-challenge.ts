@@ -38,6 +38,10 @@ function sendMail(options: SendMailOptions) {
   });
 }
 
+export function hasChallenge(challenge: string) {
+  return process.env.REGISTRATION_CHALLENGES?.includes(challenge);
+}
+
 export async function registrationConfirmationChallenge(userInfo: { email: string, userId: string } | undefined) {
   const token = v1uuid();
   switch (registrationChallengeMode) {
@@ -50,7 +54,7 @@ export async function registrationConfirmationChallenge(userInfo: { email: strin
     }
     const db = await sharedConnection();
     const addRegistrationConfirmationSql = 'INSERT INTO registration_confirmations(expires_at, secret, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY), ?, unhex(?));';
-    const link = `http://${process.env.APP_HOSTNAME}/verify/${token}`;
+    const link = `${process.env.APP_BASE_URL}/verify/${token}`;
     const mailOptions: nodemailer.SendMailOptions = {
       to:   userInfo.email,
       text: `Please confirm your registration by visiting this link ${link}`,
