@@ -1,17 +1,17 @@
-import {DataResponse}                               from '../types/data-response';
+import {DataResponse}                                        from '../types/data-response';
 import {RegisterResponseBody}                                from '../types/register-response-body';
 import {USERNAME_REGEX, hashUnique, passwordIssues, encrypt} from '../utilities/security';
 import crypto                                                from 'crypto';
-import {body, ValidationChain}                      from 'express-validator';
-import {rejectOnValidationError}                    from '../utilities/express';
-import {sharedConnection}                           from '../utilities/mysql';
-import {v1 as v1uuid}                               from 'uuid';
-import {Request, Response}                          from 'express';
-import {RowDataPacket}                              from 'mysql2/promise';
-import {registrationConfirmationChallenge}          from '../utilities/registration-confirmation-challenge';
-import {registrationChallengeMode}                  from '../constants';
+import {body, ValidationChain}                               from 'express-validator';
+import {rejectOnValidationError}                             from '../utilities/express';
+import {sharedConnection}                                    from '../utilities/mysql';
+import {v1 as v1uuid}                                        from 'uuid';
+import {Request, Response, Handler}                          from 'express';
+import {RowDataPacket}                                       from 'mysql2/promise';
+import {registrationConfirmationChallenge}                   from '../utilities/registration-confirmation-challenge';
+import {registrationChallengeMode}                           from '../constants';
 // import asn1                                         from 'asn1';
-import speakeasy                                    from 'speakeasy';
+import speakeasy                                             from 'speakeasy';
 
 const middleware: ValidationChain[] = [
   body('username')
@@ -95,7 +95,7 @@ async function register(req: Request, res: Response) {
   }
 }
 
-const final: ValidationChain[] = [];
+const final: (ValidationChain | Handler)[] = [];
 if (registrationChallengeMode === 'email') {
   final.push(body('email').isEmail());
 }
