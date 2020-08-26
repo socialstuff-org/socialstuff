@@ -48,6 +48,7 @@
     "setupFiles": [
       "./jest.init.js"
     ],
-    "testRegex": "\\.test\\.ts$"
+    "testRegex": "\\.test\\.ts$",
+    "collectCoverage": true
   }
 }
