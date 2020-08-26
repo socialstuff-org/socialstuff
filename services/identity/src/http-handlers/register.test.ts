@@ -8,27 +8,28 @@
 // SocialStuff Identity is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import mysql       from 'mysql2/promise';
-import {register}  from './register';
-import fs          from 'fs';
-import path        from 'path';
-import {FakeMysql} from '../utilities/test-mocks';
+import {sharedConnection} from '../utilities/mysql';
+import {register}         from './register';
+import fs                 from 'fs';
+import path               from 'path';
+import {FakeMysql}        from '../utilities/test-mocks';
 
-jest.mock('mysql2/promise');
+jest.mock('../utilities/mysql');
 
 describe('register', () => {
   const publicKey = fs.readFileSync(path.join(__dirname, '..', '..', 'rsa-example.public')).toString('utf8').replace(/\\n/g, '\n');
+
   function mockRequest(): any {
     return {
       body: {
-        username: 'SomeUsername',
-        password: 'StrongPassword123!',
-        public_key: publicKey
+        username:   'SomeUsername',
+        password:   'StrongPassword123!',
+        public_key: publicKey,
       },
     };
   }
@@ -36,7 +37,7 @@ describe('register', () => {
   function mockResponse(): any {
     const response = {
       __status: 200,
-      __body: undefined,
+      __body:   undefined,
       status(code: number) {
         response.__status = code;
         return response;
@@ -47,14 +48,15 @@ describe('register', () => {
       },
       end() {
         return response;
-      }
+      },
     };
     return response;
   }
 
   test('valid registration works', async () => {
     const dbMock = new FakeMysql([0, 0, 0]);
-    mysql.createConnection.mockResolvedValue(dbMock);
+    // @ts-ignore
+    sharedConnection.mockResolvedValue(dbMock);
     const req = mockRequest();
     const res = mockResponse();
     await register(req, res);
@@ -62,5 +64,6 @@ describe('register', () => {
     const registerResult = res.__body;
     expect(registerResult?.data?.message).not.toBeNull();
     expect(registerResult?.data?.token).not.toBeNull();
+    // TODO validate the data, which has been added to the database
   });
 });

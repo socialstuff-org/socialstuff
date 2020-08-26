@@ -8,16 +8,16 @@
 // SocialStuff Identity is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Request, Response} from 'express';
-import {ValidationChain}   from 'express-validator';
+import {Request, Response}     from 'express';
+import {body, ValidationChain} from 'express-validator';
 
 const middleware: ValidationChain[] = [
-
+  body('')
 ];
 
 function registerConfirm(req: Request, res: Response) {
