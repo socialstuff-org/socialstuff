@@ -2,4 +2,9 @@
 - test login endpoint
 - test hashing logic
 - implement and test verification of public keys
-- two step registration with public key verification
+- two-step registration with public key verification
+- mfa authentication via temporary codes (via an authenticator app)
+- add registration restriction via invite
+- mfa authentication via security key
+- opt-in for mfa during and after registration
+- generate and send mfa recovery codes
