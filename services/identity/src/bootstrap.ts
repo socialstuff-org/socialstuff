@@ -22,6 +22,10 @@ const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env(ENV);
 
 export default (async () => {
+  if (ENV === 'test') {
+    return;
+  }
+
   {
     let retryConnection = true;
     while (retryConnection) {
