@@ -14,6 +14,8 @@
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
 import {NextFunction, Request, Response} from 'express';
+import {RequestWithDependencies}         from '../types/request-with-dependencies';
+import {sharedConnection}                from './mysql';
 
 const {validationResult} = require('express-validator');
 
@@ -24,4 +26,9 @@ export function rejectOnValidationError(req: Request, res: Response, next: NextF
   } else {
     res.status(400).json({errors: errors.mapped()});
   }
+}
+
+export async function injectDatabaseConnectionIntoRequest(req: RequestWithDependencies, _: Response, next: NextFunction) {
+  req.dbHandle = await sharedConnection();
+  next();
 }

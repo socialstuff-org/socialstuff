@@ -1,4 +1,5 @@
-import {ValidationChain} from 'express-validator';
-import {Handler}         from 'express';
+import {ValidationChain}                from 'express-validator';
+import {RequestHandler}                 from 'express';
+import {RequestWithDependenciesHandler} from './request-with-dependencies';
 
-export type ComposedHandler = ValidationChain | ValidationChain[] | Handler;
+export type ComposedHandler = ValidationChain | ValidationChain[] | RequestHandler | RequestWithDependenciesHandler;

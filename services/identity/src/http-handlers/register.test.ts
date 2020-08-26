@@ -13,13 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {sharedConnection} from '../utilities/mysql';
 import {register}         from './register';
 import fs                 from 'fs';
 import path               from 'path';
 import {FakeMysql}        from '../utilities/test-mocks';
-
-jest.mock('../utilities/mysql');
 
 describe('register', () => {
   const publicKey = fs.readFileSync(path.join(__dirname, '..', '..', 'rsa-example.public')).toString('utf8').replace(/\\n/g, '\n');
@@ -55,10 +52,9 @@ describe('register', () => {
 
   test('valid registration works', async () => {
     const dbMock = new FakeMysql([0, 0, 0]);
-    // @ts-ignore
-    sharedConnection.mockResolvedValue(dbMock);
     const req = mockRequest();
     const res = mockResponse();
+    req.dbHandle = dbMock;
     await register(req, res);
     expect(res.__status).toBe(201);
     const registerResult = res.__body;

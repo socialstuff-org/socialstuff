@@ -13,20 +13,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {DataResponse}                                        from '../types/data-response';
-import {RegisterResponseBody}                                from '../types/register-response-body';
-import {USERNAME_REGEX, hashUnique, passwordIssues, encrypt} from '../utilities/security';
-import crypto                                                from 'crypto';
-import {body, ValidationChain}                               from 'express-validator';
-import {rejectOnValidationError}                             from '../utilities/express';
-import {sharedConnection}                                    from '../utilities/mysql';
-import {v1 as v1uuid}                      from 'uuid';
-import {Request, RequestHandler, Response} from 'express';
-import {RowDataPacket}                     from 'mysql2/promise';
-import {hasChallenge}                                        from '../utilities/registration-confirmation-challenge';
-import {registrationChallengeMode, registrationChallenges}   from '../constants';
+import {DataResponse}                                                 from '../types/data-response';
+import {RegisterResponseBody}                                         from '../types/register-response-body';
+import {USERNAME_REGEX, hashUnique, passwordIssues, encrypt}          from '../utilities/security';
+import crypto                                                         from 'crypto';
+import {body, ValidationChain}                                        from 'express-validator';
+import {injectDatabaseConnectionIntoRequest, rejectOnValidationError} from '../utilities/express';
+import {sharedConnection}                                             from '../utilities/mysql';
+import {v1 as v1uuid}                                                 from 'uuid';
+import {Response}                                                     from 'express';
+import {RowDataPacket}                                                from 'mysql2/promise';
+import {hasChallenge}                                                 from '../utilities/registration-confirmation-challenge';
+import {registrationChallengeMode, registrationChallenges}            from '../constants';
 // import asn1                                         from 'asn1';
-import speakeasy                                             from 'speakeasy';
+import speakeasy                                                      from 'speakeasy';
+import {ComposedHandler}                                              from '../types/composed-handler';
+import {RequestWithDependencies}                                      from '../types/request-with-dependencies';
 
 export const middleware: ValidationChain[] = [
   body('username')
@@ -79,8 +81,8 @@ const addUserSql = 'INSERT INTO users (id, username, password, public_key, mfa_s
 const saveRegistrationConfirmationTokenSql = 'INSERT INTO registration_confirmations (expires_at, secret, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY), ?, unhex(?));';
 const removeUsedInviteCodeSql = 'DELETE FROM registration_invites WHERE secret = unhex(?);';
 
-export async function register(req: Request, res: Response) {
-  const db = await sharedConnection();
+export async function register(req: RequestWithDependencies, res: Response) {
+  const db = req.dbHandle!;
   const passwordHash = await hashUnique(req.body.password);
 
   const id = v1uuid().replace(/-/g, '');
@@ -118,7 +120,7 @@ export async function register(req: Request, res: Response) {
   }
 }
 
-const final: (ValidationChain | RequestHandler)[] = [];
+const final: ComposedHandler[] = [];
 if (registrationChallengeMode === 'email') {
   final.push(body('email').isEmail());
 }
@@ -143,6 +145,6 @@ if (hasChallenge(registrationChallenges.invite)) {
   final.push(checkInviteCode);
 }
 
-final.push(...middleware, rejectOnValidationError, register);
+final.push(...middleware, rejectOnValidationError, injectDatabaseConnectionIntoRequest, register);
 
-export default final;
+export default final as any;
