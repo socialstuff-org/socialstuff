@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {DataResponse}                                                 from '../types/data-response';
 import {RegisterResponseBody}                                         from '../types/register-response-body';
 import {USERNAME_REGEX, hashUnique, passwordIssues, encrypt}          from '../utilities/security';
 import crypto                                                         from 'crypto';
@@ -29,6 +28,7 @@ import {registrationChallengeMode, registrationChallenges}            from '../c
 import speakeasy                                                      from 'speakeasy';
 import {ComposedHandler}                                              from '../types/composed-handler';
 import {RequestWithDependencies}                                      from '../types/request-with-dependencies';
+import {DataResponse}                                                 from '../types/responses';
 
 export const middleware: ValidationChain[] = [
   body('username')
