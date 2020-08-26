@@ -20,14 +20,13 @@ import crypto                                                from 'crypto';
 import {body, ValidationChain}                               from 'express-validator';
 import {rejectOnValidationError}                             from '../utilities/express';
 import {sharedConnection}                                    from '../utilities/mysql';
-import {v1 as v1uuid}                                        from 'uuid';
-import {Request, Response}                                   from 'express';
-import {RowDataPacket}                                       from 'mysql2/promise';
+import {v1 as v1uuid}                      from 'uuid';
+import {Request, RequestHandler, Response} from 'express';
+import {RowDataPacket}                     from 'mysql2/promise';
 import {hasChallenge}                                        from '../utilities/registration-confirmation-challenge';
 import {registrationChallengeMode, registrationChallenges}   from '../constants';
 // import asn1                                         from 'asn1';
 import speakeasy                                             from 'speakeasy';
-import {ComposedHandler}                                     from '../types/composed-handler';
 
 const middleware: ValidationChain[] = [
   body('username')
@@ -80,7 +79,7 @@ const addUserSql = 'INSERT INTO users (id, username, password, public_key, mfa_s
 const saveRegistrationConfirmationTokenSql = 'INSERT INTO registration_confirmations (expires_at, secret, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY), ?, unhex(?));';
 const removeUsedInviteCodeSql = 'DELETE FROM registration_invites WHERE secret = unhex(?);';
 
-async function register(req: Request, res: Response) {
+export async function register(req: Request, res: Response) {
   const db = await sharedConnection();
   const passwordHash = await hashUnique(req.body.password);
 
@@ -119,7 +118,7 @@ async function register(req: Request, res: Response) {
   }
 }
 
-const final: ComposedHandler[] = [];
+const final: (ValidationChain | RequestHandler)[] = [];
 if (registrationChallengeMode === 'email') {
   final.push(body('email').isEmail());
 }
