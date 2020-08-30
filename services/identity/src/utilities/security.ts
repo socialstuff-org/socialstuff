@@ -81,7 +81,7 @@ export function appSecretBytes() {
 export function hashHmac(data: any) {
   const hmac = crypto.createHmac('sha512', appSecretBytes());
   hmac.write(data);
-  const hashPromise = new Promise(res => {
+  const hashPromise = new Promise<string>(res => {
     hmac.on('readable', () => {
       res(hmac.read());
     });
