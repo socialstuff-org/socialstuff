@@ -13,35 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-export class FakeMysql {
-  #data: any[] = [];
-  #counter: number = 0;
+import {NextFunction, Request, Response} from 'express';
+import {Connection}                      from 'mysql2/promise';
+import {Dictionary}                      from './common';
 
-  get counter() {
-    return this.#counter;
-  }
-
-  constructor(data: any[]) {
-    this.setData(data);
-  }
-
-  query(_q: string, _params: any[]) {
-    return Promise.resolve(this.#data[this.#counter++]);
-  }
-
-  setData(data: any[]) {
-    this.#data = data;
-  }
-
-  beginTransaction() {
-    return Promise.resolve();
-  }
-
-  commit() {
-    return Promise.resolve();
-  }
-
-  rollback() {
-    return Promise.resolve();
-  }
+export interface RequestWithDependencies extends Request {
+  dbHandle?: Connection;
+  env?: Dictionary<string>;
 }
+
+export type RequestWithDependenciesHandler = (req: RequestWithDependencies, res: Response, next: NextFunction) => any;

@@ -8,13 +8,26 @@
 // SocialStuff Identity is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface RegisterResponseBody {
-  message: string;
-  token?: string;
-  mfa_seed?: string;
+import {Dictionary} from './common';
+
+export interface DataResponse<T> {
+  data: T;
 }
+
+export interface ErrorResponseField {
+  value?: string;
+  msg: string;
+  param: string;
+  location: string;
+}
+
+export interface ErrorResponse {
+  errors: Dictionary<ErrorResponseField>;
+}
+
+

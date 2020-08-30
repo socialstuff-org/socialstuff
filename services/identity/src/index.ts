@@ -8,17 +8,19 @@
 // SocialStuff Identity is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import bootstrap  from './bootstrap';
-import bodyParser from 'body-parser';
-import express    from 'express';
-import login      from './http-handlers/login';
-import register   from './http-handlers/register';
-import util       from 'util';
+import bodyParser                            from 'body-parser';
+import bootstrap                             from './bootstrap';
+import express                               from 'express';
+import {injectProcessEnvironmentIntoRequest} from './utilities/express';
+import login                                 from './http-handlers/login';
+import register                              from './http-handlers/register';
+import registerConfirm                       from './http-handlers/register-confirm';
+import util                                  from 'util';
 
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
 const APP_HOST = process.env.APP_HOST || '0.0.0.0';
@@ -29,7 +31,9 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
+  app.use(injectProcessEnvironmentIntoRequest);
 
+  app.post('/register/confirm', registerConfirm);
   app.post('/register', register);
   app.post('/login', login);
 
