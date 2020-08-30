@@ -19,6 +19,7 @@ import express                               from 'express';
 import {injectProcessEnvironmentIntoRequest} from './utilities/express';
 import login                                 from './http-handlers/login';
 import register                              from './http-handlers/register';
+import registerConfirm                       from './http-handlers/register-confirm';
 import util                                  from 'util';
 
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
@@ -32,6 +33,7 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(injectProcessEnvironmentIntoRequest);
 
+  app.post('/register/confirm', registerConfirm);
   app.post('/register', register);
   app.post('/login', login);
 
