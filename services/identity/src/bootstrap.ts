@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
+/* istanbul ignore file */
+
 // @ts-ignore
 import customEnv                                             from 'custom-env';
 import {createConnection, rebuildDatabase, sharedConnection} from './utilities/mysql';
