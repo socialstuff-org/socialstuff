@@ -88,7 +88,7 @@ export async function register(req: RequestWithDependencies, res: Response) {
   const id = v1uuid().replace(/-/g, '');
   const response: DataResponse<RegisterResponseBody> = {data: {message: 'Registered successfully!'}};
   const addUserSqlParams = [id, req.body.username, passwordHash, req.body.public_key];
-  if (process.env.MFA === 'TOTP') {
+  if (req.env?.MFA === 'TOTP') {
     const mfa = speakeasy.generateSecret({length: 64});
     const encryptedSecret = await encrypt(mfa.base32);
     addUserSqlParams.push(encryptedSecret);
