@@ -83,7 +83,10 @@ export function hashHmac(data: any) {
   hmac.write(data);
   const hashPromise = new Promise<string>(res => {
     hmac.on('readable', () => {
-      res(hmac.read());
+      const data = hmac.read();
+      if (data) {
+        res(data);
+      }
     });
   });
   hmac.end();
@@ -115,7 +118,7 @@ export function decrypt(data: string) {
   const {iv, value} = JSON.parse(base64decode(data));
   const ivBuffer = Buffer.from(iv, 'base64');
   const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, appSecretBytes(), ivBuffer);
-  let decrypted: string[] = [];
+  const decrypted: string[] = [];
   decipher.on('readable', () => {
     let chunk;
     while (null !== (chunk = decipher.read())) {
