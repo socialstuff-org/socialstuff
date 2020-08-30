@@ -19,6 +19,15 @@ export interface DataResponse<T> {
   data: T;
 }
 
-export interface ErrorResponse {
-  errors: Dictionary<any>;
+export interface ErrorResponseField {
+  value?: string;
+  msg: string;
+  param: string;
+  location: string;
 }
+
+export interface ErrorResponse {
+  errors: Dictionary<ErrorResponseField>;
+}
+
+
