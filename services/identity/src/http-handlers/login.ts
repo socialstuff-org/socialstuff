@@ -19,6 +19,8 @@ import {sharedConnection}           from '../utilities/mysql';
 import {rejectOnValidationError}    from '../utilities/express';
 import {hashHmac, verifyHashUnique} from '../utilities/security';
 import {RowDataPacket}              from 'mysql2/promise';
+import { v1 } from 'uuid';
+import { DataResponse } from '../types/responses';
 
 const middleware = [
   body('username').isString().isLength({min: 5, max: 20}).withMessage('This is not a valid username.'),
@@ -29,7 +31,7 @@ const middleware = [
 async function login(req: Request, res: Response) {
   const db = await sharedConnection();
 
-  const sql = 'SELECT id,password as passwordHash FROM users WHERE username LIKE ?;';
+  const sql = 'SELECT id,password FROM users WHERE username LIKE ? AND can_login=1;';
 
   const [userRow] = await db.query(sql, [req.body.username]) as RowDataPacket[][];
 
@@ -37,25 +39,23 @@ async function login(req: Request, res: Response) {
     res.status(400).json({errors: [{message: 'Invalid credentials!'}]}).end();
     return;
   }
-  const [{id, passwordHash}] = userRow;
+  const [{id, password}] = userRow;
 
-  const passwordsMatch = await verifyHashUnique(passwordHash, req.body.password);
+  const passwordsMatch = await verifyHashUnique(password, req.body.password);
   if (!passwordsMatch) {
     res.status(400).json({errors: [{message: 'Invalid credentials!'}]}).end();
     return;
   }
 
-  const token = '';
-  // TODO generate uuid as token
+  const token = v1().replace(/-/g, '');
   const addTokenSql = 'INSERT INTO tokens (token, id_user, expires_at) VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 DAY));';
   try {
-    await db.query(addTokenSql, [hashHmac(token), id]);
+    await db.query(addTokenSql, [await hashHmac(token), id]);
+    const response: DataResponse<{token: string}> = { data: { token } };
+    res.status(201).json(response).end();
   } catch (e) {
     res.status(500).json({errors: [{message: 'Internal login error!'}]}).end();
-    return;
   }
-
-  res.status(200).json({data: {token}});
 }
 
 
