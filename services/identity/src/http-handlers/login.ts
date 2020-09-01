@@ -50,7 +50,7 @@ async function login(req: Request, res: Response) {
   const token = v1().replace(/-/g, '');
   const addTokenSql = 'INSERT INTO tokens (token, id_user, expires_at) VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 DAY));';
   try {
-    await db.query(addTokenSql, [await hashHmac(token), id]);
+    await db.query(addTokenSql, [hashHmac(token), id]);
     const response: DataResponse<{token: string}> = { data: { token } };
     res.status(201).json(response).end();
   } catch (e) {

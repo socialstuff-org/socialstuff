@@ -33,17 +33,17 @@ describe('security-helper', () => {
   });
 
   describe('encrypt', () => {
-    test('same data results in different crypt texts', async () => {
-      const crypt1 = await encrypt('foobar');
-      const crypt2 = await encrypt('foobar');
+    test('same data results in different crypt texts', () => {
+      const crypt1 = encrypt('foobar');
+      const crypt2 = encrypt('foobar');
       expect(crypt1).not.toBe(crypt2);
     });
   });
 
   describe('decrypt', () => {
-    test('properly decrypts encrypted data', async () => {
-      const crypt = await encrypt('foobar');
-      const d = await decrypt(crypt);
+    test('properly decrypts encrypted data', () => {
+      const crypt = encrypt('foobar');
+      const d = decrypt(crypt).toString('utf8');
       expect(d).toBe('foobar');
     });
   });

@@ -15,7 +15,6 @@
 
 import crypto from 'crypto';
 import argon  from 'argon2';
-import util   from 'util';
 
 const ENCRYPTION_ALGORITHM = 'aes-256-cbc';
 
@@ -66,8 +65,6 @@ export function passwordIssues(password: string) {
 
 /** @var {Buffer} */
 let _appSecretBytes: Buffer;
-/** @var {(arg1: number) => Promise<Buffer>} randomBytes */
-export const randomBytes = util.promisify(crypto.randomBytes);
 
 export function appSecretBytes() {
   if (!_appSecretBytes) {
@@ -78,61 +75,28 @@ export function appSecretBytes() {
   return _appSecretBytes;
 }
 
-export function hashHmac(data: any) {
+export function hashHmac(data: crypto.BinaryLike) {
   const hmac = crypto.createHmac('sha512', appSecretBytes());
-  hmac.write(data);
-  const hashPromise = new Promise<string>(res => {
-    hmac.on('readable', () => {
-      const data = hmac.read();
-      if (data) {
-        res(data);
-      }
-    });
-  });
-  hmac.end();
-  return hashPromise;
+  return hmac.update(data).digest('hex');
 }
 
-export async function encrypt(data: any) {
-  const iv = await randomBytes(16);
+export function encrypt(data: Buffer | string) {
+  if (!(data instanceof Buffer)) {
+    data = Buffer.from(data, 'utf8');
+  }
+  const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, appSecretBytes(), iv);
-  const encrypted: string[] = [];
-  cipher.on('readable', () => {
-    let chunk;
-    while (null !== (chunk = cipher.read())) {
-      encrypted.push(chunk.toString('hex'));
-    }
-  });
-  const encryptPromise = new Promise<string>(res => {
-    cipher.on('end', () => {
-      const cryptText = JSON.stringify({iv: iv.toString('base64'), value: encrypted.join('')});
-      res(base64encode(cryptText));
-    });
-  });
-  cipher.write(data);
-  cipher.end();
-  return encryptPromise;
+  const encrypted = cipher.update(data, undefined, 'base64') + cipher.final('base64');
+  const cryptText = JSON.stringify({iv: iv.toString('base64'), value: encrypted});
+  return base64encode(cryptText);
 }
 
 export function decrypt(data: string) {
   const {iv, value} = JSON.parse(base64decode(data));
   const ivBuffer = Buffer.from(iv, 'base64');
   const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, appSecretBytes(), ivBuffer);
-  const decrypted: string[] = [];
-  decipher.on('readable', () => {
-    let chunk;
-    while (null !== (chunk = decipher.read())) {
-      decrypted.push(chunk.toString('utf8'));
-    }
-  });
-  const decryptPromise = new Promise<string>(res => {
-    decipher.on('end', () => {
-      res(decrypted.join(''));
-    });
-  });
-  decipher.write(value, 'hex');
-  decipher.end();
-  return decryptPromise;
+  const encrypted = Buffer.from(value, 'base64');
+  return Buffer.concat([decipher.update(encrypted), decipher.final()]);
 }
 
 export function base64encode(data: string) {
@@ -143,7 +107,7 @@ export function base64decode(data: string) {
   return Buffer.from(data, 'base64').toString('utf-8');
 }
 
-export async function verifyHashUnique(h: string, plain: string) {
+export function verifyHashUnique(h: string, plain: string) {
   const {hash, salt} = JSON.parse(base64decode(h));
   return argon.verify(hash, plain, {secret: appSecretBytes(), salt});
 }
