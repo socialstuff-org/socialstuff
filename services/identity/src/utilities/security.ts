@@ -69,7 +69,10 @@ let _appSecretBytes: Buffer;
 export function appSecretBytes() {
   if (!_appSecretBytes) {
     const h = crypto.createHash('sha256');
-    h.update(process.env.APP_SECRET as string);
+    if (!process.env.APP_SECRET) {
+      throw new Error('Missing APP_SECRET environment variable!');
+    }
+    h.update(process.env.APP_SECRET);
     _appSecretBytes = h.digest();
   }
   return _appSecretBytes;
@@ -80,21 +83,21 @@ export function hashHmac(data: crypto.BinaryLike) {
   return hmac.update(data).digest('hex');
 }
 
-export function encrypt(data: Buffer | string) {
+export function encrypt(data: Buffer | string, key: Buffer = appSecretBytes()) {
   if (!(data instanceof Buffer)) {
     data = Buffer.from(data, 'utf8');
   }
   const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, appSecretBytes(), iv);
+  const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, iv);
   const encrypted = cipher.update(data, undefined, 'base64') + cipher.final('base64');
   const cryptText = JSON.stringify({iv: iv.toString('base64'), value: encrypted});
   return base64encode(cryptText);
 }
 
-export function decrypt(data: string) {
+export function decrypt(data: string, key: Buffer = appSecretBytes()) {
   const {iv, value} = JSON.parse(base64decode(data));
   const ivBuffer = Buffer.from(iv, 'base64');
-  const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, appSecretBytes(), ivBuffer);
+  const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, ivBuffer);
   const encrypted = Buffer.from(value, 'base64');
   return Buffer.concat([decipher.update(encrypted), decipher.final()]);
 }
