@@ -52,7 +52,7 @@ export default (async () => {
   }
 
   const publicKey = (await fs.promises.readFile(__dirname + '/../rsa-example.public')).toString('utf-8');
-  const password = 'foobar';
+  const password = 'foobarfoobar';
   const username = 'johndoe';
 
   console.log('Setting up database...');

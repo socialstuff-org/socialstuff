@@ -90,7 +90,7 @@ export async function register(req: RequestWithDependencies, res: Response) {
   const addUserSqlParams = [id, req.body.username, passwordHash, req.body.public_key];
   if (req.env?.MFA === 'TOTP') {
     const mfa = speakeasy.generateSecret({length: 64});
-    const encryptedSecret = await encrypt(mfa.base32);
+    const encryptedSecret = encrypt(mfa.base32);
     addUserSqlParams.push(encryptedSecret);
     response.data.mfa_seed = mfa.otpauth_url;
   } else {
@@ -111,7 +111,7 @@ export async function register(req: RequestWithDependencies, res: Response) {
     if (hasChallenge(registrationChallenges.invite)) {
       await db.query(removeUsedInviteCodeSql, [req.body.invite]);
     }
-    await db.query(saveRegistrationConfirmationTokenSql, [await hashHmac(challengeToken), id]);
+    await db.query(saveRegistrationConfirmationTokenSql, [hashHmac(challengeToken), id]);
     await db.commit();
     res.status(201).json(response);
   } catch (e) {

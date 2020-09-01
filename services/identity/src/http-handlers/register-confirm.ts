@@ -14,7 +14,7 @@
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
 import {Response}                                                     from 'express';
-import {body, ValidationChain}                                        from 'express-validator';
+import {body}                                                         from 'express-validator';
 import {ComposedHandler}                                              from '../types/composed-handler';
 import {RequestWithDependencies}                                      from '../types/request-with-dependencies';
 import {DataResponse}                                                 from '../types/responses';
@@ -33,7 +33,7 @@ const middleware: ComposedHandler[] = [
       return;
     }
     const db = await sharedConnection();
-    const tokenHash = await hashHmac(token);
+    const tokenHash = hashHmac(token);
     const [row] = await db.query<RowDataPacket[]>(findTokenSql, [tokenHash]);
     if (row.length === 0) {
       throw new Error('Please provide a valid confirmation token!');
@@ -45,7 +45,7 @@ const middleware: ComposedHandler[] = [
 
 async function registerConfirm(req: RequestWithDependencies, res: Response) {
   const db = req.dbHandle!;
-  const tokenHash = await hashHmac(req.body.token);
+  const tokenHash = hashHmac(req.body.token);
   const [[{userId}]] = await db.query(findTokenSql, [tokenHash]) as RowDataPacket[][];
   await db.beginTransaction();
   console.log(userId);

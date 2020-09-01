@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {decrypt, encrypt, hashUnique, passwordIssues, verifyHashUnique} from './security';
+import {decrypt, encrypt, hashHmac, hashUnique, passwordIssues, verifyHashUnique} from './security';
 
 describe('security-helper', () => {
   describe('hashUnique', () => {
@@ -33,17 +33,17 @@ describe('security-helper', () => {
   });
 
   describe('encrypt', () => {
-    test('same data results in different crypt texts', async () => {
-      const crypt1 = await encrypt('foobar');
-      const crypt2 = await encrypt('foobar');
+    test('same data results in different crypt texts', () => {
+      const crypt1 = encrypt('foobar');
+      const crypt2 = encrypt('foobar');
       expect(crypt1).not.toBe(crypt2);
     });
   });
 
   describe('decrypt', () => {
-    test('properly decrypts encrypted data', async () => {
-      const crypt = await encrypt('foobar');
-      const d = await decrypt(crypt);
+    test('properly decrypts encrypted data', () => {
+      const crypt = encrypt('foobar');
+      const d = decrypt(crypt).toString('utf8');
       expect(d).toBe('foobar');
     });
   });
@@ -81,6 +81,18 @@ describe('security-helper', () => {
     test('complains about missing special', () => {
       const issues = passwordIssues('HHHHHHHHHHa12');
       expect(Object.keys(issues)).toEqual(['special']);
+    });
+  });
+
+  describe('hashHmac', () => {
+    test('the same value results in the same hash', async () => {
+      const value = 'Hello, World!';
+      const hash1 = await hashHmac(value);
+      const hash2 = await hashHmac(value);
+      expect(hash1).not.toBeNull();
+      expect(hash1).not.toBeUndefined();
+      expect(typeof hash1).toBe('string');
+      expect(hash1).toBe(hash2);
     });
   });
 });
