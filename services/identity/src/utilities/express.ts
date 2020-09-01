@@ -14,10 +14,12 @@
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
 import {NextFunction, Request, Response} from 'express';
+import {castTo}                          from './types';
+import {Dictionary}                      from '../types/common';
 import {RequestWithDependencies}         from '../types/request-with-dependencies';
 import {sharedConnection}                from './mysql';
+import {validationResult}                from 'express-validator';
 
-const {validationResult} = require('express-validator');
 
 export function rejectOnValidationError(req: Request, res: Response, next: NextFunction) {
   const errors = validationResult(req);
@@ -30,5 +32,10 @@ export function rejectOnValidationError(req: Request, res: Response, next: NextF
 
 export async function injectDatabaseConnectionIntoRequest(req: RequestWithDependencies, _: Response, next: NextFunction) {
   req.dbHandle = await sharedConnection();
+  next();
+}
+
+export function injectProcessEnvironmentIntoRequest(req: RequestWithDependencies, _: Response, next: NextFunction) {
+  req.env = castTo<Dictionary<string>>(process.env);
   next();
 }

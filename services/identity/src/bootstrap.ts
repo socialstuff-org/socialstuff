@@ -13,10 +13,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
+/* istanbul ignore file */
+
+import {createConnection, rebuildDatabase, sharedConnection} from './utilities/mysql';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
-import {createConnection, rebuildDatabase, sharedConnection} from './utilities/mysql';
+import {delay}                                               from './utilities/common';
+import fs                                                    from 'fs';
+import {hashHmac, hashUnique}                                from './utilities/security';
 import {v1}                                                  from 'uuid';
+import {OkPacket}                                            from 'mysql2/promise';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env(ENV);
@@ -34,9 +40,7 @@ export default (async () => {
         retryConnection = false;
       } catch (e) {
         console.error('retrying initial connection...', e);
-        await new Promise(res => {
-          setTimeout(res, 1000);
-        });
+        await delay(1000);
       }
     }
   }
@@ -47,11 +51,24 @@ export default (async () => {
     return;
   }
 
+  const publicKey = (await fs.promises.readFile(__dirname + '/../rsa-example.public')).toString('utf-8');
+  const password = 'foobarfoobar';
+  const username = 'johndoe';
+
   console.log('Setting up database...');
   await rebuildDatabase();
   console.log('Database ready for use!');
   console.log('seeding some data...');
   const id = v1().replace(/-/g, '');
-  await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [id]);
-  console.log('sample invite code:', id);
+  const token = await hashHmac(id);
+  await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
+  console.log('sample invite code:      ', id);
+  const addUserSql = 'INSERT INTO users (id,username,password,public_key) VALUES (unhex(?),?,?,?);';
+  const userID = v1().replace(/-/g, '');
+  await db.query<OkPacket>(addUserSql, [userID,username, await hashUnique(password), publicKey]);
+  const secret = v1().replace(/-/g, '');
+  const secretHash = await hashHmac(secret);
+  const addUSerRegistrationConfirmation = 'INSERT INTO registration_confirmations (expires_at, secret_hash, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY),?,unhex(?));';
+  await db.query(addUSerRegistrationConfirmation, [secretHash, userID]);
+  console.log('sample registration code:', secret);
 })();

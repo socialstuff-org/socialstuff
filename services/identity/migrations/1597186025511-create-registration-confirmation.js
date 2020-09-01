@@ -19,7 +19,7 @@ module.exports.up = async next => {
   const db = await sharedConnection();
   await db.query(`CREATE TABLE IF NOT EXISTS registration_confirmations(
     expires_at date not null,
-    secret varchar(50) not null,
+    secret_hash char(128) not null,
     id_user BINARY(16) not null,
     foreign key (id_user) references users(id)
   );`);
