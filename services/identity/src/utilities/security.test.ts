@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {decrypt, encrypt, hashUnique, passwordIssues, verifyHashUnique} from './security';
+import {decrypt, encrypt, hashHmac, hashUnique, passwordIssues, verifyHashUnique} from './security';
 
 describe('security-helper', () => {
   describe('hashUnique', () => {
@@ -81,6 +81,18 @@ describe('security-helper', () => {
     test('complains about missing special', () => {
       const issues = passwordIssues('HHHHHHHHHHa12');
       expect(Object.keys(issues)).toEqual(['special']);
+    });
+  });
+
+  describe('hashHmac', () => {
+    test('the same value results in the same hash', async () => {
+      const value = 'Hello, World!';
+      const hash1 = await hashHmac(value);
+      const hash2 = await hashHmac(value);
+      expect(hash1).not.toBeNull();
+      expect(hash1).not.toBeUndefined();
+      expect(typeof hash1).toBe('string');
+      expect(hash1).toBe(hash2);
     });
   });
 });
