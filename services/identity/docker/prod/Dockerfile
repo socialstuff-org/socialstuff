@@ -1,7 +1,7 @@
 FROM socialstuff-identity:base
 RUN mkdir /app
 WORKDIR /app
-COPY ../.. .
+COPY . .
 RUN npm i
 RUN npm run build
 RUN npm prune --production
