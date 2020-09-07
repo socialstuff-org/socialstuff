@@ -15,12 +15,12 @@
 
 import {Request, Response}          from 'express';
 import {body}                       from 'express-validator';
-import {sharedConnection}           from '../utilities/mysql';
-import {rejectOnValidationError}    from '../utilities/express';
-import {hashHmac, verifyHashUnique} from '../utilities/security';
+import {sharedConnection}           from 'utilities/mysql';
+import {rejectOnValidationError}    from 'utilities/express';
+import {hashHmac, verifyHashUnique} from 'utilities/security';
 import {RowDataPacket}              from 'mysql2/promise';
-import { v1 } from 'uuid';
-import { DataResponse } from '../types/responses';
+import {v1}                         from 'uuid';
+import {DataResponse}               from 'types/responses';
 
 const middleware = [
   body('username').isString().isLength({min: 5, max: 20}).withMessage('This is not a valid username.'),
@@ -51,7 +51,7 @@ async function login(req: Request, res: Response) {
   const addTokenSql = 'INSERT INTO tokens (token, id_user, expires_at) VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 DAY));';
   try {
     await db.query(addTokenSql, [hashHmac(token), id]);
-    const response: DataResponse<{token: string}> = { data: { token } };
+    const response: DataResponse<{ token: string }> = {data: {token}};
     res.status(201).json(response).end();
   } catch (e) {
     res.status(500).json({errors: [{message: 'Internal login error!'}]}).end();

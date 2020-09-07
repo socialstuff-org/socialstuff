@@ -13,22 +13,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {RegisterResponseBody}                                          from '../types/response-bodies';
-import {USERNAME_REGEX, hashUnique, passwordIssues, encrypt, hashHmac} from '../utilities/security';
+import {RegisterResponseBody}                                          from 'types/response-bodies';
+import {USERNAME_REGEX, hashUnique, passwordIssues, encrypt, hashHmac} from 'utilities/security';
 import crypto                                                          from 'crypto';
 import {body, ValidationChain}                                         from 'express-validator';
-import {injectDatabaseConnectionIntoRequest, rejectOnValidationError}  from '../utilities/express';
-import {sharedConnection}                                              from '../utilities/mysql';
+import {injectDatabaseConnectionIntoRequest, rejectOnValidationError}  from 'utilities/express';
+import {sharedConnection}                                              from 'utilities/mysql';
 import {v1 as v1uuid}                                                  from 'uuid';
 import {Response}                                                      from 'express';
 import {RowDataPacket}                                                 from 'mysql2/promise';
-import {hasChallenge}                                                  from '../utilities/registration-confirmation-challenge';
+import {hasChallenge}                                                  from 'utilities/registration-confirmation-challenge';
 import {registrationChallengeMode, registrationChallenges}             from '../constants';
 // import asn1                                         from 'asn1';
 import speakeasy                                                       from 'speakeasy';
-import {ComposedHandler}                                               from '../types/composed-handler';
-import {RequestWithDependencies}                                       from '../types/request-with-dependencies';
-import {DataResponse}                                                  from '../types/responses';
+import {ComposedHandler}                                               from 'types/composed-handler';
+import {RequestWithDependencies}                                       from 'types/request-with-dependencies';
+import {DataResponse}                                                  from 'types/responses';
 
 export const middleware: ValidationChain[] = [
   body('username')

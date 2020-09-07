@@ -15,12 +15,12 @@
 
 import {Response}                                                     from 'express';
 import {body}                                                         from 'express-validator';
-import {ComposedHandler}                                              from '../types/composed-handler';
-import {RequestWithDependencies}                                      from '../types/request-with-dependencies';
-import {DataResponse}                                                 from '../types/responses';
-import {injectDatabaseConnectionIntoRequest, rejectOnValidationError} from '../utilities/express';
-import {sharedConnection}                                             from '../utilities/mysql';
-import {hashHmac}                                                     from '../utilities/security';
+import {ComposedHandler}                                              from 'types/composed-handler';
+import {RequestWithDependencies}                                      from 'types/request-with-dependencies';
+import {DataResponse}                                                 from 'types/responses';
+import {injectDatabaseConnectionIntoRequest, rejectOnValidationError} from 'utilities/express';
+import {sharedConnection}                                             from 'utilities/mysql';
+import {hashHmac}                                                     from 'utilities/security';
 import {RowDataPacket}                                                from 'mysql2/promise';
 
 const findTokenSql = 'SELECT id_user as userId FROM registration_confirmations WHERE secret_hash=? AND NOW() < expires_at;';

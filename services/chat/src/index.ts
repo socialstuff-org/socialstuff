@@ -1,25 +1,22 @@
-// This file is part of SocialStuff Identity.
+// This file is part of SocialStuff Chat.
 //
-// SocialStuff Identity is free software: you can redistribute it and/or modify
+// SocialStuff Chat is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// SocialStuff Identity is distributed in the hope that it will be useful,
+// SocialStuff Chat is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
-// along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
+// along with SocialStuff Chat.  If not, see <https://www.gnu.org/licenses/>.
 
 import bodyParser                            from 'body-parser';
 import bootstrap                             from './bootstrap';
 import express                               from 'express';
 import {injectProcessEnvironmentIntoRequest} from 'utilities/express';
-import login                                 from './http-handlers/login';
-import register                              from './http-handlers/register';
-import registerConfirm                       from './http-handlers/register-confirm';
 import util                                  from 'util';
 
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
@@ -33,10 +30,6 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(injectProcessEnvironmentIntoRequest as express.Handler);
 
-  app.post('/register/confirm', registerConfirm);
-  app.post('/register', register);
-  app.post('/login', login);
-
   try {
     const appListen: (port: number, host: string) => Promise<void> = util.promisify(app.listen.bind(app));
     await appListen(APP_PORT, APP_HOST);
@@ -44,5 +37,5 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
     console.error(err);
     return;
   }
-  console.log(`Social Stuff Identity service running on ${APP_HOST}:${APP_PORT}.`);
+  console.log(`SocialStuff Chat service running on ${APP_HOST}:${APP_PORT}.`);
 })();
