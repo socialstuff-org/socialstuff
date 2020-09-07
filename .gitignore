@@ -1,3 +1,4 @@
 /services/identity/nbproject
 .idea/
 .vscode/
+node_modules/
