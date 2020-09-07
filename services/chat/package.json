@@ -1,7 +1,7 @@
 {
-  "name": "@socialstuff/identity",
+  "name": "@socialstuff/chat",
   "version": "0.1.0",
-  "description": "The SocialStuff authentication service.",
+  "description": "The SocialStuff chat service.",
   "main": "src/index.ts",
   "scripts": {
     "test": "jest",
@@ -12,16 +12,12 @@
   "author": "Jörn Neumeyer",
   "license": "AGPL-3.0",
   "dependencies": {
-    "argon2": "^0.26.2",
-    "asn1": "^0.2.4",
     "body-parser": "^1.19.0",
     "custom-env": "^2.0.1",
     "express": "^4.17.1",
     "express-validator": "^6.6.0",
     "migrate": "^1.7.0",
-    "mysql2": "^2.1.0",
-    "nodemailer": "^6.4.11",
-    "speakeasy": "^2.0.0",
+    "utilities": "file:../../shared/typescript/utilities",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
@@ -47,6 +43,7 @@
     "eslint-plugin-node": "^11.1.0",
     "jest": "^26.1.0",
     "nodemon": "^2.0.4",
+    "types": "file:../../shared/typescript/types",
     "typescript": "^4.0.2"
   },
   "jest": {

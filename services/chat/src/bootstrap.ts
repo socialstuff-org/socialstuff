@@ -1,28 +1,27 @@
-// This file is part of SocialStuff Identity.
+// This file is part of SocialStuff Chat.
 //
-// SocialStuff Identity is free software: you can redistribute it and/or modify
+// SocialStuff Chat is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// SocialStuff Identity is distributed in the hope that it will be useful,
+// SocialStuff Chat is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
-// along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
+// along with SocialStuff Chat.  If not, see <https://www.gnu.org/licenses/>.
 
 /* istanbul ignore file */
 
-import {createConnection, rebuildDatabase, sharedConnection} from './utilities/mysql';
+import {createConnection, rebuildDatabase, sharedConnection} from 'utilities/mysql';
+import {hashHmac, hashUnique}                                from 'utilities/security';
+import {delay}                                               from 'utilities/common';
+import {v1}                                                  from 'uuid';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
-import {delay}                                               from './utilities/common';
 import fs                                                    from 'fs';
-import {hashHmac, hashUnique}                                from './utilities/security';
-import {v1}                                                  from 'uuid';
-import {OkPacket}                                            from 'mysql2/promise';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env(ENV);
