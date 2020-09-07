@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  socialstuff_identity_web_dev:
+    container_name: socialstuff_identity_web_dev
+    hostname: socialstuff_identity_web_dev
+    build:
+      context: ../..
+      dockerfile: docker/dev/Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - socialstuff_identity_network_dev
+    depends_on:
+      - socialstuff_identity_mysql_dev
+    volumes:
+    - ../..:/app
+    environment:
+      NODE_ENV: dev
+
+  socialstuff_identity_mysql_dev:
+    container_name: socialstuff_identity_mysql_dev
+    hostname: socialstuff_identity_mysql_dev
+    image: mariadb:10.1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: socialstuff_identity_dev
+    networks:
+      - socialstuff_identity_network_dev
+    ports:
+    - "3306:3306"
+
+networks:
+  socialstuff_identity_network_dev:
