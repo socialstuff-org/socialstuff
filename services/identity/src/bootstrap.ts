@@ -15,12 +15,12 @@
 
 /* istanbul ignore file */
 
-import {createConnection, rebuildDatabase, sharedConnection} from './utilities/mysql';
+import {createConnection, rebuildDatabase, sharedConnection} from 'utilities/mysql';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
-import {delay}                                               from './utilities/common';
+import {delay}                                               from 'utilities/common';
 import fs                                                    from 'fs';
-import {hashHmac, hashUnique}                                from './utilities/security';
+import {hashHmac, hashUnique}                                from 'utilities/security';
 import {v1}                                                  from 'uuid';
 import {OkPacket}                                            from 'mysql2/promise';
 

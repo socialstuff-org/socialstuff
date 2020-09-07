@@ -15,8 +15,8 @@
 
 import bodyParser                            from 'body-parser';
 import bootstrap                             from './bootstrap';
-import express                               from 'express';
-import {injectProcessEnvironmentIntoRequest} from './utilities/express';
+import express, {Handler}                    from 'express';
+import {injectProcessEnvironmentIntoRequest} from 'utilities/express';
 import login                                 from './http-handlers/login';
 import register                              from './http-handlers/register';
 import registerConfirm                       from './http-handlers/register-confirm';
@@ -31,7 +31,7 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
-  app.use(injectProcessEnvironmentIntoRequest);
+  app.use(injectProcessEnvironmentIntoRequest as Handler);
 
   app.post('/register/confirm', registerConfirm);
   app.post('/register', register);
