@@ -14,7 +14,6 @@
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
 import nodemailer, {SendMailOptions} from 'nodemailer';
-import {registrationChallengeMode}   from '../constants';
 import {sharedConnection}            from './mysql';
 import {v1 as v1uuid}                from 'uuid';
 
@@ -42,7 +41,7 @@ export function hasChallenge(challenge: string) {
   return process.env.REGISTRATION_CHALLENGES?.includes(challenge);
 }
 
-export async function registrationConfirmationChallenge(userInfo: { email: string, userId: string } | undefined) {
+export async function registrationConfirmationChallenge(registrationChallengeMode: 'response' | 'email', userInfo: { email: string, userId: string } | undefined) {
   const token = v1uuid();
   switch (registrationChallengeMode) {
   case 'response':
