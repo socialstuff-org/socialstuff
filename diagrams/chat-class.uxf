@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>790</x>
+      <y>310</y>
+      <w>290</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>Message
+-
+id: UUID
+receiver: String
+message: String
+received_at: DateTime
+is_read: Boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>460</x>
+      <y>310</y>
+      <w>250</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>MessageStatus
+-
+message_id: UUID
+username: String
+delivered: Boolean
+read: Boolean?</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>700</x>
+      <y>330</y>
+      <w>110</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=0..1</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>460</x>
+      <y>110</y>
+      <w>250</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>Handshakes
+-
+username: String
+message: String</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
