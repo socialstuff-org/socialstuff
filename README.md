@@ -9,3 +9,6 @@ Each service is meant to represent a distinct functionality.
 ### Identity
 The identity service provides authentication and authorization functionalities
 for users who are registered at a certain SocialStuff deployment.
+
+## Design
+Please refer the [design documents](docs/design.md) for more details.
