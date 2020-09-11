@@ -16,7 +16,8 @@ login-db:
 	docker exec -ti socialstuff_identity_mysql_dev mysql -u root -proot --database=socialstuff_identity_dev
 
 prod: base-image
+	npx loin i
 	docker build -t socialstuff-identity:prod -f docker/prod/Dockerfile .
 
 base-image:
-	docker build . -t socialstuff-identity:base
+	docker build ../base-image -t socialstuff-node:base
