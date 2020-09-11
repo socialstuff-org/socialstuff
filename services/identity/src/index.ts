@@ -32,6 +32,11 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(injectProcessEnvironmentIntoRequest as express.Handler);
+  app.use((_, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', '*');
+    next();
+  });
 
   app.post('/register/confirm', registerConfirm);
   app.post('/register', register);
