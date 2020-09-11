@@ -20,7 +20,7 @@ const middleware: ValidationChain[] = [
 
 ];
 
-async function passwordReset(req: Request, res: Response) {
+async function passwordReset(_req: Request, _res: Response) {
 
 }
 
