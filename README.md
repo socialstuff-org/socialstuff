@@ -10,5 +10,20 @@ Each service is meant to represent a distinct functionality.
 The identity service provides authentication and authorization functionalities
 for users who are registered at a certain SocialStuff deployment.
 
+## Project Roles
+* Product Owner: Jörn Neumeyer
+* Project Management / Scrum Master:
+  * Tobias Jansen
+  * Maurits van der Zee
+
+* Frontend Developers:
+  * Malte Castner
+  * Dave Hoevenaars
+  * Maurits van der Zee
+
+* Backend Developers:
+  * Tobias Jansen
+  * Jörn Neumeyer
+
 ## Design
 Please refer the [design documents](docs/design.md) for more details.
