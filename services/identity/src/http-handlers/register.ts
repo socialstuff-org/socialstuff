@@ -62,17 +62,13 @@ export const middleware: ValidationChain[] = [
         return;
       }
       try {
-        crypto.createPublicKey(pk);
+        const key = crypto.createPublicKey(pk);
+        if (key.asymmetricKeyType !== 'ec') {
+          throw new Error('Please provide an ECDH public key!');
+        }
       } catch (e) {
         console.error(e.message);
         throw new Error('Invalid public key!');
-      }
-      const base64key = pk.replace(/\n/g, '').replace(/-+[A-Z ]+-+/g, '');
-      const keyBuffer = Buffer.from(base64key, 'base64');
-      // TODO determine the actual key length via ASN.1
-      // https://crypto.stackexchange.com/questions/18031/how-to-find-modulus-from-a-rsa-public-key
-      if (keyBuffer.length < 256) {
-        throw new Error('Please generate an RSA key pair with a length of at least 2048 bits!');
       }
     }),
 ];
@@ -132,9 +128,9 @@ if (hasChallenge(registrationChallenges.invite)) {
         throw new Error('Registrations are only allowed using invites!');
       }
       const db = await sharedConnection();
-      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM registration_invites WHERE expires_at < NOW();';
+      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM registration_invites WHERE expires_at > NOW();';
       try {
-        const [[{validInvite}]] = await db.query(checkInviteCodeSql) as RowDataPacket[][];
+        const [[{validInvite}]] = await db.query<RowDataPacket[][]>(checkInviteCodeSql);
         if (validInvite === 0) {
           throw new Error();
         }
