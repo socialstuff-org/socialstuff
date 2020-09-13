@@ -2,3 +2,4 @@ node_modules/
 lib/
 .migrate
 coverage/
+loin_modules/

@@ -63,6 +63,7 @@ export const middleware: ValidationChain[] = [
       }
       try {
         crypto.createPublicKey(pk);
+        // TODO check for ecdh keys
       } catch (e) {
         console.error(e.message);
         throw new Error('Invalid public key!');
@@ -132,7 +133,7 @@ if (hasChallenge(registrationChallenges.invite)) {
         throw new Error('Registrations are only allowed using invites!');
       }
       const db = await sharedConnection();
-      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM registration_invites WHERE expires_at < NOW();';
+      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM registration_invites WHERE expires_at > NOW();';
       try {
         const [[{validInvite}]] = await db.query(checkInviteCodeSql) as RowDataPacket[][];
         if (validInvite === 0) {

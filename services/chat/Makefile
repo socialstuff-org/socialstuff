@@ -1,22 +1,23 @@
-COMPOSE_DEV_COMMAND=docker-compose -f docker/dev/docker-compose.yml
+COMPASE_DEV_COMMAND=docker-compose -f docker/dev/docker-compose.yml
 
 up: base-image
-	$(COMPOSE_DEV_COMMAND) up --build -d
+	$(COMPASE_DEV_COMMAND) up --build -d
 
 down:
-	$(COMPOSE_DEV_COMMAND) down --remove-orphans
+	$(COMPASE_DEV_COMMAND) down --remove-orphans
 
 stop:
-	$(COMPOSE_DEV_COMMAND) stop
+	$(COMPASE_DEV_COMMAND) stop
 
 login-web:
-	docker exec -ti socialstuff_chat_web_dev /bin/bash
+	docker exec -ti socialstuff_identity_web_dev /bin/bash
 
-#login-db:
-#	docker exec -ti socialstuff_identity_mysql_dev mysql -u root -proot --database=socialstuff_identity_dev
+login-db:
+	docker exec -ti socialstuff_identity_mysql_dev mysql -u root -proot --database=socialstuff_identity_dev
 
 prod: base-image
-	docker build -t socialstuff-chat:prod -f docker/prod/Dockerfile .
+	npx loin i
+	docker build -t socialstuff-identity:prod -f docker/prod/Dockerfile .
 
 base-image:
-	docker build . -t socialstuff-chat:base
+	docker build ../base-image -t socialstuff-node:base
