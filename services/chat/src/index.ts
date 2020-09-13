@@ -19,6 +19,9 @@ import express                               from 'express';
 import {injectProcessEnvironmentIntoRequest} from 'utilities/express';
 import util                                  from 'util';
 
+
+import foo from './http-handlers/foo';
+
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
 const APP_HOST = process.env.APP_HOST || '0.0.0.0';
 
@@ -29,6 +32,14 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(injectProcessEnvironmentIntoRequest as express.Handler);
+  app.use((_, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', '*');
+    next();
+  });
+
+  app.post('/foo', foo);
+
 
   try {
     const appListen: (port: number, host: string) => Promise<void> = util.promisify(app.listen.bind(app));
@@ -37,5 +48,5 @@ const APP_HOST = process.env.APP_HOST || '0.0.0.0';
     console.error(err);
     return;
   }
-  console.log(`SocialStuff Chat service running on ${APP_HOST}:${APP_PORT}.`);
+  console.log(`Social Stuff Identity service running on ${APP_HOST}:${APP_PORT}.`);
 })();

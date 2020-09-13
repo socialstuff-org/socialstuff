@@ -14,11 +14,13 @@
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
 import {NextFunction, Request, Response} from 'express';
+import { MongoClient } from 'mongodb';
 import {Connection}                      from 'mysql2/promise';
 import {Dictionary}                      from './common';
 
 export interface RequestWithDependencies extends Request {
   dbHandle?: Connection;
+  mongo?: MongoClient;
   env?: Dictionary<string>;
 }
 
