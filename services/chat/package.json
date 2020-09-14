@@ -1,7 +1,7 @@
 {
-  "name": "@socialstuff/identity",
+  "name": "@socialstuff/chat",
   "version": "0.1.0",
-  "description": "The SocialStuff authentication service.",
+  "description": "The SocialStuff chat service.",
   "main": "src/index.ts",
   "scripts": {
     "test": "jest",
@@ -10,11 +10,15 @@
     "build": "tsc",
     "preinstall": "loin i"
   },
-  "author": "Jörn Neumeyer",
+  "author": {
+    "name": "Jörn Neumeyer",
+    "email": "contact@joern-neumeyer.de"
+  },
   "license": "AGPL-3.0",
   "dependencies": {
     "argon2": "^0.26.2",
     "asn1": "^0.2.4",
+    "axios": "^0.20.0",
     "body-parser": "^1.19.0",
     "custom-env": "^2.0.1",
     "express": "^4.17.1",
