@@ -42,6 +42,23 @@ mat-list-item:hover {
   padding-bottom: 5px;
 }
 
+.mat-list-base {
+  padding-top: 0;
+}
+
+#search-bar {
+  border-radius: 50px;
+  background-color: $elderberry;
+  color: $plainWhite;
+  width: 80%;
+  border: none;
+  height: 20px;
+}
+
+#search-bar::placeholder {
+  color: $plainWhite;
+}
+
 .contact-list-divider {
   border-color: $elderberry;
 }
