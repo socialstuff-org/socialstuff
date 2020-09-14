@@ -130,7 +130,7 @@ if (hasChallenge(registrationChallenges.invite)) {
       const db = await sharedConnection();
       const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM registration_invites WHERE expires_at > NOW();';
       try {
-        const [[{validInvite}]] = await db.query<RowDataPacket[][]>(checkInviteCodeSql);
+        const [[{validInvite}]] = await db.query<RowDataPacket[]>(checkInviteCodeSql);
         if (validInvite === 0) {
           throw new Error();
         }

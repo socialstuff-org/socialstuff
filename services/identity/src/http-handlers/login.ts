@@ -33,7 +33,7 @@ async function login(req: Request, res: Response) {
 
   const sql = 'SELECT id,password FROM users WHERE username LIKE ? AND can_login=1;';
 
-  const [userRow] = await db.query(sql, [req.body.username]) as RowDataPacket[][];
+  const [userRow] = await db.query<RowDataPacket[]>(sql, [req.body.username]);
 
   if (!userRow.length) {
     res.status(400).json({errors: [{message: 'Invalid credentials!'}]}).end();
