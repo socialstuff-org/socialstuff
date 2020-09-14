@@ -4,9 +4,10 @@ COMPOSE_DEV_COMMAND_IDENTITY=docker-compose -f ../identity/docker/dev/docker-com
 up: base-image
 	$(COMPOSE_DEV_COMMAND_IDENTITY) up --build -d
 	$(COMPOSE_DEV_COMMAND) up --build -d
+	docker network connect dev_socialstuff_chat_network_dev socialstuff_identity_web_dev
 
 down:
-	$(COMPOSE_DEV_COMMAND) down --remove-orphans
+	$(COMPOSE_DEV_COMMAND) down
 
 stop:
 	$(COMPOSE_DEV_COMMAND) stop
