@@ -1,0 +1,12 @@
+@import "~app/styles/colors";
+
+mat-toolbar {
+  height: 60px;
+  background-color: $plumViolet;
+  text-align: center;
+}
+
+mat-toolbar a {
+  text-decoration: none;
+  color: $coralRed;
+}
