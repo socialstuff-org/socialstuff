@@ -18,6 +18,14 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { ChatListComponent } from './chat-list/chat-list.component';
 import { HeaderComponent } from './header/header.component';
+import {MatButtonModule} from "@angular/material/button";
+import {MatToolbarModule} from "@angular/material/toolbar";
+import {MatIconModule} from "@angular/material/icon";
+import {MatSidenavModule} from "@angular/material/sidenav";
+import {MatListModule} from "@angular/material/list";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import { FooterComponent } from './footer/footer.component';
+import {MatInputModule} from "@angular/material/input";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -25,7 +33,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent],
+  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent],
   imports: [
     BrowserModule,
     FormsModule,
@@ -38,7 +46,14 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
         useFactory: HttpLoaderFactory,
         deps: [HttpClient]
       }
-    })
+    }),
+    MatButtonModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatSidenavModule,
+    MatListModule,
+    BrowserAnimationsModule,
+    MatInputModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

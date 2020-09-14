@@ -1,3 +1,19 @@
+// IMPORTS
+
+// TODO fix imports
+// @import url(app/styles/colors.scss);
+
+// END OF IMPORTS
+
+// COLOR DEFINITION
+$elderberry: #21142D;
+$plumViolet: #510A32;
+$boysenberry: #801336;
+$frenchRasperry: #C72C41;
+$coralRed: #EE4540;
+$operaMauve: #BB89A6;
+$plainWhite: #ffffff;
+
 /* You can add global styles to this file, and also import other style files */
 html, body {
   margin: 0;
@@ -5,6 +21,8 @@ html, body {
 
   height: 100%;
   font-family: Arial, Helvetica, sans-serif;
+  background-color: $elderberry;
+  color: $plainWhite;
 }
 
 /* CAN (MUST) BE REMOVED ! Sample Global style */
@@ -48,5 +66,12 @@ html, body {
   }
 }
 
-// COLORS
-$darkBlue = #21142D;
+// MAT INPUT STYLES
+mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-field-wrapper > div.mat-form-field-flex > div.mat-form-field-infix  { padding: 0.4em 0px }
+mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-field-wrapper > div.mat-form-field-flex > div.mat-form-field-infix > span.mat-form-field-label-wrapper { top: -1.5em; }
+
+.mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+  transform: translateY(-1.1em) scale(.75);
+  width: 133.33333%;
+  color: $plainWhite !important;
+}

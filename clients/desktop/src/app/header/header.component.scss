@@ -1,0 +1,17 @@
+@import "~app/styles/colors";
+
+* {
+  background-color: $plumViolet;
+}
+
+mat-toolbar {
+  height: 60px;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+mat-icon {
+  color: $plainWhite;
+}
