@@ -1,0 +1,56 @@
+@import "~app/styles/colors";
+
+.bubble {
+  max-width: 300px;
+  height: auto;
+  border-radius: 10px;
+}
+
+.bubble-own {
+  background-color: $coralRed;
+  float: right;
+}
+
+.bubble-foreign {
+  background-color: $boysenberry;
+  float: left;
+}
+
+.message-container {
+  padding: 9px 14px;
+  font-size: 1em;
+  margin-bottom: 5px;
+}
+
+.status-container {
+  width: auto;
+  height: auto;
+  float: right;
+  margin-left: 5px;
+}
+
+.status-sent {
+  font-size: 1em;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.status-delivered {
+  font-size: 1.2em;
+}
+
+.status-seen {
+  font-size: 1em;
+}
+
+.time-container {
+  width: auto;
+  height: auto;
+  float: right;
+  position: inherit;
+  bottom: 10px;
+  right: 10px;
+}
