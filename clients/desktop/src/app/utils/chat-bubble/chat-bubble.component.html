@@ -1,0 +1,21 @@
+<div class="bubble bubble-{{ message.isSender ? 'own' : 'foreign' }}">
+  <div class="message-container">
+    {{message.message}}
+  </div>
+
+  <div class="status-container">
+    <div *ngIf="message.sent">
+      <mat-icon class="status-sent">keyboard_backspace</mat-icon>
+    </div>
+    <div *ngIf="message.delivered">
+      <mat-icon class="status-delivered">swap_vert</mat-icon>
+    </div>
+    <div *ngIf="message.seen">
+      <mat-icon class="status-seen">visibility</mat-icon>
+    </div>
+  </div>
+
+  <div class="time-container">
+    {{message.time}}
+  </div>
+</div>
