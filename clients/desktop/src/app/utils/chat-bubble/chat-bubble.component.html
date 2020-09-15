@@ -1,4 +1,4 @@
-<div class="bubble" [ngClass]="{'bubble-own' : message.isSender, 'bubble-foreign' : !message.isSender}">
+<div class="bubble bubble-{{ message.isSender ? 'own' : 'foreign' }}">
   <div class="message-container">
     {{message.message}}
   </div>
