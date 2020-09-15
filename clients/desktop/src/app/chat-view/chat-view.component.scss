@@ -1,0 +1,14 @@
+.chat-message-list {
+  width: 90%;
+  margin: 0 auto;
+  grid-area: chat-message-list;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 0 20px;
+}
+
+.message-row {
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 70%;
+}
