@@ -26,6 +26,8 @@ import {MatListModule} from "@angular/material/list";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { FooterComponent } from './footer/footer.component';
 import {MatInputModule} from "@angular/material/input";
+import { ChatBubbleComponent } from './utils/chat-bubble/chat-bubble.component';
+import { ChatViewComponent } from './chat-view/chat-view.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -33,7 +35,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent],
+  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent],
   imports: [
     BrowserModule,
     FormsModule,
