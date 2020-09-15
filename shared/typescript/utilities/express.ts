@@ -1,23 +1,24 @@
-// This file is part of SocialStuff Identity.
+// This file is part of SocialStuff.
 //
-// SocialStuff Identity is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
+// SocialStuff is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// SocialStuff Identity is distributed in the hope that it will be useful,
+// SocialStuff is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
+// GNU Lesser General Public License for more details.
 //
-// You should have received a copy of the GNU Affero General Public License
-// along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU Lesser General Public License
+// along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
 import {NextFunction, Request, Response} from 'express';
 import {castTo}                          from './types';
 import {Dictionary}                      from '../types/common';
 import {RequestWithDependencies}         from '../types/request-with-dependencies';
 import {sharedConnection}                from './mysql';
+import {sharedConnection as mongoConnection} from './mongodb';
 import {validationResult}                from 'express-validator';
 
 
@@ -32,6 +33,11 @@ export function rejectOnValidationError(req: Request, res: Response, next: NextF
 
 export async function injectDatabaseConnectionIntoRequest(req: RequestWithDependencies, _: Response, next: NextFunction) {
   req.dbHandle = await sharedConnection();
+  next();
+}
+
+export async function injectMongodbConnectionIntoRequest(req: RequestWithDependencies, _: Response, next: NextFunction) {
+  req.mongo = await mongoConnection();
   next();
 }
 

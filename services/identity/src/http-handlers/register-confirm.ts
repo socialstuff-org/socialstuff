@@ -46,7 +46,7 @@ const middleware: ComposedHandler[] = [
 async function registerConfirm(req: RequestWithDependencies, res: Response) {
   const db = req.dbHandle!;
   const tokenHash = hashHmac(req.body.token);
-  const [[{userId}]] = await db.query(findTokenSql, [tokenHash]) as RowDataPacket[][];
+  const [[{userId}]] = await db.query<RowDataPacket[]>(findTokenSql, [tokenHash]);
   await db.beginTransaction();
   console.log(userId);
   try {
