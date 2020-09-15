@@ -48,6 +48,9 @@ export class ChatViewComponent implements OnInit {
     fifthMessage.isSender = false;
     fifthMessage.delivered = true;
     this.messages.push(fifthMessage);
+
+    // later on the messages will be retrieved by the server in the correct order
+    this.messages = this.messages.slice().reverse();
   }
 
   ngOnInit(): void {
