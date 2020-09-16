@@ -325,4 +325,26 @@ confirmation</panel_attributes>
     <panel_attributes/>
     <additional_attributes>10.0;20.0;40.0;20.0</additional_attributes>
   </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>900</x>
+      <y>440</y>
+      <w>170</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Generate invite</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>860</x>
+      <y>450</y>
+      <w>60</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>10.0;120.0;40.0;10.0</additional_attributes>
+  </element>
 </diagram>
