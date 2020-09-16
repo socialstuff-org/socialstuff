@@ -1,6 +1,7 @@
 {
   "extends": "eslint:recommended",
   "rules": {
+    "no-unused-vars": "warn",
     "semi": [
       "error",
       "always"
@@ -21,7 +22,7 @@
       2
     ],
     "sort-imports": [
-      "error",
+      "warn",
       {
         "ignoreCase": true,
         "ignoreDeclarationSort": false,
@@ -41,14 +42,14 @@
       "global"
     ],
     "eqeqeq": [
-      "error",
+      "warn",
       "always"
     ],
     "linebreak-style": [
-      "error",
+      "warn",
       "unix"
     ],
-    "prefer-const": "error",
+    "prefer-const": "warn",
     "max-nested-callbacks": [
       "warn",
       3
