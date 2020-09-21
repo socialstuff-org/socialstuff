@@ -4,7 +4,7 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>290</x>
+      <x>150</x>
       <y>120</y>
       <w>110</w>
       <h>40</h>
@@ -15,9 +15,9 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>20</x>
+      <x>80</x>
       <y>30</y>
-      <w>650</w>
+      <w>450</w>
       <h>810</h>
     </coordinates>
     <panel_attributes>User</panel_attributes>
@@ -26,7 +26,7 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>270</x>
+      <x>130</x>
       <y>230</y>
       <w>140</w>
       <h>50</h>
@@ -39,7 +39,7 @@ option</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>330</x>
+      <x>190</x>
       <y>50</y>
       <w>20</w>
       <h>20</h>
@@ -50,7 +50,7 @@ option</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>330</x>
+      <x>190</x>
       <y>50</y>
       <w>30</w>
       <h>90</h>
@@ -61,7 +61,7 @@ option</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>330</x>
+      <x>190</x>
       <y>150</y>
       <w>30</w>
       <h>100</h>
@@ -72,7 +72,7 @@ option</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>270</x>
+      <x>130</x>
       <y>340</y>
       <w>140</w>
       <h>50</h>
@@ -85,7 +85,7 @@ username + password</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>330</x>
+      <x>190</x>
       <y>270</y>
       <w>30</w>
       <h>90</h>
@@ -96,7 +96,7 @@ username + password</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>330</x>
+      <x>190</x>
       <y>380</y>
       <w>30</w>
       <h>90</h>
@@ -107,7 +107,7 @@ username + password</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>270</x>
+      <x>130</x>
       <y>450</y>
       <w>140</w>
       <h>50</h>
@@ -118,7 +118,7 @@ username + password</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>270</x>
+      <x>130</x>
       <y>620</y>
       <w>140</w>
       <h>50</h>
@@ -129,7 +129,7 @@ username + password</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>320</x>
+      <x>180</x>
       <y>540</y>
       <w>40</w>
       <h>40</h>
@@ -140,7 +140,7 @@ username + password</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>330</x>
+      <x>190</x>
       <y>490</y>
       <w>30</w>
       <h>70</h>
@@ -151,7 +151,7 @@ username + password</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>350</x>
+      <x>210</x>
       <y>540</y>
       <w>160</w>
       <h>40</h>
@@ -163,7 +163,7 @@ username + password</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>330</x>
+      <x>190</x>
       <y>570</y>
       <w>150</w>
       <h>70</h>
@@ -175,7 +175,7 @@ username + password</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>490</x>
+      <x>350</x>
       <y>540</y>
       <w>100</w>
       <h>40</h>
@@ -186,7 +186,7 @@ username + password</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>400</x>
+      <x>260</x>
       <y>360</y>
       <w>160</w>
       <h>200</h>
@@ -197,7 +197,7 @@ username + password</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>330</x>
+      <x>190</x>
       <y>660</y>
       <w>30</w>
       <h>90</h>
@@ -208,7 +208,7 @@ username + password</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>330</x>
+      <x>190</x>
       <y>730</y>
       <w>20</w>
       <h>20</h>
