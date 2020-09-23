@@ -15,13 +15,11 @@
 
 /* istanbul ignore file */
 
-import path                                                  from 'path';
 import {createConnection, rebuildDatabase, sharedConnection} from 'utilities/mysql';
 import crypto                                                from 'crypto';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
 import {delay}                                               from 'utilities/common';
-import fs                                                    from 'fs';
 import {hashHmac, hashUnique}                                from 'utilities/security';
 import {v1}                                                  from 'uuid';
 import {OkPacket}                                            from 'mysql2/promise';
@@ -55,7 +53,7 @@ export default (async () => {
 
   const ecdh = crypto.createECDH('secp256k1');
   ecdh.generateKeys();
-  fs.writeFileSync(path.join(__dirname, 'priv.pem'), ecdh.getPrivateKey().toString('base64'));
+  process.env.ECDH_PRIVATE_KEY = ecdh.getPrivateKey().toString('base64');
   const publicKey = ecdh.getPrivateKey().toString('base64');
   const password = crypto.randomBytes(16).toString('hex');
   const username = 'root';
