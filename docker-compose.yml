@@ -7,8 +7,8 @@ services:
     build:
       context: services/chat
       dockerfile: docker/dev/Dockerfile
-    ports:
-      - "3100:3000"
+#    ports:
+#      - "3100:3000"
     networks:
       - socialstuff_chat_network_dev
       - socialstuff_network_dev
