@@ -15,7 +15,9 @@
 
 /* istanbul ignore file */
 
+import path                                                  from 'path';
 import {createConnection, rebuildDatabase, sharedConnection} from 'utilities/mysql';
+import crypto                                                from 'crypto';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
 import {delay}                                               from 'utilities/common';
@@ -51,9 +53,12 @@ export default (async () => {
     return;
   }
 
-  const publicKey = (await fs.promises.readFile(__dirname + '/../rsa-example.public')).toString('utf-8');
-  const password = 'foobarfoobar';
-  const username = 'johndoe';
+  const ecdh = crypto.createECDH('secp256k1');
+  ecdh.generateKeys();
+  fs.writeFileSync(path.join(__dirname, 'priv.pem'), ecdh.getPrivateKey().toString('base64'));
+  const publicKey = ecdh.getPrivateKey().toString('base64');
+  const password = crypto.randomBytes(16).toString('hex');
+  const username = 'root';
 
   console.log('Setting up database...');
   await rebuildDatabase();
@@ -62,6 +67,7 @@ export default (async () => {
   const id = v1().replace(/-/g, '');
   const token = await hashHmac(id);
   await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
+  console.log('root password:           ', password);
   console.log('sample invite code:      ', id);
   const addUserSql = 'INSERT INTO users (id,username,password,public_key) VALUES (unhex(?),?,?,?);';
   const userID = v1().replace(/-/g, '');
