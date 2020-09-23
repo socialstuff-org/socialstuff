@@ -24,7 +24,6 @@ import {Response}                                                      from 'exp
 import {RowDataPacket}                                                 from 'mysql2/promise';
 import {hasChallenge}                                                  from 'utilities/registration-confirmation-challenge';
 import {registrationChallengeMode, registrationChallenges}             from '../constants';
-// import asn1                                         from 'asn1';
 import speakeasy                                                       from 'speakeasy';
 import {ComposedHandler}                                               from 'types/composed-handler';
 import {RequestWithDependencies}                                       from 'types/request-with-dependencies';
