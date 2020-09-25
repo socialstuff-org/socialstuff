@@ -263,4 +263,17 @@ send to receiver</panel_attributes>
 [False]</panel_attributes>
     <additional_attributes>460.0;10.0;460.0;30.0;10.0;30.0;10.0;340.0</additional_attributes>
   </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>308</x>
+      <y>252</y>
+      <w>378</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>This diagram should explain
+the read state a message may have
+that a use sent to another one</panel_attributes>
+    <additional_attributes/>
+  </element>
 </diagram>
