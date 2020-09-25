@@ -60,7 +60,21 @@ services:
     networks:
       - socialstuff_identity_network_dev
     ports:
-    - "3306:3306"
+      - "3306:3306"
+  
+  
+  socialstuff_nginx_dev:
+    container_name: socialstuff_nginx_dev
+    hostname: socialstuff_nginx_dev
+    build:
+      context: deployment/reverse_proxy
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - socialstuff_network_dev
+    environment:
+      - NGINX_PORT=80
 
 networks:
   socialstuff_network_dev:
