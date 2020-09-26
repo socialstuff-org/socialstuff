@@ -1,1 +1,15 @@
-<p>login works!</p>
+<form action="">
+  <p>
+    <mat-form-field>
+      <mat-label>Username</mat-label>
+      <input matInput [(ngModel)]="username" name="username"/>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field>
+      <mat-label>Password</mat-label>
+      <input matInput [(ngModel)]="password" name="password"/>
+    </mat-form-field>
+  </p>
+  <button (click)="login()">Login</button>
+</form>

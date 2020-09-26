@@ -1,4 +1,4 @@
-# Message persistence and forarding
+# Message persistence and forwarding
 
 This document showacses some examples on how a worst and best case message exchange may happen,
 in a case in which the server support delivery status reporting and read receipts are enabled.
