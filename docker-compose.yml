@@ -59,8 +59,8 @@ services:
       MYSQL_DATABASE: socialstuff_identity_dev
     networks:
       - socialstuff_identity_network_dev
-    ports:
-      - "3306:3306"
+#    ports:
+#      - "3306:3306"
   
   
   socialstuff_nginx_dev:
