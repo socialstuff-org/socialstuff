@@ -1,15 +1,33 @@
-<form action="">
-  <p>
-    <mat-form-field>
-      <mat-label>Username</mat-label>
-      <input matInput [(ngModel)]="username" name="username"/>
-    </mat-form-field>
-  </p>
-  <p>
-    <mat-form-field>
-      <mat-label>Password</mat-label>
-      <input matInput [(ngModel)]="password" name="password"/>
-    </mat-form-field>
-  </p>
-  <button (click)="login()">Login</button>
-</form>
+<div id="login-container">
+  <div id="sub-login-container">
+  <form action="">
+    <div class="input-wrapper" id="logo">
+      <img src="assets/img/eye.svg" alt="img unavailable">
+    </div>
+    
+    <div class="input-wrapper" style="margin-bottom: 25px;">
+      <span id="login-headline">please enter your credentials</span>
+    </div>
+
+    <div class="input-wrapper">
+      <input [(ngModel)]="hostname" name="domain" class="custom-input-field" id="custom-input-field-type-2" placeholder="domain"/>
+      <input [(ngModel)]="port" name="port" class="custom-input-field" id="custom-input-field-type-3" placeholder="port" type="number" min="1" max="65535"/>
+    </div>
+    <div class="input-wrapper">
+      <input [(ngModel)]="username" name="username" class="custom-input-field wide-input-field" placeholder="username"/>
+    </div>
+    <div class="input-wrapper">
+      <input [(ngModel)]="password" name="password" class="custom-input-field wide-input-field" placeholder="·········" type="password"/>
+    </div>
+    <div class="input-wrapper">
+      <button (click)="login()" class="custom-button">Login</button>
+    </div>
+    <div class="input-wrapper">
+      <button (click)="login()" class="custom-button">Forgot password</button>
+    </div>
+    <div class="input-wrapper">
+      <a routerLink="/register">Don't have an account yet?</a>
+    </div>
+  </form>
+  </div>
+</div>
