@@ -23,7 +23,16 @@ import {v1}                         from 'uuid';
 import {DataResponse}               from 'types/responses';
 
 const middleware = [
-  body('username').isString().isLength({min: 5, max: 20}).withMessage('This is not a valid username.'),
+  body('username').isString().custom(async (username: string) => {
+    if (!username) {
+      throw new Error();
+    }
+    if (username.length >=5 && username.length <= 20 || username === 'root') {
+      
+    } else {
+      throw new Error();
+    }
+  }).withMessage('This is not a valid username.'),
   body('password').isString().isLength({min: 10, max: 40}).withMessage('This is not a valid password.'),
   rejectOnValidationError,
 ];
