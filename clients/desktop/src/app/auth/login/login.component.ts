@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {AuthService}         from '../../services/auth.service';
 import {ApiService}          from '../../services/api.service';
 import {AppConfigService}    from '../../services/app-config.service';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private api: ApiService,
-    private config: AppConfigService
+    private config: AppConfigService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -27,6 +29,10 @@ export class LoginComponent implements OnInit {
   public login() {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     this.auth.login(this.username, this.password);
+  }
+
+  public forgotPassword() {
+    this.router.navigateByUrl('/forgot-password');
   }
 
 }
