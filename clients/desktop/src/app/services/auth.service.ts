@@ -17,6 +17,7 @@ export class AuthService {
     this.http.post<any>(this.api.remoteEndpoint() + '/identity/login', {username, password})
       .subscribe((response: HttpResponse) => {
         console.log(response);
+        alert('logged in!');
       }, (error: HttpErrorResponse) => {
         if (error.status === 400) {
           console.log('invalid credentials!');
@@ -24,6 +25,7 @@ export class AuthService {
           console.log('unknown error!');
         }
         console.error(error.error.errors);
+        alert('log in failed!');
       });
   }
 }

@@ -9,9 +9,11 @@ import {createEmptyMessage, Message} from "../models/Message";
 export class ChatViewComponent implements OnInit {
 
   public messages: Message[];
+  public chatPartner: string;
 
   constructor() {
     this.messages = [];
+    this.chatPartner = 'Jörn Neumeyer';
 
     // sample data for UI testing
     const message = createEmptyMessage();

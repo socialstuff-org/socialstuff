@@ -29,6 +29,8 @@ import {MatInputModule}          from '@angular/material/input';
 import {ChatBubbleComponent}     from './utils/chat-bubble/chat-bubble.component';
 import {ChatViewComponent}       from './chat-view/chat-view.component';
 import {ChatAppComponent}        from './chat-app/chat-app.component';
+import { SidenavComponent } from './sidenav/sidenav.component';
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -36,7 +38,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent],
+  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent],
   imports:      [
     BrowserModule,
     FormsModule,
