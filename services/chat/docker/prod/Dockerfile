@@ -1,4 +1,4 @@
-FROM socialstuff-identity:base
+FROM socialstuff-node:base
 RUN mkdir /app
 WORKDIR /app
 COPY . .
