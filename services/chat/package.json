@@ -7,8 +7,7 @@
     "test": "jest",
     "start": "node .",
     "dev": "nodemon -- --unhandled-rejections=strict",
-    "build": "tsc",
-    "preinstall": "loin i"
+    "build": "tsc"
   },
   "author": {
     "name": "Jörn Neumeyer",
