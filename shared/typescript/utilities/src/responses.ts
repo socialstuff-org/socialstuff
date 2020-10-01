@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Dictionary} from './common';
-
 export interface DataResponse<T> {
   data: T;
 }
@@ -27,7 +25,7 @@ export interface ErrorResponseField {
 }
 
 export interface ErrorResponse {
-  errors: Dictionary<ErrorResponseField>;
+  errors: { [key: string]: ErrorResponseField };
 }
 
 

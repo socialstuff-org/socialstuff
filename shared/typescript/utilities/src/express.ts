@@ -14,11 +14,6 @@
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
 import {NextFunction, Request, Response} from 'express';
-import {castTo}                          from './types';
-import {Dictionary}                      from '../types/common';
-import {RequestWithDependencies}         from '../types/request-with-dependencies';
-import {sharedConnection}                from './mysql';
-import {sharedConnection as mongoConnection} from './mongodb';
 import {validationResult}                from 'express-validator';
 
 
@@ -31,17 +26,7 @@ export function rejectOnValidationError(req: Request, res: Response, next: NextF
   }
 }
 
-export async function injectDatabaseConnectionIntoRequest(req: RequestWithDependencies, _: Response, next: NextFunction) {
-  req.dbHandle = await sharedConnection();
-  next();
-}
-
-export async function injectMongodbConnectionIntoRequest(req: RequestWithDependencies, _: Response, next: NextFunction) {
-  req.mongo = await mongoConnection();
-  next();
-}
-
-export function injectProcessEnvironmentIntoRequest(req: RequestWithDependencies, _: Response, next: NextFunction) {
-  req.env = castTo<Dictionary<string>>(process.env);
+export function injectProcessEnvironmentIntoRequest(req: Request, _: Response, next: NextFunction) {
+  (req as any).env = process.env as { [key: string]: string };
   next();
 }

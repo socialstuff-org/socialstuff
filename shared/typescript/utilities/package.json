@@ -1,12 +1,16 @@
 {
-  "name": "utilities",
+  "name": "@socialstuff/utilities",
   "version": "0.1.0",
-  "description": "",
+  "description": "A collection of utilities used in SocialStuff.",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "prepublish": "tsc"
   },
-  "author": "Jörn Neumeyer",
+  "author": {
+    "name": "Jörn Neumeyer",
+    "email": "contact@joern-neumeyer.de"
+  },
   "license": "LGPL-3.0",
   "dependencies": {
     "argon2": "^0.27.0",
