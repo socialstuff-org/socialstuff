@@ -1,5 +1,8 @@
 {
   "name": "@socialstuff/utilities",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "A collection of utilities used in SocialStuff.",
   "main": "index.js",
