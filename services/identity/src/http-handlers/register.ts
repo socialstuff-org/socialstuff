@@ -13,21 +13,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {RegisterResponseBody}                                          from 'types/response-bodies';
-import {USERNAME_REGEX, hashUnique, passwordIssues, encrypt, hashHmac} from 'utilities/security';
-import crypto                                                          from 'crypto';
-import {body, ValidationChain}                                         from 'express-validator';
-import {injectDatabaseConnectionIntoRequest, rejectOnValidationError}  from 'utilities/express';
-import {sharedConnection}                                              from 'utilities/mysql';
-import {v1 as v1uuid}                                                  from 'uuid';
-import {Response}                                                      from 'express';
-import {RowDataPacket}                                                 from 'mysql2/promise';
-import {hasChallenge}                                                  from 'utilities/registration-confirmation-challenge';
-import {registrationChallengeMode, registrationChallenges}             from '../constants';
+import crypto                                                 from 'crypto';
+import {body, ValidationChain}                                from 'express-validator';
+import {v1 as v1uuid}                                         from 'uuid';
+import {Request, Response}                                    from 'express';
+import {RowDataPacket}                                        from 'mysql2/promise';
+import {registrationChallengeMode, registrationChallenges}    from '../constants';
 import speakeasy                                                       from 'speakeasy';
-import {ComposedHandler}                                               from 'types/composed-handler';
-import {RequestWithDependencies}                                       from 'types/request-with-dependencies';
-import {DataResponse}                                                  from 'types/responses';
+import {encrypt, hashHmac, hashUnique, passwordIssues, USERNAME_REGEX} from '@socialstuff/utilities/security';
+import {sharedConnection}                                              from '../mysql';
+import {RequestWithDependencies}                              from '../request-with-dependencies';
+import {DataResponse}                                         from '@socialstuff/utilities/responses';
+import {hasChallenge}                                         from '../registration-confirmation-challenge';
+import {rejectOnValidationError}                              from '@socialstuff/utilities/express';
+import {injectDatabaseConnectionIntoRequest}                  from '../utilities';
 
 export const middleware: ValidationChain[] = [
   body('username')
@@ -76,14 +75,15 @@ const addUserSql = 'INSERT INTO users (id, username, password, public_key, mfa_s
 const saveRegistrationConfirmationTokenSql = 'INSERT INTO registration_confirmations (expires_at, secret_hash, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY), ?, unhex(?));';
 const removeUsedInviteCodeSql = 'DELETE FROM registration_invites WHERE secret = unhex(?);';
 
-export async function register(req: RequestWithDependencies, res: Response) {
-  const db = req.dbHandle!;
+export async function register(req: Request, res: Response) {
+  const r = req as RequestWithDependencies;
+  const db = r.dbHandle;
   const passwordHash = await hashUnique(req.body.password);
 
   const id = v1uuid().replace(/-/g, '');
-  const response: DataResponse<RegisterResponseBody> = {data: {message: 'Registered successfully!'}};
+  const response: DataResponse<any> = {data: {message: 'Registered successfully!'}};
   const addUserSqlParams = [id, req.body.username, passwordHash, req.body.public_key];
-  if (req.env?.MFA === 'TOTP') {
+  if (r.env?.MFA === 'TOTP') {
     const mfa = speakeasy.generateSecret({length: 64});
     const encryptedSecret = encrypt(mfa.base32);
     addUserSqlParams.push(encryptedSecret);
@@ -115,7 +115,7 @@ export async function register(req: RequestWithDependencies, res: Response) {
   }
 }
 
-const final: ComposedHandler[] = [];
+const final: any[] = [];
 if (registrationChallengeMode === 'email') {
   final.push(body('email').isEmail());
 }

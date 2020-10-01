@@ -13,11 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {NextFunction, Request, Response} from 'express';
-import {sharedConnection}                from './mysql';
-import {RequestWithDependencies}         from './request-with-dependencies';
+import {Request}    from 'express';
+import {Connection} from 'mysql2/promise';
 
-export async function injectDatabaseConnectionIntoRequest(req: Request, _: Response, next: NextFunction) {
-  (req as RequestWithDependencies).dbHandle = await sharedConnection();
-  next();
+export interface RequestWithDependencies extends Request {
+  env: { [key: string]: string };
+  dbHandle: Connection;
 }

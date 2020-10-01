@@ -1,9 +1,10 @@
-import {Response}                from 'express';
-import {param}                   from 'express-validator';
-import {RowDataPacket}           from 'mysql2/promise';
-import {RequestWithDependencies} from 'types/request-with-dependencies';
-import {DataResponse}                                                 from 'types/responses';
-import {injectDatabaseConnectionIntoRequest, rejectOnValidationError} from 'utilities/express';
+import {Request, Response}                   from 'express';
+import {param}                               from 'express-validator';
+import {RowDataPacket}                       from 'mysql2/promise';
+import {rejectOnValidationError}             from '@socialstuff/utilities/express';
+import {injectDatabaseConnectionIntoRequest} from '../utilities';
+import {RequestWithDependencies}             from '../request-with-dependencies';
+import {DataResponse}                        from '@socialstuff/utilities/responses';
 
 const middleware = [
   param('username').isString(),
@@ -14,8 +15,8 @@ const middleware = [
 
 const selectPublicKeyQuery = 'SELECT public_key FROM users WHERE username LIKE ?;';
 
-export async function publicKeyOf(req: RequestWithDependencies, res: Response) {
-  const db    = req.dbHandle!;
+export async function publicKeyOf(req: Request, res: Response) {
+  const db    = (req as RequestWithDependencies).dbHandle;
   const [row] = await db.query<RowDataPacket[]>(selectPublicKeyQuery, req.params.username);
   if (row.length === 0) {
     res.status(404).end();
