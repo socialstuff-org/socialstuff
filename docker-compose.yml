@@ -7,8 +7,6 @@ services:
     build:
       context: services/chat
       dockerfile: docker/dev/Dockerfile
-#    ports:
-#      - "3100:3000"
     networks:
       - socialstuff_chat_network_dev
       - socialstuff_network_dev
@@ -38,8 +36,6 @@ services:
     build:
       context: services/identity
       dockerfile: docker/dev/Dockerfile
-    ports:
-      - "3000:3000"
     networks:
       - socialstuff_identity_network_dev
       - socialstuff_network_dev
@@ -59,8 +55,6 @@ services:
       MYSQL_DATABASE: socialstuff_identity_dev
     networks:
       - socialstuff_identity_network_dev
-#    ports:
-#      - "3306:3306"
   
   
   socialstuff_nginx_dev:

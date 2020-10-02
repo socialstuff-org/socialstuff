@@ -15,16 +15,16 @@
 
 /* istanbul ignore file */
 
-import {createConnection, rebuildDatabase, sharedConnection} from 'utilities/mysql';
 import crypto                                                from 'crypto';
 import path                                                  from 'path';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
-import {delay}                                               from 'utilities/common';
-import {hashHmac, hashUnique}                                from 'utilities/security';
 import {v1}                                                  from 'uuid';
 import {OkPacket}                                            from 'mysql2/promise';
-import fs from 'fs';
+import fs                                                    from 'fs';
+import {createConnection, rebuildDatabase, sharedConnection} from './mysql';
+import {delay}                from '@socialstuff/utilities/common';
+import {hashHmac, hashUnique} from '@socialstuff/utilities/security';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env(ENV);

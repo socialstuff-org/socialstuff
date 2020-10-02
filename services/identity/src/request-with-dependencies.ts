@@ -13,21 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Dictionary} from './common';
+import {Request}    from 'express';
+import {Connection} from 'mysql2/promise';
 
-export interface DataResponse<T> {
-  data: T;
+export interface RequestWithDependencies extends Request {
+  env: { [key: string]: string };
+  dbHandle: Connection;
 }
-
-export interface ErrorResponseField {
-  value?: string;
-  msg: string;
-  param: string;
-  location: string;
-}
-
-export interface ErrorResponse {
-  errors: Dictionary<ErrorResponseField>;
-}
-
-

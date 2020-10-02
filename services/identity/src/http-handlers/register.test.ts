@@ -16,10 +16,8 @@
 import {register}                from './register';
 import fs                        from 'fs';
 import path                      from 'path';
-import {FakeMysql}               from 'utilities/test-mocks';
-import {RequestWithDependencies} from 'types/request-with-dependencies';
-import {Connection}              from 'mysql2/promise';
-import {castTo}                  from 'utilities/types';
+import {FakeMysql}               from '@socialstuff/utilities/testing';
+import {RequestWithDependencies} from '../request-with-dependencies';
 
 describe('register', () => {
   const publicKey = fs.readFileSync(path.join(__dirname, '..', '..', 'rsa-example.public')).toString('utf8').replace(/\\n/g, '\n');
@@ -57,7 +55,7 @@ describe('register', () => {
     const dbMock = new FakeMysql([0, 0, 0]);
     const req = mockRequest() as RequestWithDependencies;
     const res = mockResponse();
-    req.dbHandle = castTo<Connection>(dbMock);
+    req.dbHandle = dbMock as any;
     await register(req, res);
     expect(res.__status).toBe(201);
     const registerResult = res.__body;

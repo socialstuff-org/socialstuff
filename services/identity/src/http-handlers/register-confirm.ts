@@ -13,21 +13,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Response}                                                     from 'express';
-import {body}                                                         from 'express-validator';
-import {ComposedHandler}                                              from 'types/composed-handler';
-import {RequestWithDependencies}                                      from 'types/request-with-dependencies';
-import {DataResponse}                                                 from 'types/responses';
-import {injectDatabaseConnectionIntoRequest, rejectOnValidationError} from 'utilities/express';
-import {sharedConnection}                                             from 'utilities/mysql';
-import {hashHmac}                                                     from 'utilities/security';
-import {RowDataPacket}                                                from 'mysql2/promise';
+import {Request, Response}                   from 'express';
+import {body}                                from 'express-validator';
+import {RowDataPacket}                       from 'mysql2/promise';
+import {sharedConnection}                    from '../mysql';
+import {hashHmac}                            from '@socialstuff/utilities/security';
+import {injectDatabaseConnectionIntoRequest} from '../utilities';
+import {rejectOnValidationError}             from '@socialstuff/utilities/express';
+import {DataResponse}                        from '@socialstuff/utilities/responses';
+import {RequestWithDependencies}             from '../request-with-dependencies';
 
 const findTokenSql = 'SELECT id_user as userId FROM registration_confirmations WHERE secret_hash=? AND NOW() < expires_at;';
 const deleteRegistrationConfirmationSql = 'DELETE FROM registration_confirmations WHERE secret_hash=?;';
 const enableUserLoginSql = 'UPDATE users SET can_login=1 WHERE id=?;';
 
-const middleware: ComposedHandler[] = [
+const middleware: any[] = [
   body('token').isHexadecimal().custom(async token => {
     if (!token) {
       return;
@@ -43,8 +43,8 @@ const middleware: ComposedHandler[] = [
   injectDatabaseConnectionIntoRequest,
 ];
 
-async function registerConfirm(req: RequestWithDependencies, res: Response) {
-  const db = req.dbHandle!;
+async function registerConfirm(req: Request, res: Response) {
+  const db = (req as RequestWithDependencies).dbHandle;
   const tokenHash = hashHmac(req.body.token);
   const [[{userId}]] = await db.query<RowDataPacket[]>(findTokenSql, [tokenHash]);
   await db.beginTransaction();

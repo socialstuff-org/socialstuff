@@ -13,8 +13,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface RegisterResponseBody {
-  message: string;
-  token?: string;
-  mfa_seed?: string;
+import {NextFunction, Request, Response} from 'express';
+import {sharedConnection}                from './mysql';
+import {RequestWithDependencies}         from './request-with-dependencies';
+
+export async function injectDatabaseConnectionIntoRequest(req: Request, _: Response, next: NextFunction) {
+  (req as RequestWithDependencies).dbHandle = await sharedConnection();
+  next();
 }
