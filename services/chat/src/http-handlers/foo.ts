@@ -14,13 +14,12 @@
 // along with SocialStuff Chat.  If not, see <https://www.gnu.org/licenses/>.
 
 import axios                                from 'axios';
-import {ValidationChain}                    from 'express-validator';
-import {Response}                           from 'express';
-import {injectMongodbConnectionIntoRequest} from 'utilities/express';
-import {RequestWithDependencies}            from 'types/request-with-dependencies';
+import {ValidationChain}               from 'express-validator';
+import {Request, Response}             from 'express';
+import { injectConnectionIntoRequest } from '../mongodb';
 
 export const middleware: ValidationChain[] = [
-  injectMongodbConnectionIntoRequest as any
+  injectConnectionIntoRequest as any
 ];
 
 const defaultResponse = {
@@ -31,8 +30,8 @@ const defaultResponse = {
   }
 };
 
-export async function foo(req: RequestWithDependencies, res: Response) {
-  const target = req.env!.SOCIALSTUFF_IDENTITY_ENDPOINT + '/register';
+export async function foo(req: Request, res: Response) {
+  const target = (req as any).env!.SOCIALSTUFF_IDENTITY_ENDPOINT + '/register';
   console.log('target:', target);
   try {
     const identityResponse = await axios.post(target);
