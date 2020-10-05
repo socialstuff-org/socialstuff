@@ -1,0 +1,85 @@
+:host {
+
+}
+
+@import "../styles/colors";
+
+#sidenav-container {
+  position: absolute;
+  top: 60px;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+}
+
+#sidenav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 250px;
+  background-color: $plumViolet;
+}
+
+#footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.sidenav-link {
+  text-decoration: none;
+  margin-left: 10px;
+  color: $plainWhite;
+}
+
+mat-list-item:hover {
+  background-color: $coralRed;
+}
+
+.contactListItem {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.mat-list-base {
+  padding-top: 0;
+}
+
+#search-bar {
+  border-radius: 50px;
+  background-color: $elderberry;
+  color: $plainWhite;
+  width: 80%;
+  border: none;
+  height: 20px;
+}
+
+#search-bar::placeholder {
+  color: $plainWhite;
+}
+
+.contact-list-divider {
+  border-color: $elderberry;
+}
+
+.profile-picture {
+  width: 40px;
+  height: 40px;
+  border: 2px solid $frenchRasperry;
+  border-radius: 40px;
+  text-align: center;
+  line-height: 40px;
+  float: left;
+  background-color: $elderberry;
+}
+
+.username {
+  line-height: 20px;
+  width: 100%;
+  margin-left: 65px;
+}
+
+mat-form-field input::placeholder {
+  color: $plainWhite !important;
+}

@@ -7,8 +7,6 @@ services:
     build:
       context: services/chat
       dockerfile: docker/dev/Dockerfile
-    ports:
-      - "3100:3000"
     networks:
       - socialstuff_chat_network_dev
       - socialstuff_network_dev
@@ -38,8 +36,6 @@ services:
     build:
       context: services/identity
       dockerfile: docker/dev/Dockerfile
-    ports:
-      - "3000:3000"
     networks:
       - socialstuff_identity_network_dev
       - socialstuff_network_dev
@@ -59,8 +55,20 @@ services:
       MYSQL_DATABASE: socialstuff_identity_dev
     networks:
       - socialstuff_identity_network_dev
+  
+  
+  socialstuff_nginx_dev:
+    container_name: socialstuff_nginx_dev
+    hostname: socialstuff_nginx_dev
+    build:
+      context: deployment/reverse_proxy
+      dockerfile: Dockerfile
     ports:
-    - "3306:3306"
+      - "8080:80"
+    networks:
+      - socialstuff_network_dev
+    environment:
+      - NGINX_PORT=80
 
 networks:
   socialstuff_network_dev:

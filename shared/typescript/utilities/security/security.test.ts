@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-import {decrypt, encrypt, hashHmac, hashUnique, passwordIssues, verifyHashUnique} from './security';
+import {decrypt, encrypt, hashHmac, hashUnique, passwordIssues, verifyHashUnique} from '.';
 
 describe('security-helper', () => {
   describe('hashUnique', () => {

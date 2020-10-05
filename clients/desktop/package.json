@@ -19,7 +19,7 @@
     "build": "npm run electron:serve-tsc && ng build --base-href ./",
     "build:dev": "npm run build -- -c dev",
     "build:prod": "npm run build -- -c production",
-    "ng:serve": "ng serve -c web -o",
+    "ng:serve": "ng serve -c web -o --host 0.0.0.0 --disableHostCheck",
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
     "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && npx electron . --serve",
     "electron:local": "npm run build:prod && npx electron .",
@@ -90,6 +90,7 @@
     "@angular/animations": "^10.0.0 || ^11.0.0-0",
     "@angular/cdk": "10.2.0",
     "@angular/forms": "^10.0.0 || ^11.0.0-0",
-    "@angular/material": "10.2.0"
+    "@angular/material": "10.2.0",
+    "idb": "5.0.6"
   }
 }

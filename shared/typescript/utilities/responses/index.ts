@@ -13,15 +13,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {NextFunction, Request, Response} from 'express';
-import { MongoClient } from 'mongodb';
-import {Connection}                      from 'mysql2/promise';
-import {Dictionary}                      from './common';
-
-export interface RequestWithDependencies extends Request {
-  dbHandle?: Connection;
-  mongo?: MongoClient;
-  env?: Dictionary<string>;
+export interface DataResponse<T> {
+  data: T;
 }
 
-export type RequestWithDependenciesHandler = (req: RequestWithDependencies, res: Response, next: NextFunction) => any;
+export interface ErrorResponseField {
+  value?: string;
+  msg: string;
+  param: string;
+  location: string;
+}
+
+export interface ErrorResponse {
+  errors: { [key: string]: ErrorResponseField };
+}
+
+

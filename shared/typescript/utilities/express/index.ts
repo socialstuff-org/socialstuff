@@ -13,6 +13,20 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-export function castTo<T>(value: any) {
-  return value as T;
+import {NextFunction, Request, Response} from 'express';
+import {validationResult}                from 'express-validator';
+
+
+export function rejectOnValidationError(req: Request, res: Response, next: NextFunction) {
+  const errors = validationResult(req);
+  if (errors.isEmpty()) {
+    next();
+  } else {
+    res.status(400).json({errors: errors.mapped()});
+  }
+}
+
+export function injectProcessEnvironmentIntoRequest(req: Request, _: Response, next: NextFunction) {
+  (req as any).env = process.env as { [key: string]: string };
+  next();
 }

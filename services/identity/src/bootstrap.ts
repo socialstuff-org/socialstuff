@@ -15,14 +15,16 @@
 
 /* istanbul ignore file */
 
-import {createConnection, rebuildDatabase, sharedConnection} from 'utilities/mysql';
+import crypto                                                from 'crypto';
+import path                                                  from 'path';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
-import {delay}                                               from 'utilities/common';
-import fs                                                    from 'fs';
-import {hashHmac, hashUnique}                                from 'utilities/security';
 import {v1}                                                  from 'uuid';
 import {OkPacket}                                            from 'mysql2/promise';
+import fs                                                    from 'fs';
+import {createConnection, rebuildDatabase, sharedConnection} from './mysql';
+import {delay}                from '@socialstuff/utilities/common';
+import {hashHmac, hashUnique} from '@socialstuff/utilities/security';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env(ENV);
@@ -45,15 +47,27 @@ export default (async () => {
     }
   }
 
+  {
+    const keysPath = path.join(__dirname, '..', 'priv.pem')
+    if (!fs.existsSync(keysPath)) {
+      const keys = crypto.generateKeyPairSync('rsa', { modulusLength: 4096 });
+      fs.writeFileSync(keysPath, keys.privateKey.export({ format: 'pem', type: 'pkcs1' }));
+      fs.writeFileSync(path.join(__dirname, '..', 'pub.pem'), keys.publicKey.export({ format: 'pem', type: 'pkcs1' }));
+    }
+  }
+
   const db = await sharedConnection();
 
   if (ENV !== 'dev') {
     return;
   }
 
-  const publicKey = (await fs.promises.readFile(__dirname + '/../rsa-example.public')).toString('utf-8');
-  const password = 'foobarfoobar';
-  const username = 'johndoe';
+  const ecdh = crypto.createECDH('secp256k1');
+  ecdh.generateKeys();
+  process.env.ECDH_PRIVATE_KEY = ecdh.getPrivateKey().toString('base64');
+  const publicKey = ecdh.getPrivateKey().toString('base64');
+  const password = crypto.randomBytes(16).toString('hex');
+  const username = 'root';
 
   console.log('Setting up database...');
   await rebuildDatabase();
@@ -62,8 +76,9 @@ export default (async () => {
   const id = v1().replace(/-/g, '');
   const token = await hashHmac(id);
   await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
+  console.log('root password:           ', password);
   console.log('sample invite code:      ', id);
-  const addUserSql = 'INSERT INTO users (id,username,password,public_key) VALUES (unhex(?),?,?,?);';
+  const addUserSql = 'INSERT INTO users (id,username,password,public_key, can_login) VALUES (unhex(?),?,?,?,1);';
   const userID = v1().replace(/-/g, '');
   await db.query<OkPacket>(addUserSql, [userID,username, await hashUnique(password), publicKey]);
   const secret = v1().replace(/-/g, '');

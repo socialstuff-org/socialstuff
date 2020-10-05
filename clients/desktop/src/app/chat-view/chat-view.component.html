@@ -1,8 +1,13 @@
-<div style="margin-top: 20px;"><!-- SPACER --></div>
-<div class="chat-message-list">
-  <div *ngFor="let message of messages">
-    <div class="message-row">
-      <app-chat-bubble [message]="message"></app-chat-bubble>
+<app-header [chatPartner]="chatPartner"></app-header>
+<app-sidenav></app-sidenav>
+
+<div id="chat-view-container">
+  <div style="margin-top: 20px;"><!-- SPACER --></div>
+  <div class="chat-message-list">
+    <div *ngFor="let message of messages">
+      <div class="message-row">
+        <app-chat-bubble [message]="message"></app-chat-bubble>
+      </div>
     </div>
   </div>
 </div>

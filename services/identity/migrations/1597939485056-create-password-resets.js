@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-const { sharedConnection } = require('../lib/db-util');
+const { sharedConnection } = require('../lib/mysql');
 
 module.exports.up = async next => {
   const db = await sharedConnection();

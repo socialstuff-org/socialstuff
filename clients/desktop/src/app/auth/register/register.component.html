@@ -1,1 +1,37 @@
-<p>register works!</p>
+<div id="register-container">
+  <div id="sub-register-container">
+    <form action="">
+      <div class="input-wrapper" id="logo">
+        <img src="assets/img/eye.svg" alt="img unavailable">
+      </div>
+
+      <div class="input-wrapper" style="margin-bottom: 25px;">
+        <span id="register-headline">please enter your details</span>
+      </div>
+
+      <div class="input-wrapper">
+        <input [(ngModel)]="hostname" name="domain" class="custom-input-field" id="custom-input-field-type-2" placeholder="domain"/>
+        <input [(ngModel)]="port" name="port" class="custom-input-field" id="custom-input-field-type-3" placeholder="port" type="number" min="1" max="65535"/>
+      </div>
+      <div class="input-wrapper">
+        <input [(ngModel)]="username" name="username" class="custom-input-field wide-input-field" placeholder="username"/>
+      </div>
+      <div class="input-wrapper">
+        <input [(ngModel)]="password" name="password" class="custom-input-field wide-input-field" placeholder="·········" type="password"/>
+      </div>
+      <div class="input-wrapper">
+        <input [(ngModel)]="password_confirm" name="password_confirm" class="custom-input-field wide-input-field" placeholder="confirm password" type="password"/>
+      </div>
+      <div class="input-wrapper">
+        <button (click)="register()" class="custom-button">register</button>
+      </div>
+      <div class="input-wrapper">
+        <a routerLink="/login">Already have an account?</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<p>Already registered? Go to <a [href]="['login']">login</a></p>

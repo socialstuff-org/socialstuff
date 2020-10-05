@@ -15,21 +15,30 @@
 
 import {Request, Response}          from 'express';
 import {body}                       from 'express-validator';
-import {sharedConnection}           from 'utilities/mysql';
-import {rejectOnValidationError}    from 'utilities/express';
-import {hashHmac, verifyHashUnique} from 'utilities/security';
 import {RowDataPacket}              from 'mysql2/promise';
 import {v1}                         from 'uuid';
-import {DataResponse}               from 'types/responses';
+import {rejectOnValidationError}    from '@socialstuff/utilities/express';
+import {RequestWithDependencies}    from '../request-with-dependencies';
+import {hashHmac, verifyHashUnique} from '@socialstuff/utilities/security';
+import {DataResponse}               from '@socialstuff/utilities/responses';
 
 const middleware = [
-  body('username').isString().isLength({min: 5, max: 20}).withMessage('This is not a valid username.'),
+  body('username').isString().custom(async (username: string) => {
+    if (!username) {
+      throw new Error();
+    }
+    if (username.length >= 5 && username.length <= 20 || username === 'root') {
+
+    } else {
+      throw new Error();
+    }
+  }).withMessage('This is not a valid username.'),
   body('password').isString().isLength({min: 10, max: 40}).withMessage('This is not a valid password.'),
   rejectOnValidationError,
 ];
 
 async function login(req: Request, res: Response) {
-  const db = await sharedConnection();
+  const db = (req as RequestWithDependencies).dbHandle;
 
   const sql = 'SELECT id,password FROM users WHERE username LIKE ? AND can_login=1;';
 
