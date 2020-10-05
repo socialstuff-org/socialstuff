@@ -1,4 +1,5 @@
-import {MongoClient} from 'mongodb';
+import {NextFunction, Request, Response} from 'express';
+import {MongoClient}                     from 'mongodb';
 
 export function createConnection() {
   const mongoUri = `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE}`;
@@ -15,4 +16,9 @@ export function sharedConnection() {
     _sharedConnection = createConnection();
   }
   return _sharedConnection;
+}
+
+export async function injectConnectionIntoRequest(req: Request, _: Response, next: NextFunction) {
+  (req as any).mongo = await sharedConnection();
+  next();
 }
