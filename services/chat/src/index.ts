@@ -16,7 +16,7 @@
 import bodyParser                            from 'body-parser';
 import bootstrap                             from './bootstrap';
 import express                               from 'express';
-import {injectProcessEnvironmentIntoRequest} from 'utilities/express';
+import {injectProcessEnvironmentIntoRequest} from '@socialstuff/utilities/express';
 import util                                  from 'util';
 
 
