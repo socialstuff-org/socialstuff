@@ -20,5 +20,18 @@ module.exports = (config, options) => {
         }
     }
 
+    var IGNORES = [
+        'net'
+      ];
+
+    config.externals = [
+        function (context, request, callback) {
+            if (IGNORES.indexOf(request) >= 0) {
+              return callback(null, "require('" + request + "')");
+            }
+            return callback();
+          }
+    ];
+
     return config;
 }
