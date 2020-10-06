@@ -15,10 +15,10 @@
 
 /* istanbul ignore file */
 
-import {createConnection} from 'utilities/mongodb';
+import {createConnection} from './mongodb';
 // @ts-ignore
 import customEnv          from 'custom-env';
-import {delay}            from 'utilities/common';
+import {delay}            from '@socialstuff/utilities/common';
 // import fs        from 'fs';
 
 const ENV = process.env.NODE_ENV || 'dev';
