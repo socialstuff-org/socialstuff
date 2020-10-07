@@ -128,7 +128,7 @@ export async function hashUnique(data: any, secret?: Buffer) {
   return base64encode(hashString);
 }
 
-export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: string): Promise<{ pub: string, priv: string }> {
+export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: string): Promise<{ pub: KeyObject, priv: KeyObject }> {
   const privateKeyEncoding: any = {
     type:   'pkcs8',
     format: 'pem',
@@ -149,7 +149,7 @@ export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: st
       if (err) {
         rej(err);
       } else {
-        res({priv: privateKey, pub: publicKey});
+        res({priv: crypto.createPrivateKey(privateKey), pub: crypto.createPublicKey(publicKey)});
       }
     }));
   });
