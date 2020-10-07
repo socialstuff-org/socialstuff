@@ -13,7 +13,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-import {decrypt, encrypt, hashHmac, hashUnique, passwordIssues, verifyHashUnique} from '.';
+import crypto from 'crypto';
+import {
+  decrypt,
+  encrypt,
+  generateRsaKeyPair,
+  hashHmac,
+  hashUnique,
+  openEnvelop,
+  passwordIssues,
+  verifyHashUnique,
+  wrapEnvelop,
+}             from '.';
 
 describe('security-helper', () => {
   describe('hashUnique', () => {
@@ -87,12 +98,26 @@ describe('security-helper', () => {
   describe('hashHmac', () => {
     test('the same value results in the same hash', async () => {
       const value = 'Hello, World!';
-      const hash1 = await hashHmac(value);
-      const hash2 = await hashHmac(value);
+      const hash1 = hashHmac(value);
+      const hash2 = hashHmac(value);
       expect(hash1).not.toBeNull();
       expect(hash1).not.toBeUndefined();
       expect(typeof hash1).toBe('string');
       expect(hash1).toBe(hash2);
+    });
+  });
+
+  describe('key exchange', () => {
+    test('ecdh key gets properly packed and unpacked', async () => {
+      const aliceEcdh = crypto.createECDH('prime256v1');
+      const bobEcdh = crypto.createECDH('prime256v1');
+      aliceEcdh.generateKeys();
+      bobEcdh.generateKeys();
+      const aliceRsa = await generateRsaKeyPair();
+      const bobRsa = await generateRsaKeyPair();
+      const envelop = wrapEnvelop(aliceEcdh.getPublicKey(), aliceRsa.priv, bobRsa.pub);
+      const unwrapped = openEnvelop(envelop, aliceRsa.pub, bobRsa.priv);
+      expect(unwrapped.ecdh).toEqual(aliceEcdh.getPublicKey().toString('base64'));
     });
   });
 });
