@@ -110,14 +110,47 @@ export function base64decode(data: string) {
   return Buffer.from(data, 'base64').toString('utf-8');
 }
 
-export function verifyHashUnique(h: string, plain: string) {
+export function verifyHashUnique(h: string, plain: string, secret?: Buffer) {
+  if (!secret) {
+    secret = appSecretBytes();
+  }
   const {hash, salt} = JSON.parse(base64decode(h));
-  return argon.verify(hash, plain, {secret: appSecretBytes(), salt});
+  return argon.verify(hash, plain, {secret, salt});
 }
 
-export async function hashUnique(data: any) {
+export async function hashUnique(data: any, secret?: Buffer) {
+  if (!secret) {
+    secret = appSecretBytes();
+  }
   const salt = crypto.randomBytes(64);
-  const hash = await argon.hash(data, {secret: appSecretBytes(), salt});
+  const hash = await argon.hash(data, {secret, salt});
   const hashString = JSON.stringify({hash, salt});
   return base64encode(hashString);
+}
+
+export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: string): Promise<{ pub: string, priv: string }> {
+  const privateKeyEncoding: any = {
+    type:   'pkcs8',
+    format: 'pem',
+  };
+  if (passphrase) {
+    privateKeyEncoding.cipher = 'aes-256-cbc';
+    privateKeyEncoding.passphrase = passphrase;
+  }
+  return new Promise((res, rej) => {
+    crypto.generateKeyPair('rsa', {
+      modulusLength,
+      publicKeyEncoding: {
+        type:   'spki',
+        format: 'pem',
+      },
+      privateKeyEncoding,
+    }, ((err, publicKey, privateKey) => {
+      if (err) {
+        rej(err);
+      } else {
+        res({priv: privateKey, pub: publicKey});
+      }
+    }));
+  });
 }
