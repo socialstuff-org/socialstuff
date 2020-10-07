@@ -1,3 +1,4 @@
 **/*.js
 **/*.d.ts
 **/*.d.ts.map
+!jest.init.js
