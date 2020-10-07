@@ -13,60 +13,31 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  injectDatabaseConnectionIntoRequest,
-  injectProcessEnvironmentIntoRequest,
-  rejectOnValidationError,
-}                                from './express';
-import {castTo}                  from './types';
-import {RequestWithDependencies} from '../types/request-with-dependencies';
-import {Response}                from 'express';
-import {sharedConnection}        from './mysql';
+import {rejectOnValidationError} from '.';
+import {Response, Request}       from 'express';
 import {validationResult}        from 'express-validator';
 
-jest.mock('./mysql');
 jest.mock('express-validator');
 
 describe('express', () => {
-  describe('injectProcessEnvironmentIntoRequest', () => {
-    test('environment injection works', () => {
-      const req: RequestWithDependencies = castTo({});
-      const res: Response = castTo<Response>({});
-      const nextFunction = jest.fn();
-      injectProcessEnvironmentIntoRequest(req, res, nextFunction);
-      expect(Object.keys(req).length).toBeTruthy();
-      expect(nextFunction).toBeCalled();
-    });
-  });
-
-  describe('injectDatabaseConnectionIntoRequest', () => {
-    test('database injection works with stub', next => {
-      expect.assertions(1);
-      const req: RequestWithDependencies = castTo({});
-      const res: Response = castTo<Response>({});
-      // @ts-ignore
-      sharedConnection.mockResolvedValue(3);
-      injectDatabaseConnectionIntoRequest(req, res, () => {
-        // @ts-ignore
-        sharedConnection.mockClear();
-        expect(req.dbHandle).toBe(3);
-        next();
-      });
-    });
-  });
-
   describe('rejectOnValidationError', () => {
     test('rejects on errors with status 400', () => {
-      const req: RequestWithDependencies = castTo({});
-      const res: Response = castTo<Response>({
+      const req: Request = {} as any;
+      const res: Response = ({
         status: jest.fn(),
-        json: jest.fn(),
-      });
+        json:   jest.fn(),
+      }) as any;
       // @ts-ignore
       res.status.mockReturnValue(res);
       const nextFunction = jest.fn();
       // @ts-ignore
-      validationResult.mockReturnValue({ isEmpty() { return false; }, mapped() { return 42; } });
+      validationResult.mockReturnValue({
+        isEmpty() {
+          return false;
+        }, mapped() {
+          return 42;
+        },
+      });
       rejectOnValidationError(req, res, nextFunction);
       // @ts-ignore
       validationResult.mockClear();
@@ -76,11 +47,15 @@ describe('express', () => {
     });
 
     test('passes the request on, if no error are present', () => {
-      const req: RequestWithDependencies = castTo({});
-      const res: Response = castTo<Response>({});
+      const req: Request = {} as any;
+      const res: Response = {} as any;
       const nextFunction = jest.fn();
       // @ts-ignore
-      validationResult.mockImplementation(() => ({ isEmpty() { return true; } }));
+      validationResult.mockImplementation(() => ({
+        isEmpty() {
+          return true;
+        },
+      }));
       rejectOnValidationError(req, res, nextFunction);
       // @ts-ignore
       validationResult.mockClear();
