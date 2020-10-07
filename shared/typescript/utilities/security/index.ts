@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-import crypto from 'crypto';
-import argon  from 'argon2';
+import crypto, {KeyObject} from 'crypto';
+import argon               from 'argon2';
 
 const ENCRYPTION_ALGORITHM = 'aes-256-cbc';
 
@@ -153,4 +153,34 @@ export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: st
       }
     }));
   });
+}
+
+export function wrapEnvelop(senderEcdhPub: Buffer, senderRsaPriv: KeyObject, receiverRsaPub: KeyObject) {
+  const ecdhStr = senderEcdhPub.toString('base64');
+  const signer = crypto.createSign('RSA-SHA512');
+  signer.update(ecdhStr);
+  const letter = {
+    name:    'alice',
+    ecdhSig: signer.sign(senderRsaPriv, 'base64'),
+    ecdh:    ecdhStr,
+  };
+  const letterBuffer = Buffer.from(JSON.stringify(letter), 'utf8');
+  const key = crypto.randomBytes(32);
+  const letterEncrypted = encrypt(letterBuffer, key);
+  const encryptedKey = crypto.publicEncrypt(receiverRsaPub, key);
+  const envelop = {letter: letterEncrypted, key: encryptedKey.toString('base64')};
+  return JSON.stringify(envelop);
+}
+
+export function openEnvelop(envelopStr: string, senderRsaPub: KeyObject, receiverRsaPriv: KeyObject) {
+  const envelop = JSON.parse(envelopStr) as { letter: string, key: string };
+  const key = crypto.privateDecrypt(receiverRsaPriv, Buffer.from(envelop.key, 'base64'));
+  const letterStr = decrypt(envelop.letter, key).toString('utf-8');
+  const letter = JSON.parse(letterStr) as { name: string, ecdhSig: string, ecdh: string };
+  const verifier = crypto.createVerify('RSA-SHA512');
+  verifier.update(letter.ecdh);
+  if (!verifier.verify(senderRsaPub, letter.ecdhSig, 'base64')) {
+    throw new Error('Sender verification failed!');
+  }
+  return letter;
 }
