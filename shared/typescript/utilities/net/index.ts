@@ -1,5 +1,5 @@
 import {Socket, SocketConnectOpts, SocketConstructorOpts} from 'net';
-import {fromEvent, Observable}                   from 'rxjs';
+import {fromEvent, Observable}                            from 'rxjs';
 
 export class RxSocket {
   private readonly _socket: Socket;
@@ -17,7 +17,7 @@ export class RxSocket {
           res();
         }
       });
-    })
+    });
   }
 
   public on(event: 'data'): Observable<Buffer>;
