@@ -2,3 +2,5 @@
 !**/*.d.ts
 .gitignore
 tsconfig.json
+.idea/
+.vscode/
