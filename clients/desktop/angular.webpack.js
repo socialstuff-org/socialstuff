@@ -3,35 +3,38 @@
  */
 
 module.exports = (config, options) => {
-    config.target = 'electron-renderer';
+  config.target = 'electron-renderer';
 
 
-    if (options.fileReplacements) {
-        for(let fileReplacement of options.fileReplacements) {
-            if (fileReplacement.replace !== 'src/environments/environment.ts') {
-                continue;
-            }
+  if (options.fileReplacements) {
+    for (let fileReplacement of options.fileReplacements) {
+      if (fileReplacement.replace !== 'src/environments/environment.ts') {
+        continue;
+      }
 
-            let fileReplacementParts = fileReplacement['with'].split('.');
-            if (fileReplacementParts.length > 1 && ['web'].indexOf(fileReplacementParts[1]) >= 0) {
-                config.target = 'web';
-            }
-            break;
-        }
+      let fileReplacementParts = fileReplacement['with'].split('.');
+      if (fileReplacementParts.length > 1 && ['web'].indexOf(fileReplacementParts[1]) >= 0) {
+        config.target = 'web';
+      }
+      break;
     }
+  }
 
-    var IGNORES = [
-        'net'
-      ];
+  const IGNORES = [
+    'crypto',
+    'fs',
+    'net',
+    'path',
+  ];
 
-    config.externals = [
-        function (context, request, callback) {
-            if (IGNORES.indexOf(request) >= 0) {
-              return callback(null, "require('" + request + "')");
-            }
-            return callback();
-          }
-    ];
+  config.externals = [
+    function (context, request, callback) {
+      if (IGNORES.indexOf(request) >= 0) {
+        return callback(null, 'require(\'' + request + '\')');
+      }
+      return callback();
+    },
+  ];
 
-    return config;
-}
+  return config;
+};
