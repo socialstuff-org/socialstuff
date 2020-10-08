@@ -152,12 +152,12 @@ export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: st
   });
 }
 
-export function wrapEnvelop(senderEcdhPub: Buffer, senderRsaPriv: KeyObject, receiverRsaPub: KeyObject) {
+export function wrapEnvelop(senderName: string, senderEcdhPub: Buffer, senderRsaPriv: KeyObject, receiverRsaPub: KeyObject) {
   const ecdhStr = senderEcdhPub.toString('base64');
   const signer = crypto.createSign('RSA-SHA512');
   signer.update(ecdhStr);
   const letter = {
-    name:    'alice',
+    name:    senderName,
     ecdhSig: signer.sign(senderRsaPriv, 'base64'),
     ecdh:    ecdhStr,
   };
@@ -171,13 +171,17 @@ export function wrapEnvelop(senderEcdhPub: Buffer, senderRsaPriv: KeyObject, rec
 
 export function openEnvelop(envelopStr: string, senderRsaPub: KeyObject, receiverRsaPriv: KeyObject) {
   const envelop = JSON.parse(envelopStr) as { letter: string, key: string };
-  const key = crypto.privateDecrypt(receiverRsaPriv, Buffer.from(envelop.key, 'base64'));
-  const letterStr = decrypt(envelop.letter, key).toString('utf-8');
-  const letter = JSON.parse(letterStr) as { name: string, ecdhSig: string, ecdh: string };
-  const verifier = crypto.createVerify('RSA-SHA512');
-  verifier.update(letter.ecdh);
-  if (!verifier.verify(senderRsaPub, letter.ecdhSig, 'base64')) {
+  try {
+    const key = crypto.privateDecrypt(receiverRsaPriv, Buffer.from(envelop.key, 'base64'));
+    const letterStr = decrypt(envelop.letter, key).toString('utf-8');
+    const letter = JSON.parse(letterStr) as { name: string, ecdhSig: string, ecdh: string };
+    const verifier = crypto.createVerify('RSA-SHA512');
+    verifier.update(letter.ecdh);
+    if (!verifier.verify(senderRsaPub, letter.ecdhSig, 'base64')) {
+      throw new Error();
+    }
+    return letter;
+  } catch (e) {
     throw new Error('Sender verification failed!');
   }
-  return letter;
 }

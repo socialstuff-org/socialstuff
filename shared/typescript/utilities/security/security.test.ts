@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-import crypto from 'crypto';
+import crypto, {KeyObject} from 'crypto';
 import {
   decrypt,
   encrypt,
@@ -24,7 +24,7 @@ import {
   passwordIssues,
   verifyHashUnique,
   wrapEnvelop,
-}             from '.';
+}                          from '.';
 
 describe('security-helper', () => {
   describe('hashUnique', () => {
@@ -108,16 +108,29 @@ describe('security-helper', () => {
   });
 
   describe('key exchange', () => {
-    test('ecdh key gets properly packed and unpacked', async () => {
-      const aliceEcdh = crypto.createECDH('prime256v1');
-      const bobEcdh = crypto.createECDH('prime256v1');
-      aliceEcdh.generateKeys();
-      bobEcdh.generateKeys();
-      const aliceRsa = await generateRsaKeyPair();
-      const bobRsa = await generateRsaKeyPair();
-      const envelop = wrapEnvelop(aliceEcdh.getPublicKey(), aliceRsa.priv, bobRsa.pub);
+    const aliceEcdh = crypto.createECDH('prime256v1');
+    const bobEcdh = crypto.createECDH('prime256v1');
+    aliceEcdh.generateKeys();
+    bobEcdh.generateKeys();
+    let aliceRsa: { pub: KeyObject, priv: KeyObject };
+    let bobRsa: { pub: KeyObject, priv: KeyObject };
+
+    beforeAll(async () => {
+      aliceRsa = await generateRsaKeyPair(1024);
+      bobRsa = await generateRsaKeyPair(1024);
+    });
+
+    test('ecdh key gets properly packed and unpacked', () => {
+      const envelop = wrapEnvelop('alice', aliceEcdh.getPublicKey(), aliceRsa.priv, bobRsa.pub);
       const unwrapped = openEnvelop(envelop, aliceRsa.pub, bobRsa.priv);
       expect(unwrapped.ecdh).toEqual(aliceEcdh.getPublicKey().toString('base64'));
+    });
+
+    test('throws if wrong private key is provided while unwrapping', async () => {
+      expect(() => {
+        const envelop = wrapEnvelop('alice', aliceEcdh.getPublicKey(), aliceRsa.priv, bobRsa.pub);
+        openEnvelop(envelop, aliceRsa.pub, aliceRsa.priv);
+      }).toThrow('Sender verification failed!');
     });
   });
 });
