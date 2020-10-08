@@ -78,8 +78,8 @@ export function appSecretBytes() {
   return _appSecretBytes;
 }
 
-export function hashHmac(data: crypto.BinaryLike) {
-  const hmac = crypto.createHmac('sha512', appSecretBytes());
+export function hashHmac(data: crypto.BinaryLike, key: Buffer = appSecretBytes()) {
+  const hmac = crypto.createHmac('sha512', key);
   return hmac.update(data).digest('hex');
 }
 
@@ -110,10 +110,7 @@ export function base64decode(data: string) {
   return Buffer.from(data, 'base64').toString('utf-8');
 }
 
-export function verifyHashUnique(h: string, plain: string, secret?: Buffer) {
-  if (!secret) {
-    secret = appSecretBytes();
-  }
+export function verifyHashUnique(h: string, plain: string, secret: Buffer = appSecretBytes()) {
   const {hash, salt} = JSON.parse(base64decode(h));
   return argon.verify(hash, plain, {secret, salt});
 }
