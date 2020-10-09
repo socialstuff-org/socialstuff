@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-import crypto from 'crypto';
-import argon  from 'argon2';
+import crypto, {KeyObject} from 'crypto';
+import argon               from 'argon2';
 
 const ENCRYPTION_ALGORITHM = 'aes-256-cbc';
 
@@ -78,8 +78,8 @@ export function appSecretBytes() {
   return _appSecretBytes;
 }
 
-export function hashHmac(data: crypto.BinaryLike) {
-  const hmac = crypto.createHmac('sha512', appSecretBytes());
+export function hashHmac(data: crypto.BinaryLike, key: Buffer = appSecretBytes()) {
+  const hmac = crypto.createHmac('sha512', key);
   return hmac.update(data).digest('hex');
 }
 
@@ -110,14 +110,78 @@ export function base64decode(data: string) {
   return Buffer.from(data, 'base64').toString('utf-8');
 }
 
-export function verifyHashUnique(h: string, plain: string) {
+export function verifyHashUnique(h: string, plain: string, secret: Buffer = appSecretBytes()) {
   const {hash, salt} = JSON.parse(base64decode(h));
-  return argon.verify(hash, plain, {secret: appSecretBytes(), salt});
+  return argon.verify(hash, plain, {secret, salt});
 }
 
-export async function hashUnique(data: any) {
+export async function hashUnique(data: any, secret?: Buffer) {
+  if (!secret) {
+    secret = appSecretBytes();
+  }
   const salt = crypto.randomBytes(64);
-  const hash = await argon.hash(data, {secret: appSecretBytes(), salt});
+  const hash = await argon.hash(data, {secret, salt});
   const hashString = JSON.stringify({hash, salt});
   return base64encode(hashString);
+}
+
+export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: string): Promise<{ pub: KeyObject, priv: KeyObject }> {
+  const privateKeyEncoding: any = {
+    type:   'pkcs8',
+    format: 'pem',
+  };
+  if (passphrase) {
+    privateKeyEncoding.cipher = 'aes-256-cbc';
+    privateKeyEncoding.passphrase = passphrase;
+  }
+  return new Promise((res, rej) => {
+    crypto.generateKeyPair('rsa', {
+      modulusLength,
+      publicKeyEncoding: {
+        type:   'spki',
+        format: 'pem',
+      },
+      privateKeyEncoding,
+    }, ((err, publicKey, privateKey) => {
+      if (err) {
+        rej(err);
+      } else {
+        res({priv: crypto.createPrivateKey(privateKey), pub: crypto.createPublicKey(publicKey)});
+      }
+    }));
+  });
+}
+
+export function wrapEnvelop(senderName: string, senderEcdhPub: Buffer, senderRsaPriv: KeyObject, receiverRsaPub: KeyObject) {
+  const ecdhStr = senderEcdhPub.toString('base64');
+  const signer = crypto.createSign('RSA-SHA512');
+  signer.update(ecdhStr);
+  const letter = {
+    name:    senderName,
+    ecdhSig: signer.sign(senderRsaPriv, 'base64'),
+    ecdh:    ecdhStr,
+  };
+  const letterBuffer = Buffer.from(JSON.stringify(letter), 'utf8');
+  const key = crypto.randomBytes(32);
+  const letterEncrypted = encrypt(letterBuffer, key);
+  const encryptedKey = crypto.publicEncrypt(receiverRsaPub, key);
+  const envelop = {letter: letterEncrypted, key: encryptedKey.toString('base64')};
+  return JSON.stringify(envelop);
+}
+
+export function openEnvelop(envelopStr: string, senderRsaPub: KeyObject, receiverRsaPriv: KeyObject) {
+  const envelop = JSON.parse(envelopStr) as { letter: string, key: string };
+  try {
+    const key = crypto.privateDecrypt(receiverRsaPriv, Buffer.from(envelop.key, 'base64'));
+    const letterStr = decrypt(envelop.letter, key).toString('utf-8');
+    const letter = JSON.parse(letterStr) as { name: string, ecdhSig: string, ecdh: string };
+    const verifier = crypto.createVerify('RSA-SHA512');
+    verifier.update(letter.ecdh);
+    if (!verifier.verify(senderRsaPub, letter.ecdhSig, 'base64')) {
+      throw new Error();
+    }
+    return letter;
+  } catch (e) {
+    throw new Error('Sender verification failed!');
+  }
 }
