@@ -1,0 +1,121 @@
+// This file is part of the TITP.
+//
+// TITP is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// TITP is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with TITP.  If not, see <https://www.gnu.org/licenses/>.
+
+import {Server, Socket}                                                              from 'net';
+import * as Rx                                                                       from 'rxjs';
+import {Observable}                                                                  from 'rxjs';
+import {KeyObject, ECDH, createVerify, createSign, privateDecrypt, createDecipheriv} from 'crypto';
+import {makeWriteP}                                                                  from '../socket';
+
+const ECDH_END_INDEX = 97;
+const ECDH_SIG_END_INDEX = ECDH_END_INDEX + 512;
+const USERNAME_AES_KEY_END_INDEX = ECDH_SIG_END_INDEX + 512;
+const USERNAME_END_INDEX = USERNAME_AES_KEY_END_INDEX + 32;
+
+export type RsaUserLookupFunction = (username: string) => Promise<KeyObject>;
+
+export class TitpServer {
+  private _server: Server;
+  private _ecdh: ECDH;
+  private _rsa: { priv: KeyObject, pub: KeyObject };
+  private _userRsa: { [key: string]: KeyObject } = {};
+  private _userSyncKeys: { [key: string]: Buffer } = {};
+  private readonly _rsaLookup: RsaUserLookupFunction;
+
+  constructor(rsa: { priv: KeyObject, pub: KeyObject }, ecdh: ECDH, rsaLookup: RsaUserLookupFunction) {
+    this._server = new Server(this._handleIncomingConnection.bind(this));
+    this._ecdh = ecdh;
+    this._rsa = rsa;
+    this._rsaLookup = rsaLookup;
+  }
+
+  public rsaPublicKey() {
+    return this._rsa.pub;
+  }
+
+  private async _handleIncomingConnection(socket: Socket) {
+    const username = await this._performHandshake(socket);
+    console.log(`Server> new successful connection with user '${username}'.`);
+  }
+
+  private _performHandshake(s: Socket) {
+    return new Promise((res, rej) => {
+      let dataBuffer = Buffer.from([]);
+      const dataSubscription = Rx.fromEvent<Buffer>(s, 'data').subscribe(async data => {
+        dataBuffer = Buffer.concat([dataBuffer, data]);
+        // console.log('new data length:', dataBuffer.length, '; required index:', USERNAME_END_INDEX);
+        if (dataBuffer.length < (USERNAME_END_INDEX - 1)) {
+          return;
+        }
+        const ecdhPub = dataBuffer.slice(0, ECDH_END_INDEX);
+        const ecdhSig = dataBuffer.slice(ECDH_END_INDEX, ECDH_SIG_END_INDEX);
+        const [usernameKey, usernameIv] = (() => {
+          const usernameKeyBuffer = dataBuffer.slice(ECDH_SIG_END_INDEX, USERNAME_AES_KEY_END_INDEX);
+          const decrypted = privateDecrypt(this._rsa.priv, usernameKeyBuffer);
+          return [decrypted.slice(0, 32), decrypted.slice(32)];
+        })();
+        const usernameBytes = (() => {
+          const username = dataBuffer.slice(USERNAME_AES_KEY_END_INDEX, USERNAME_END_INDEX);
+          const decipher = createDecipheriv('aes-256-cbc', usernameKey, usernameIv);
+          return Buffer.concat([decipher.update(username), decipher.final()]);
+        })();
+        const username = usernameBytes.toString('utf8').trimEnd();
+        const userRsa = this._userRsa[username] || await this._rsaLookup(username);
+        {
+          const verifier = createVerify('RSA-SHA512');
+          verifier.update(ecdhPub);
+          const signatureMatch = verifier.verify(userRsa, ecdhSig);
+          if (!signatureMatch) {
+            rej('The signature did not match!');
+            dataSubscription.unsubscribe();
+            return;
+          }
+        }
+        this._userRsa[username] = userRsa;
+        this._userSyncKeys[username] = this._ecdh.computeSecret(ecdhPub);
+
+        const write = makeWriteP(s);
+        const reply: Buffer[] = [this._ecdh.getPublicKey()];
+        {
+          const signer = createSign('RSA-SHA512');
+          signer.update(this._ecdh.getPublicKey());
+          const serverEcdhSig = signer.sign(this._rsa.priv);
+          reply.push(serverEcdhSig);
+        }
+
+        await write(Buffer.concat(reply));
+        dataSubscription.unsubscribe();
+        res(username);
+      });
+    });
+  }
+
+  // public on(event: 'connection'): Observable<TitpClient>;
+  public on(event: string): Observable<any> {
+    return new Observable<any>();
+  }
+
+  public listen(port: number, host: string = '0.0.0.0') {
+    return new Promise<TitpServer>(res => {
+      this._server.listen(port, host, () => res(this));
+    });
+  }
+
+  public close() {
+    return new Promise<void>((res, rej) => {
+      this._server.close(e => ((e ? rej : res)(e as any)));
+    });
+  }
+}
