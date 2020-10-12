@@ -15,9 +15,10 @@
 
 import {Server, Socket}                                                              from 'net';
 import * as Rx                                                                       from 'rxjs';
-import {Observable}                                                                  from 'rxjs';
+import {fromEvent, Observable}                                                       from 'rxjs';
 import {KeyObject, ECDH, createVerify, createSign, privateDecrypt, createDecipheriv} from 'crypto';
 import {makeWriteP}                                                                  from '../socket';
+import {TitpClientConnection}                                                        from './client-connection';
 
 const ECDH_END_INDEX = 97;
 const ECDH_SIG_END_INDEX = ECDH_END_INDEX + 512;
@@ -32,6 +33,7 @@ export class TitpServer {
   private _rsa: { priv: KeyObject, pub: KeyObject };
   private _userRsa: { [key: string]: KeyObject } = {};
   private _userSyncKeys: { [key: string]: Buffer } = {};
+  private _userSocks: { [key: string]: Socket } = {};
   private readonly _rsaLookup: RsaUserLookupFunction;
 
   constructor(rsa: { priv: KeyObject, pub: KeyObject }, ecdh: ECDH, rsaLookup: RsaUserLookupFunction) {
@@ -47,11 +49,18 @@ export class TitpServer {
 
   private async _handleIncomingConnection(socket: Socket) {
     const username = await this._performHandshake(socket);
+    this._userSocks[username] = socket;
     console.log(`Server> new successful connection with user '${username}'.`);
+    const key = this._userSyncKeys[username];
+    const con = new TitpClientConnection(socket, username, key);
+    con.data().subscribe(x => {
+      console.log(`Server> ${username}: ${x.toString('utf8')}`);
+      con.write('You too!');
+    });
   }
 
   private _performHandshake(s: Socket) {
-    return new Promise((res, rej) => {
+    return new Promise<string>((res, rej) => {
       let dataBuffer = Buffer.from([]);
       const dataSubscription = Rx.fromEvent<Buffer>(s, 'data').subscribe(async data => {
         dataBuffer = Buffer.concat([dataBuffer, data]);
