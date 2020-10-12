@@ -13,12 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import fs                                                         from 'fs';
-import path                                                       from 'path';
-import {createECDH, createPrivateKey, createPublicKey, KeyObject} from 'crypto';
-import {generateRsaKeyPair}                                       from '@socialstuff/utilities/security';
-import {TitpClient}                                               from '../client';
-import {TitpServer}                                               from '../server';
+import fs                                                                     from 'fs';
+import path                                                                   from 'path';
+import {createECDH, createPrivateKey, createPublicKey, getCiphers, KeyObject} from 'crypto';
+import {generateRsaKeyPair}                                                   from '@socialstuff/utilities/security';
+import {TitpClient}                                                           from '../client';
+import {TitpServer}                                                           from '../server';
+import {delay}                                                                from '@socialstuff/utilities/common';
 
 async function loadOrGenerateKeys(name: string, mod: number = 4096) {
   let exists;
@@ -72,8 +73,15 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
 
   await server.listen(8444);
   console.log('server running');
-  alice.connect(server.rsaPublicKey(), '127.0.0.1', 8444).then(x => {
+  alice.connect(server.rsaPublicKey(), '127.0.0.1', 8444).then(async () => {
     console.log('alice is now connected');
+    await delay(1000);
+    console.log('Client> sending message...');
+    await alice.write('Hello, World!');
+  });
+
+  alice.data().subscribe(x => {
+    console.log(`Client> server sent: ${x.toString('utf8')}`);
   });
 
 })();
