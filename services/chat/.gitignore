@@ -4,3 +4,6 @@ lib/
 coverage/
 loin_modules/
 .env
+*.d.ts
+*.d.ts.map
+src/**/*.js
