@@ -13,11 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Socket}                from 'net';
-import {Observable, fromEvent} from 'rxjs';
-import {promisify}             from 'util';
+import {Socket}                         from 'net';
+import {Observable, fromEvent, Subject} from 'rxjs';
+import {promisify}                      from 'util';
 import {
-  createCipheriv,
+  BinaryLike,
+  createCipheriv, createDecipheriv,
   createPrivateKey,
   createPublicKey,
   createSign, createVerify,
@@ -25,17 +26,19 @@ import {
   KeyObject,
   publicEncrypt,
   randomBytes,
-}                              from 'crypto';
-import {makeWriteP}            from '../socket';
+}                                       from 'crypto';
+import {makeWriteP}                     from '../socket';
 
 
 export class TitpClient {
   private _socket: Socket = new Socket();
   private _rsa: { priv: KeyObject, pub: KeyObject };
   private _ecdh: ECDH;
-  private _write: (data: (Uint8Array | string)) => Promise<void>;
+  private readonly _write: (data: (Uint8Array | string)) => Promise<void>;
   private _username: string;
   private _syncKey: Buffer = Buffer.alloc(0, 0);
+  private _dataBuffer: Buffer = Buffer.alloc(0);
+  private readonly _data: Subject<Buffer> = new Subject<Buffer>();
 
   constructor(username: string, rsa: { priv: KeyObject, pub: KeyObject } | string, ecdh: ECDH) {
     if (typeof rsa === 'string') {
@@ -53,6 +56,10 @@ export class TitpClient {
 
   public rsaPublicKey() {
     return this._rsa.pub;
+  }
+
+  public data(): Observable<Buffer> {
+    return this._data;
   }
 
   public async connect(hostRsaPub: KeyObject, host: string, port: number = 8086) {
@@ -92,13 +99,30 @@ export class TitpClient {
           return;
         }
         this._syncKey = this._ecdh.computeSecret(ecdhPub);
+        fromEvent<Buffer>(this._socket, 'data').subscribe(data => {
+          this._dataBuffer = Buffer.concat([this._dataBuffer, data]);
+          if (this._socket.bufferSize) {
+            return;
+          }
+          const decipher = createDecipheriv('aes-256-cbc', this._syncKey.slice(0, 32), this._syncKey.slice(32));
+          const result = Buffer.concat([decipher.update(this._dataBuffer), decipher.final()]);
+          this._dataBuffer = Buffer.alloc(0);
+          this._data.next(result);
+        });
         sub.unsubscribe();
         res();
       });
     });
   }
 
+  public on(event: 'data'): Observable<Buffer>;
   public on(event: string): Observable<any> {
-    return new Observable<any>();
+    return fromEvent(this._socket, event);
+  }
+
+  public write(data: BinaryLike) {
+    const cipher = createCipheriv('aes-256-cbc', this._syncKey.slice(0, 32), this._syncKey.slice(32));
+    const enc = Buffer.concat([cipher.update(data), cipher.final()]);
+    return this._write(enc);
   }
 }
