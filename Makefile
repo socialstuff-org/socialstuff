@@ -9,6 +9,9 @@ down:
 stop:
 	$(COMPOSE_DEV_COMMAND) stop
 
+kill:
+	$(COMPOSE_DEV_COMMAND) kill -s SIGINT
+
 # login-web:
 # 	docker exec -ti socialstuff_identity_web_dev /bin/bash
 
