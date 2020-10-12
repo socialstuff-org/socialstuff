@@ -13,19 +13,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Server, Socket}                                                              from 'net';
-import * as Rx                                                                       from 'rxjs';
-import {fromEvent, Observable}                                                       from 'rxjs';
-import {KeyObject, ECDH, createVerify, createSign, privateDecrypt, createDecipheriv} from 'crypto';
-import {makeWriteP}                                                                  from '../socket';
-import {TitpClientConnection}                                                        from './client-connection';
+import {Server, Socket}                                              from 'net';
+import * as Rx                                                       from 'rxjs';
+import {Observable}                                                  from 'rxjs';
+import {KeyObject, ECDH, createVerify, createSign, createDecipheriv} from 'crypto';
+import {makeWriteP}                                                  from '../socket';
+import {TitpClientConnection}                                        from './client-connection';
 
 const ECDH_END_INDEX = 97;
 const ECDH_SIG_END_INDEX = ECDH_END_INDEX + 512;
-const USERNAME_AES_KEY_END_INDEX = ECDH_SIG_END_INDEX + 512;
-const USERNAME_END_INDEX = USERNAME_AES_KEY_END_INDEX + 32;
 
 export type RsaUserLookupFunction = (username: string) => Promise<KeyObject>;
+
+enum ClientServerHandshakeStep {
+  ReceiveEcdh,
+  ReceiveUsername
+}
 
 export class TitpServer {
   private _server: Server;
@@ -62,51 +65,63 @@ export class TitpServer {
   private _performHandshake(s: Socket) {
     return new Promise<string>((res, rej) => {
       let dataBuffer = Buffer.from([]);
+      let step: ClientServerHandshakeStep = ClientServerHandshakeStep.ReceiveEcdh;
+      let ecdhPub: Buffer;
+      let ecdhSig: Buffer;
+      let syncKey: Buffer;
+      const write = makeWriteP(s);
       const dataSubscription = Rx.fromEvent<Buffer>(s, 'data').subscribe(async data => {
         dataBuffer = Buffer.concat([dataBuffer, data]);
-        // console.log('new data length:', dataBuffer.length, '; required index:', USERNAME_END_INDEX);
-        if (dataBuffer.length < (USERNAME_END_INDEX - 1)) {
-          return;
-        }
-        const ecdhPub = dataBuffer.slice(0, ECDH_END_INDEX);
-        const ecdhSig = dataBuffer.slice(ECDH_END_INDEX, ECDH_SIG_END_INDEX);
-        const [usernameKey, usernameIv] = (() => {
-          const usernameKeyBuffer = dataBuffer.slice(ECDH_SIG_END_INDEX, USERNAME_AES_KEY_END_INDEX);
-          const decrypted = privateDecrypt(this._rsa.priv, usernameKeyBuffer);
-          return [decrypted.slice(0, 32), decrypted.slice(32)];
-        })();
-        const usernameBytes = (() => {
-          const username = dataBuffer.slice(USERNAME_AES_KEY_END_INDEX, USERNAME_END_INDEX);
-          const decipher = createDecipheriv('aes-256-cbc', usernameKey, usernameIv);
-          return Buffer.concat([decipher.update(username), decipher.final()]);
-        })();
-        const username = usernameBytes.toString('utf8').trimEnd();
-        const userRsa = this._userRsa[username] || await this._rsaLookup(username);
-        {
-          const verifier = createVerify('RSA-SHA512');
-          verifier.update(ecdhPub);
-          const signatureMatch = verifier.verify(userRsa, ecdhSig);
-          if (!signatureMatch) {
-            rej('The signature did not match!');
-            dataSubscription.unsubscribe();
-            return;
+        switch (step) {
+          case ClientServerHandshakeStep.ReceiveEcdh: {
+            if (dataBuffer.length < (ECDH_SIG_END_INDEX - 1)) {
+              return;
+            }
+            ecdhPub = dataBuffer.slice(0, ECDH_END_INDEX);
+            ecdhSig = dataBuffer.slice(ECDH_END_INDEX, ECDH_SIG_END_INDEX);
+
+            syncKey = this._ecdh.computeSecret(ecdhPub);
+            const reply: Buffer[] = [this._ecdh.getPublicKey()];
+            {
+              const signer = createSign('RSA-SHA512');
+              signer.update(this._ecdh.getPublicKey());
+              const serverEcdhSig = signer.sign(this._rsa.priv);
+              reply.push(serverEcdhSig);
+            }
+            await write(Buffer.concat(reply));
+            dataBuffer = Buffer.alloc(0);
+            step = ClientServerHandshakeStep.ReceiveUsername;
           }
-        }
-        this._userRsa[username] = userRsa;
-        this._userSyncKeys[username] = this._ecdh.computeSecret(ecdhPub);
+            break;
 
-        const write = makeWriteP(s);
-        const reply: Buffer[] = [this._ecdh.getPublicKey()];
-        {
-          const signer = createSign('RSA-SHA512');
-          signer.update(this._ecdh.getPublicKey());
-          const serverEcdhSig = signer.sign(this._rsa.priv);
-          reply.push(serverEcdhSig);
+          case ClientServerHandshakeStep.ReceiveUsername: {
+            if (dataBuffer.length < 32) {
+              return;
+            }
+            const decipher = createDecipheriv('aes-256-cbc', syncKey.slice(0, 32), syncKey.slice(32));
+            const username = Buffer
+              .concat([decipher.update(dataBuffer.slice(0, 32)), decipher.final()])
+              .toString('utf8')
+              .trimEnd();
+            const userRsa = this._userRsa[username] || await this._rsaLookup(username);
+            {
+              const verifier = createVerify('RSA-SHA512');
+              verifier.update(ecdhPub);
+              const signatureMatch = verifier.verify(userRsa, ecdhSig);
+              if (!signatureMatch) {
+                rej('The signature did not match!');
+                s.end();
+                dataSubscription.unsubscribe();
+                return;
+              }
+            }
+            this._userRsa[username] = userRsa;
+            this._userSyncKeys[username] = this._ecdh.computeSecret(ecdhPub);
+            dataSubscription.unsubscribe();
+            res(username);
+          }
+            break;
         }
-
-        await write(Buffer.concat(reply));
-        dataSubscription.unsubscribe();
-        res(username);
       });
     });
   }

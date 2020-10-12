@@ -68,22 +68,22 @@ export class TitpClient {
     const signer = createSign('RSA-SHA512');
     signer.update(this._ecdh.getPublicKey());
     const signedEcdh = signer.sign(this._rsa.priv);
-    const usernameKey = randomBytes(32);
-    const usernameIv = randomBytes(16);
-    const usernameKeyEnc = publicEncrypt(hostRsaPub, Buffer.concat([usernameKey, usernameIv]));
-    const paddedUsername = this._username.padEnd(20, ' ');
-    const cipher = createCipheriv('aes-256-cbc', usernameKey, usernameIv);
-    const usernameEnc = Buffer.concat([cipher.update(paddedUsername), cipher.final()]);
+    // const usernameKey = randomBytes(32);
+    // const usernameIv = randomBytes(16);
+    // const usernameKeyEnc = publicEncrypt(hostRsaPub, Buffer.concat([usernameKey, usernameIv]));
+    // const paddedUsername = this._username.padEnd(20, ' ');
+    // const cipher = createCipheriv('aes-256-cbc', usernameKey, usernameIv);
+    // const usernameEnc = Buffer.concat([cipher.update(paddedUsername), cipher.final()]);
     messageBuffer.push(this._ecdh.getPublicKey());
     messageBuffer.push(signedEcdh);
-    messageBuffer.push(usernameKeyEnc);
-    messageBuffer.push(usernameEnc);
+    // messageBuffer.push(usernameKeyEnc);
+    // messageBuffer.push(usernameEnc);
 
     const message = Buffer.concat(messageBuffer);
     await this._write(message);
     return new Promise((res, rej) => {
       let dataBuffer = Buffer.alloc(0);
-      const sub = fromEvent<Buffer>(this._socket, 'data').subscribe(data => {
+      const sub = fromEvent<Buffer>(this._socket, 'data').subscribe(async data => {
         dataBuffer = Buffer.concat([dataBuffer, data]);
         if (dataBuffer.length < 609) {
           return;
@@ -99,6 +99,7 @@ export class TitpClient {
           return;
         }
         this._syncKey = this._ecdh.computeSecret(ecdhPub);
+        await this.write(this._username.padEnd(20, ' '));
         fromEvent<Buffer>(this._socket, 'data').subscribe(data => {
           this._dataBuffer = Buffer.concat([this._dataBuffer, data]);
           if (this._socket.bufferSize) {
