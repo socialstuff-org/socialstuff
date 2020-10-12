@@ -9,18 +9,11 @@ down:
 stop:
 	$(COMPOSE_DEV_COMMAND) stop
 
-kill:
-	$(COMPOSE_DEV_COMMAND) kill -s SIGINT
+start-identity:
+	cd services/identity && npm run dev
 
-# login-web:
-# 	docker exec -ti socialstuff_identity_web_dev /bin/bash
-
-# login-db:
-# 	docker exec -ti socialstuff_identity_mysql_dev mysql -u root -proot --database=socialstuff_identity_dev
-
-# prod: base-image
-# 	npx loin i
-# 	docker build -t socialstuff-identity:prod -f docker/prod/Dockerfile .
+start-chat:
+	cd services/chat && npm run dev
 
 base-image:
 	docker build services/base-image -t socialstuff-node:base

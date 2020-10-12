@@ -3,3 +3,4 @@ lib/
 .migrate
 coverage/
 loin_modules/
+.env

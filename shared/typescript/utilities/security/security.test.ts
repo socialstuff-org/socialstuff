@@ -13,7 +13,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-import {decrypt, encrypt, hashHmac, hashUnique, passwordIssues, verifyHashUnique} from '.';
+import crypto, {KeyObject} from 'crypto';
+import {
+  decrypt,
+  encrypt,
+  generateRsaKeyPair,
+  hashHmac,
+  hashUnique,
+  openEnvelop,
+  passwordIssues,
+  verifyHashUnique,
+  wrapEnvelop,
+}                          from '.';
 
 describe('security-helper', () => {
   describe('hashUnique', () => {
@@ -87,12 +98,39 @@ describe('security-helper', () => {
   describe('hashHmac', () => {
     test('the same value results in the same hash', async () => {
       const value = 'Hello, World!';
-      const hash1 = await hashHmac(value);
-      const hash2 = await hashHmac(value);
+      const hash1 = hashHmac(value);
+      const hash2 = hashHmac(value);
       expect(hash1).not.toBeNull();
       expect(hash1).not.toBeUndefined();
       expect(typeof hash1).toBe('string');
       expect(hash1).toBe(hash2);
+    });
+  });
+
+  describe('key exchange', () => {
+    const aliceEcdh = crypto.createECDH('prime256v1');
+    const bobEcdh = crypto.createECDH('prime256v1');
+    aliceEcdh.generateKeys();
+    bobEcdh.generateKeys();
+    let aliceRsa: { pub: KeyObject, priv: KeyObject };
+    let bobRsa: { pub: KeyObject, priv: KeyObject };
+
+    beforeAll(async () => {
+      aliceRsa = await generateRsaKeyPair(1024);
+      bobRsa = await generateRsaKeyPair(1024);
+    });
+
+    test('ecdh key gets properly packed and unpacked', () => {
+      const envelop = wrapEnvelop('alice', aliceEcdh.getPublicKey(), aliceRsa.priv, bobRsa.pub);
+      const unwrapped = openEnvelop(envelop, aliceRsa.pub, bobRsa.priv);
+      expect(unwrapped.ecdh).toEqual(aliceEcdh.getPublicKey().toString('base64'));
+    });
+
+    test('throws if wrong private key is provided while unwrapping', async () => {
+      expect(() => {
+        const envelop = wrapEnvelop('alice', aliceEcdh.getPublicKey(), aliceRsa.priv, bobRsa.pub);
+        openEnvelop(envelop, aliceRsa.pub, aliceRsa.priv);
+      }).toThrow('Sender verification failed!');
     });
   });
 });

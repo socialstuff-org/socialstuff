@@ -2,3 +2,6 @@
 !**/*.d.ts
 .gitignore
 tsconfig.json
+.idea/
+.vscode/
+sandbox.ts

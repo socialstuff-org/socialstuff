@@ -60,12 +60,12 @@ export const middleware: ValidationChain[] = [
         return;
       }
       try {
-        const key = crypto.createPublicKey(pk);
-        if (key.asymmetricKeyType !== 'ec') {
-          throw new Error('Please provide an ECDH public key!');
-        }
+        crypto.createPublicKey(pk);
+        // if (key.asymmetricKeyType !== 'ec') {
+        //   throw new Error('Please provide an ECDH public key!');
+        // }
       } catch (e) {
-        console.error(e.message);
+        // console.error(e.message);
         throw new Error('Invalid public key!');
       }
     }),

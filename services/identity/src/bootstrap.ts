@@ -20,13 +20,13 @@ import path                                                  from 'path';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
 import {v1}                                                  from 'uuid';
-import {OkPacket}                                            from 'mysql2/promise';
 import fs                                                    from 'fs';
 import {createConnection, rebuildDatabase, sharedConnection} from './mysql';
-import {delay}                from '@socialstuff/utilities/common';
-import {hashHmac, hashUnique} from '@socialstuff/utilities/security';
+import {delay}                                               from '@socialstuff/utilities/common';
+import {hashHmac, hashUnique}                                from '@socialstuff/utilities/security';
 
 const ENV = process.env.NODE_ENV || 'dev';
+customEnv.env();
 customEnv.env(ENV);
 
 export default (async () => {
@@ -48,11 +48,11 @@ export default (async () => {
   }
 
   {
-    const keysPath = path.join(__dirname, '..', 'priv.pem')
+    const keysPath = path.join(__dirname, '..', 'priv.pem');
     if (!fs.existsSync(keysPath)) {
-      const keys = crypto.generateKeyPairSync('rsa', { modulusLength: 4096 });
-      fs.writeFileSync(keysPath, keys.privateKey.export({ format: 'pem', type: 'pkcs1' }));
-      fs.writeFileSync(path.join(__dirname, '..', 'pub.pem'), keys.publicKey.export({ format: 'pem', type: 'pkcs1' }));
+      const keys = crypto.generateKeyPairSync('rsa', {modulusLength: 4096});
+      fs.writeFileSync(keysPath, keys.privateKey.export({format: 'pem', type: 'pkcs1'}));
+      fs.writeFileSync(path.join(__dirname, '..', 'pub.pem'), keys.publicKey.export({format: 'pem', type: 'pkcs1'}));
     }
   }
 
@@ -80,7 +80,7 @@ export default (async () => {
   console.log('sample invite code:      ', id);
   const addUserSql = 'INSERT INTO users (id,username,password,public_key, can_login) VALUES (unhex(?),?,?,?,1);';
   const userID = v1().replace(/-/g, '');
-  await db.query<OkPacket>(addUserSql, [userID,username, await hashUnique(password), publicKey]);
+  await db.query(addUserSql, [userID, username, await hashUnique(password), publicKey]);
   const secret = v1().replace(/-/g, '');
   const secretHash = await hashHmac(secret);
   const addUSerRegistrationConfirmation = 'INSERT INTO registration_confirmations (expires_at, secret_hash, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY),?,unhex(?));';

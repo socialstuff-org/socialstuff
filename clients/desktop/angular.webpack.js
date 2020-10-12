@@ -3,22 +3,38 @@
  */
 
 module.exports = (config, options) => {
-    config.target = 'electron-renderer';
+  config.target = 'electron-renderer';
 
 
-    if (options.fileReplacements) {
-        for(let fileReplacement of options.fileReplacements) {
-            if (fileReplacement.replace !== 'src/environments/environment.ts') {
-                continue;
-            }
+  if (options.fileReplacements) {
+    for (let fileReplacement of options.fileReplacements) {
+      if (fileReplacement.replace !== 'src/environments/environment.ts') {
+        continue;
+      }
 
-            let fileReplacementParts = fileReplacement['with'].split('.');
-            if (fileReplacementParts.length > 1 && ['web'].indexOf(fileReplacementParts[1]) >= 0) {
-                config.target = 'web';
-            }
-            break;
-        }
+      let fileReplacementParts = fileReplacement['with'].split('.');
+      if (fileReplacementParts.length > 1 && ['web'].indexOf(fileReplacementParts[1]) >= 0) {
+        config.target = 'web';
+      }
+      break;
     }
+  }
 
-    return config;
-}
+  const IGNORES = [
+    'crypto',
+    'fs',
+    'net',
+    'path',
+  ];
+
+  config.externals = [
+    function (context, request, callback) {
+      if (IGNORES.indexOf(request) >= 0) {
+        return callback(null, 'require(\'' + request + '\')');
+      }
+      return callback();
+    },
+  ];
+
+  return config;
+};
