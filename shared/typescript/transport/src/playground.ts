@@ -20,6 +20,7 @@ import {generateRsaKeyPair}                                                   fr
 import {TitpClient}                                                           from '../client';
 import {TitpServer}                                                           from '../server';
 import {delay}                                                                from '@socialstuff/utilities/common';
+import {TitpClientBus}                                                        from '../server/client-bus';
 
 async function loadOrGenerateKeys(name: string, mod: number = 4096) {
   let exists;
@@ -48,28 +49,43 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
 (async () => {
   const userRsaKeys: { [key: string]: KeyObject } = {};
 
+  const clientBus = new TitpClientBus();
+
   const server = await (async () => {
     const rsa = await loadOrGenerateKeys('server');
     const ecdh = createECDH('secp384r1');
     ecdh.generateKeys();
-    return new TitpServer(rsa, ecdh, async x => {
-      const key = userRsaKeys[x];
-      if (key) {
-        return key;
-      } else {
-        throw new Error('Username unknown!');
+    return new TitpServer(rsa, ecdh, {
+      async fetchRsa(username: string) {
+        const key = userRsaKeys[username];
+        if (key) {
+          return key;
+        } else {
+          throw new Error('Username unknown!');
+        }
       }
     });
   })();
 
+  server.newConnection().subscribe(con => {
+    clientBus.pushClient(con);
+  });
+
   const alice = await (async () => {
-    const aliceRsa = await loadOrGenerateKeys('alice');
-    const a = createECDH('secp384r1');
-    a.generateKeys();
-    return new TitpClient('alice', aliceRsa, a);
+    const rsa = await loadOrGenerateKeys('alice');
+    const ecdh = createECDH('secp384r1');
+    ecdh.generateKeys();
+    return new TitpClient('alice', rsa, ecdh);
+  })();
+  const bob = await (async () => {
+    const rsa = await loadOrGenerateKeys('bob');
+    const ecdh = createECDH('secp384r1');
+    ecdh.generateKeys();
+    return new TitpClient('bob', rsa, ecdh);
   })();
 
   userRsaKeys['alice'] = alice.rsaPublicKey();
+  userRsaKeys['bob'] = bob.rsaPublicKey();
 
   await server.listen(8444);
   console.log('server running');
@@ -80,8 +96,10 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
     await alice.write('Hello, World!');
   });
 
-  alice.data().subscribe(x => {
+  alice.data().subscribe(async x => {
     console.log(`Client> server sent: ${x.toString('utf8')}`);
+    await alice.end();
+    await server.close();
   });
 
 })();
