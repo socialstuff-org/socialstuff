@@ -15,9 +15,10 @@
 
 import {Server, Socket}                                                              from 'net';
 import * as Rx                                                                       from 'rxjs';
-import {fromEvent, Observable}                                                       from 'rxjs';
+import {Observable, Subject}                                                         from 'rxjs';
 import {KeyObject, ECDH, createVerify, createSign, privateDecrypt, createDecipheriv} from 'crypto';
 import {makeWriteP}                                                                  from '../socket';
+import {UserKeyRegistry}                                                             from '../user-key-registry';
 import {TitpClientConnection}                                                        from './client-connection';
 
 const ECDH_END_INDEX = 97;
@@ -31,16 +32,15 @@ export class TitpServer {
   private _server: Server;
   private _ecdh: ECDH;
   private _rsa: { priv: KeyObject, pub: KeyObject };
-  private _userRsa: { [key: string]: KeyObject } = {};
-  private _userSyncKeys: { [key: string]: Buffer } = {};
   private _userSocks: { [key: string]: Socket } = {};
-  private readonly _rsaLookup: RsaUserLookupFunction;
+  private _userKeyRegistry: UserKeyRegistry;
+  private _newConnection: Subject<TitpClientConnection> = new Subject<TitpClientConnection>();
 
-  constructor(rsa: { priv: KeyObject, pub: KeyObject }, ecdh: ECDH, rsaLookup: RsaUserLookupFunction) {
+  constructor(rsa: { priv: KeyObject, pub: KeyObject }, ecdh: ECDH, userKeyRegistry: UserKeyRegistry) {
     this._server = new Server(this._handleIncomingConnection.bind(this));
     this._ecdh = ecdh;
     this._rsa = rsa;
-    this._rsaLookup = rsaLookup;
+    this._userKeyRegistry = userKeyRegistry;
   }
 
   public rsaPublicKey() {
@@ -48,19 +48,20 @@ export class TitpServer {
   }
 
   private async _handleIncomingConnection(socket: Socket) {
-    const username = await this._performHandshake(socket);
+    const {username, ecdhPub} = await this._performHandshake(socket);
     this._userSocks[username] = socket;
     console.log(`Server> new successful connection with user '${username}'.`);
-    const key = this._userSyncKeys[username];
+    const key = this._ecdh.computeSecret(ecdhPub);
     const con = new TitpClientConnection(socket, username, key);
-    con.data().subscribe(x => {
-      console.log(`Server> ${username}: ${x.toString('utf8')}`);
-      con.write('You too!');
-    });
+    this._newConnection.next(con);
+  }
+
+  public newConnection(): Observable<TitpClientConnection> {
+    return this._newConnection;
   }
 
   private _performHandshake(s: Socket) {
-    return new Promise<string>((res, rej) => {
+    return new Promise<{ username: string, ecdhPub: Buffer }>((res, rej) => {
       let dataBuffer = Buffer.from([]);
       const dataSubscription = Rx.fromEvent<Buffer>(s, 'data').subscribe(async data => {
         dataBuffer = Buffer.concat([dataBuffer, data]);
@@ -81,7 +82,7 @@ export class TitpServer {
           return Buffer.concat([decipher.update(username), decipher.final()]);
         })();
         const username = usernameBytes.toString('utf8').trimEnd();
-        const userRsa = this._userRsa[username] || await this._rsaLookup(username);
+        const userRsa = await this._userKeyRegistry.fetchRsa(username);
         {
           const verifier = createVerify('RSA-SHA512');
           verifier.update(ecdhPub);
@@ -92,8 +93,6 @@ export class TitpServer {
             return;
           }
         }
-        this._userRsa[username] = userRsa;
-        this._userSyncKeys[username] = this._ecdh.computeSecret(ecdhPub);
 
         const write = makeWriteP(s);
         const reply: Buffer[] = [this._ecdh.getPublicKey()];
@@ -106,7 +105,7 @@ export class TitpServer {
 
         await write(Buffer.concat(reply));
         dataSubscription.unsubscribe();
-        res(username);
+        res({username, ecdhPub});
       });
     });
   }
