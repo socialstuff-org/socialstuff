@@ -101,7 +101,7 @@ export class TitpClient {
         this._syncKey = this._ecdh.computeSecret(ecdhPub);
         fromEvent<Buffer>(this._socket, 'data').subscribe(data => {
           this._dataBuffer = Buffer.concat([this._dataBuffer, data]);
-          if (this._socket.bufferSize) {
+          if (this._socket.writableLength) {
             return;
           }
           const decipher = createDecipheriv('aes-256-cbc', this._syncKey.slice(0, 32), this._syncKey.slice(32));
@@ -124,5 +124,14 @@ export class TitpClient {
     const cipher = createCipheriv('aes-256-cbc', this._syncKey.slice(0, 32), this._syncKey.slice(32));
     const enc = Buffer.concat([cipher.update(data), cipher.final()]);
     return this._write(enc);
+  }
+
+  public end() {
+    return new Promise(res => {
+      this._socket.end(() => {
+        this._socket.destroy();
+        res();
+      });
+    });
   }
 }
