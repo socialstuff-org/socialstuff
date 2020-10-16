@@ -23,8 +23,8 @@ export class HeaderComponent implements OnInit {
   }
 
   public logout() {
-    // TODO connect with auth service
-    this.router.navigateByUrl('/login');
+    // TODO connect with auth service, wipe all existent auth data
+    this.router.navigateByUrl('/logout');
   }
 
   public openContactInfo(): void {
