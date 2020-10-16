@@ -31,6 +31,9 @@ import {ChatViewComponent}       from './chat-view/chat-view.component';
 import {ChatAppComponent}        from './chat-app/chat-app.component';
 import { SidenavComponent } from './sidenav/sidenav.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { ContactInfoComponent } from './contact-info/contact-info.component';
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -38,8 +41,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent],
-  imports:      [
+  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent, ContactInfoComponent],
+  imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
@@ -47,9 +50,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AppRoutingModule,
     TranslateModule.forRoot({
       loader: {
-        provide:    TranslateLoader,
+        provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps:       [HttpClient],
+        deps: [HttpClient],
       },
     }),
     MatButtonModule,
@@ -59,6 +62,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MatListModule,
     BrowserAnimationsModule,
     MatInputModule,
+    MatDialogModule,
+    MatCheckboxModule,
   ],
   providers:    [],
   bootstrap:    [AppComponent],
