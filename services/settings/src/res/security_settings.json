@@ -1,7 +1,6 @@
-export const secSettings =
 {
   "two_factor_auth": {
-    "on" : true,
+    "on": true,
     "phone": true,
     "email": false
   },
@@ -12,7 +11,7 @@ export const secSettings =
     "number": true,
     "special_char": true,
     "reg_ex": false,
-    "reg_ex_string": "",
+    "reg_ex_string": ""
   },
   "inv_only": {
     "on": true,
