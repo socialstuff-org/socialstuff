@@ -59,6 +59,15 @@ export class ChatViewComponent implements OnInit {
     fifthMessage.delivered = true;
     this.messages.push(fifthMessage);
 
+    for (let  i = 0; i < 30; i++) {
+      let message = createEmptyMessage();
+      message.message = 'This is some longer chat message so we can test proper sizing on the chat bubbles.';
+      message.time = '20:41';
+      message.isSender = Math.random() >= 0.5;
+      message.delivered = true;
+      this.messages.push(message);
+    }
+
     // later on the messages will be retrieved by the server in the correct order
     this.messages = this.messages.slice().reverse();
   }
