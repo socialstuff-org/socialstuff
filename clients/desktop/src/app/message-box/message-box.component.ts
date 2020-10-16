@@ -9,8 +9,6 @@ export class MessageBoxComponent implements OnInit {
 
   public message: string;
 
-  @Input()
-
   constructor() { }
 
   ngOnInit(): void {
