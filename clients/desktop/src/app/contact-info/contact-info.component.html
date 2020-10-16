@@ -1,0 +1,23 @@
+<div id="wrapper" style="position: absolute; right: 0; top: 0;background-color: #510A32; height: 100vh; width: 400px;">
+
+  <div id="close">
+    <button mat-button (click)="closeContactInfo()">
+      X
+    </button>
+  </div>
+
+  <div id="image-section" style="width: 60%; margin: 0 auto; background-color: #ed3330;">
+    <img src="{{data.imageUrl}}" alt="IMG unavailable">
+    <span>{{data.imageUrl}}</span>
+    <span>{{data.customName}}</span>
+  </div>
+
+  <div id="media-section">
+    <!-- TODO list all shared media items here -->
+  </div>
+
+  <section id="notifications">
+    <mat-checkbox class="example-margin">Receive notifications</mat-checkbox>
+  </section>
+
+</div>
