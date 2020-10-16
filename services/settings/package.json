@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@socialstuff/utilities": "^0.6.0",
     "axios": "^0.20.0",
     "custom-env": "^2.0.1",
     "express": "^4.17.1"
