@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": ".",
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "removeComments": false
   },
   "exclude": [
     "**/*.test.ts",
