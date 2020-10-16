@@ -1,6 +1,6 @@
 {
   "two_factor_auth": {
-    "on": false,
+    "on": true,
     "phone": true,
     "email": false
   },
