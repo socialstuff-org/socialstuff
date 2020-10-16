@@ -11,12 +11,10 @@ export class ContactInfoComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<ContactInfoComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ChatPartner) {
+    @Inject(MAT_DIALOG_DATA) public data) {
   }
 
   ngOnInit(): void {
-    console.log(this.data.customName);
-    console.log(this.data.imageUrl);
   }
 
   public closeContactInfo() {

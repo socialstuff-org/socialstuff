@@ -1,23 +1,64 @@
 <div id="wrapper" style="position: absolute; right: 0; top: 0;background-color: #510A32; height: 100vh; width: 400px;">
 
-  <div id="close">
-    <button mat-button (click)="closeContactInfo()">
-      X
+  <div style="margin-top: 75px;"><!-- SPACER --></div>
+
+  <div>
+    <button (click)="closeContactInfo()" id="close">
+      <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <div id="image-section" style="width: 60%; margin: 0 auto; background-color: #ed3330;">
-    <img src="{{data.imageUrl}}" alt="IMG unavailable">
-    <span>{{data.imageUrl}}</span>
-    <span>{{data.customName}}</span>
+  <div id="image-section">
+    <img src="{{data.partner.imageUrl}}" alt="IMG unavailable" id="contactImage">
+    <div style="margin-top: 20px;"><!-- SPACER --></div>
+    <div id="realName" *ngIf="data.partner.realName">{{data.partner.realName}}</div>
+    <br>
+    <div id="username">{{data.partner.username}}</div>
   </div>
+
+  <div style="margin-top: 20px;"><!-- SPACER --></div>
+  <mat-divider class="contact-info-divider"></mat-divider>
+  <div style="margin-top: 20px;"><!-- SPACER --></div>
 
   <div id="media-section">
-    <!-- TODO list all shared media items here -->
+    <span id="media-link">Media, links and documents</span>
+    <br>
+
+    <div id="media-preview">
+      <!-- TODO implement media preview section -->
+    </div>
   </div>
 
+  <div style="margin-top: 20px;"><!-- SPACER --></div>
+  <mat-divider class="contact-info-divider"></mat-divider>
+  <div style="margin-top: 20px;"><!-- SPACER --></div>
+
   <section id="notifications">
-    <mat-checkbox class="example-margin">Receive notifications</mat-checkbox>
+    <span>Notification Settings</span>
+    <div style="margin-top: 10px;"><!-- SPACER --></div>
+    <ul>
+      <li>
+        <input type="checkbox" class="checkbox-margin" id="receiveNotifications"/>
+        <label for="receiveNotifications">Receive notifications</label>
+      </li>
+      <li>
+        <input type="checkbox" class="checkbox-margin" id="readReceipts" [disabled]="true" />
+        <label for="readReceipts">Enable read recipient (coming soon)</label>
+      </li>
+    </ul>
   </section>
+
+  <div style="margin-top: 20px;"><!-- SPACER --></div>
+  <mat-divider class="contact-info-divider"></mat-divider>
+  <div style="margin-top: 20px;"><!-- SPACER --></div>
+
+
+  <div id="information">
+    <span>Username</span>
+    <div style="margin-top: 10px;"><!-- SPACER --></div>
+    <span>
+      {{data.partner.username}}@domain.com
+    </span>
+  </div>
 
 </div>
