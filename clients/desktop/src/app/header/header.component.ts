@@ -1,5 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
+import {ChatPartner} from "../models/ChatPartner";
+import {MatDialog} from "@angular/material/dialog";
+import {ContactInfoComponent} from "../contact-info/contact-info.component";
 
 @Component({
   selector: 'app-header',
@@ -8,10 +11,12 @@ import {Router} from "@angular/router";
 })
 export class HeaderComponent implements OnInit {
 
-  @Input() chatPartner: string;
+  @Input() chatPartner: ChatPartner;
+  private contactInfoIsOpen = false;
 
   constructor(
     private router: Router,
+    public dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -21,5 +26,22 @@ export class HeaderComponent implements OnInit {
     // TODO connect with auth service
     this.router.navigateByUrl('/login');
   }
+
+  public openContactInfo(): void {
+
+    if (this.contactInfoIsOpen) {
+      return;
+    }
+    this.contactInfoIsOpen = true;
+    const dialogRef = this.dialog.open(ContactInfoComponent, {
+      data: {partner: this.chatPartner}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      this.contactInfoIsOpen = false;
+      // TODO handle when contact info has been closed
+    });
+  }
+
 
 }
