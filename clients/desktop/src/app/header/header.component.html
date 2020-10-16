@@ -4,7 +4,21 @@
   </span>
   <span>SocialStuff</span>
   <span class="example-spacer"></span>
-  <span>{{chatPartner}}</span>
+  <div id="profile-picture">
+    <span *ngIf="chatPartner.realName; else noRealName">{{chatPartner.acronym}}</span>
+    <ng-template #noRealName>
+      <mat-icon style="margin-top: 7px;">person</mat-icon>
+    </ng-template>
+  </div>
+  <div id="username" (click)="openContactInfo()">
+    <div *ngIf="chatPartner.realName; else onlyUsername">{{chatPartner.realName}}<br>
+      @{{chatPartner.username}}
+    </div>
+    <ng-template #onlyUsername>
+      <span style="line-height: 40px;">@{{chatPartner.username}}</span>
+    </ng-template>
+  </div>
+  <span class="example-spacer"></span>
   <button (click)="logout()" mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
     <mat-icon>exit_to_app</mat-icon>
   </button>
