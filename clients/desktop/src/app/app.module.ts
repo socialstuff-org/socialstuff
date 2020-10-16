@@ -35,6 +35,7 @@ import { ContactInfoComponent } from './contact-info/contact-info.component';
 import {MatDialogModule} from "@angular/material/dialog";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import { LogoutComponent } from './auth/logout/logout.component';
+import { LandingComponent } from './landing/landing.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -42,7 +43,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent, ContactInfoComponent, LogoutComponent],
+  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent, ContactInfoComponent, LogoutComponent, LandingComponent],
   imports: [
     BrowserModule,
     FormsModule,
