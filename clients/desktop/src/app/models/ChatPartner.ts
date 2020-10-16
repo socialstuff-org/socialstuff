@@ -1,13 +1,15 @@
 export interface ChatPartner {
   id: number;
   username: string;
-  customName: string;
+  realName: string;
+  acronym: string;
   imageUrl: string;
 }
 
 export const createEmptyChatPartner = (): ChatPartner => ({
   id: 0,
   username: '',
-  customName: '',
+  realName: '',
+  acronym: '',
   imageUrl: '',
 });
