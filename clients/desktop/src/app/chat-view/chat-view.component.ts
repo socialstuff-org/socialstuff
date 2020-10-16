@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {createEmptyMessage, Message} from "../models/Message";
+import {ChatPartner, createEmptyChatPartner} from "../models/ChatPartner";
 
 @Component({
   selector: 'app-chat-view',
@@ -9,11 +10,14 @@ import {createEmptyMessage, Message} from "../models/Message";
 export class ChatViewComponent implements OnInit {
 
   public messages: Message[];
-  public chatPartner: string;
+  public chatPartner: ChatPartner;
 
   constructor() {
     this.messages = [];
-    this.chatPartner = 'Jörn Neumeyer';
+    this.chatPartner = createEmptyChatPartner();
+    this.chatPartner.customName = 'Max Mustermann';
+    this.chatPartner.username = 'maxmustermann99';
+    this.chatPartner.imageUrl = 'https://cdn.code-lake.com/mergery/users/vanderzee.jpg';
 
     // sample data for UI testing
     const message = createEmptyMessage();
