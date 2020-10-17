@@ -13,24 +13,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Server, Socket}                                              from 'net';
-import * as Rx                                                       from 'rxjs';
-import {Observable, Subject}                                         from 'rxjs';
-import {KeyObject, ECDH, createVerify, createSign, createDecipheriv} from 'crypto';
-import {makeWriteP}                                                  from '../socket';
-import {UserKeyRegistry}                                             from '../user-key-registry';
-import {TitpClientConnection}                                        from './client-connection';
+import {Server, Socket}       from 'net';
+import {Observable, Subject}  from 'rxjs';
+import {KeyObject, ECDH}      from 'crypto';
+import {UserKeyRegistry}      from '../user-key-registry';
+import {TitpClientConnection} from './client-connection';
+import {Handshake}            from './handshake';
 
-const ECDH_END_INDEX = 97;
-const ECDH_SIG_END_INDEX = ECDH_END_INDEX + 512;
-
-enum ClientServerHandshakeStep {
-  ReceiveEcdh,
-  ReceiveUsername
-}
-
-export type RsaUserLookupFunction = (username: string) => Promise<KeyObject>;
-
+/**
+ * The TitpServer is responsible for allowing users to connect to their relay server.
+ * It will perform the TITP handshake and yield new proper connections.
+ *
+ * However, this server is not responsible for the forwarding and delivery of data, except for the handshake!
+ * To transfer data between clients, please have a look at other transport modules in this library.
+ */
 export class TitpServer {
   private _server: Server;
   private _ecdh: ECDH;
@@ -45,93 +41,46 @@ export class TitpServer {
     this._userKeyRegistry = userKeyRegistry;
   }
 
+  /**
+   * Returns the RSA public key of the user.
+   */
   public rsaPublicKey() {
     return this._rsa.pub;
   }
 
+  /**
+   * Handles new incoming connections.
+   * @param socket The newly connected socket.
+   * @private
+   */
   private async _handleIncomingConnection(socket: Socket) {
-    const con = await this._performHandshake(socket);
+    const handshake = new Handshake(socket, this._ecdh, this._rsa, this._userKeyRegistry);
+    const con = await handshake._handshakeResult.toPromise();
     console.log(`Server> new successful connection with user '${con.username()}'.`);
     this._newConnection.next(con);
   }
 
+  /**
+   * Returns an Observable, which only yields new connection with a successful handshake.
+   */
   public newConnection(): Observable<TitpClientConnection> {
     return this._newConnection;
   }
 
-  private _performHandshake(s: Socket) {
-    return new Promise<TitpClientConnection>((res, rej) => {
-      let dataBuffer = Buffer.from([]);
-      let step: ClientServerHandshakeStep = ClientServerHandshakeStep.ReceiveEcdh;
-      let ecdhPub: Buffer;
-      let ecdhSig: Buffer;
-      let syncKey: Buffer;
-      const write = makeWriteP(s);
-      const dataSubscription = Rx.fromEvent<Buffer>(s, 'data').subscribe(async data => {
-        dataBuffer = Buffer.concat([dataBuffer, data]);
-        switch (step) {
-          case ClientServerHandshakeStep.ReceiveEcdh: {
-            if (dataBuffer.length < (ECDH_SIG_END_INDEX - 1)) {
-              return;
-            }
-            ecdhPub = dataBuffer.slice(0, ECDH_END_INDEX);
-            ecdhSig = dataBuffer.slice(ECDH_END_INDEX, ECDH_SIG_END_INDEX);
-
-            syncKey = this._ecdh.computeSecret(ecdhPub);
-            const reply: Buffer[] = [this._ecdh.getPublicKey()];
-            {
-              const signer = createSign('RSA-SHA512');
-              signer.update(this._ecdh.getPublicKey());
-              const serverEcdhSig = signer.sign(this._rsa.priv);
-              reply.push(serverEcdhSig);
-            }
-            await write(Buffer.concat(reply));
-            dataBuffer = Buffer.alloc(0);
-            step = ClientServerHandshakeStep.ReceiveUsername;
-          }
-            break;
-
-          case ClientServerHandshakeStep.ReceiveUsername: {
-            if (dataBuffer.length < 32) {
-              return;
-            }
-            const decipher = createDecipheriv('aes-256-cbc', syncKey.slice(0, 32), syncKey.slice(32));
-            const username = Buffer
-              .concat([decipher.update(dataBuffer.slice(0, 32)), decipher.final()])
-              .toString('utf8')
-              .trimEnd();
-            const userRsa = await this._userKeyRegistry.fetchRsa(username);
-            {
-              const verifier = createVerify('RSA-SHA512');
-              verifier.update(ecdhPub);
-              const signatureMatch = verifier.verify(userRsa, ecdhSig);
-              if (!signatureMatch) {
-                rej('The signature did not match!');
-                s.end();
-                dataSubscription.unsubscribe();
-                return;
-              }
-            }
-            dataSubscription.unsubscribe();
-            res(new TitpClientConnection(s, username, syncKey));
-          }
-            break;
-        }
-      });
-    });
-  }
-
-  // public on(event: 'connection'): Observable<TitpClient>;
-  public on(event: string): Observable<any> {
-    return new Observable<any>();
-  }
-
+  /**
+   * Binds the server to the specified endpoint and starts listening.
+   * @param port The port to bind to.
+   * @param host The host to bind to. The default '0.0.0.0' will lead to a binding to all interfaces.
+   */
   public listen(port: number, host: string = '0.0.0.0') {
     return new Promise<TitpServer>(res => {
       this._server.listen(port, host, () => res(this));
     });
   }
 
+  /**
+   * Closes the server and stops it from allowing any further connections.
+   */
   public close() {
     return new Promise<void>((res, rej) => {
       this._server.close(e => ((e ? rej : res)(e as any)));
