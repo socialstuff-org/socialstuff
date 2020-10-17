@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Server, Socket}       from 'net';
-import {Observable, Subject}  from 'rxjs';
-import {KeyObject, ECDH}      from 'crypto';
-import {UserKeyRegistry}      from '../user-key-registry';
-import {TitpClientConnection} from './client-connection';
-import {Handshake}            from './handshake';
+import {ListenOptions, Server, Socket} from 'net';
+import {Observable, Subject}           from 'rxjs';
+import {KeyObject, ECDH}               from 'crypto';
+import {UserKeyRegistry}               from '../user-key-registry';
+import {TitpClientConnection}          from './client-connection';
+import {Handshake}                     from './handshake';
 
 /**
  * The TitpServer is responsible for allowing users to connect to their relay server.
@@ -69,12 +69,11 @@ export class TitpServer {
 
   /**
    * Binds the server to the specified endpoint and starts listening.
-   * @param port The port to bind to.
-   * @param host The host to bind to. The default '0.0.0.0' will lead to a binding to all interfaces.
+   * @param options
    */
-  public listen(port: number, host: string = '0.0.0.0') {
+  public listen(options: ListenOptions = {port: 8086, host: '::'}) {
     return new Promise<TitpServer>(res => {
-      this._server.listen(port, host, () => res(this));
+      this._server.listen(options, () => res(this));
     });
   }
 
