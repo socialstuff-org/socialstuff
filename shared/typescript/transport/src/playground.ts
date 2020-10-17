@@ -13,14 +13,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import fs                                                                     from 'fs';
-import path                                                                   from 'path';
-import {createECDH, createPrivateKey, createPublicKey, getCiphers, KeyObject} from 'crypto';
-import {generateRsaKeyPair}                                                   from '@socialstuff/utilities/security';
-import {TitpClient}                                                           from '../client';
-import {TitpServer}                                                           from '../server';
-import {delay}                                                                from '@socialstuff/utilities/common';
-import {TitpClientBus}                                                        from '../server/client-bus';
+import {delay}                                                    from '@socialstuff/utilities/common';
+import {generateRsaKeyPair}                                       from '@socialstuff/utilities/security';
+import {createECDH, createPrivateKey, createPublicKey, KeyObject} from 'crypto';
+import fs                                                         from 'fs';
+import path                                                       from 'path';
+import {TitpClient}                                               from '../client';
+import {Message, MessageType}                                     from '../message';
+import {TitpServer}                                               from '../server';
+import {TitpClientBus}                                            from '../server/client-bus';
 
 async function loadOrGenerateKeys(name: string, mod: number = 4096) {
   let exists;
@@ -63,7 +64,7 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
         } else {
           throw new Error('Username unknown!');
         }
-      }
+      },
     });
   })();
 
@@ -87,19 +88,28 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
   userRsaKeys['alice'] = alice.rsaPublicKey();
   userRsaKeys['bob'] = bob.rsaPublicKey();
 
-  await server.listen(8444);
+  await server.listen({ host: '::', port: 8444 });
   console.log('server running');
-  alice.connect(server.rsaPublicKey(), '127.0.0.1', 8444).then(async () => {
-    console.log('alice is now connected');
-    await delay(1000);
-    console.log('Client> sending message...');
-    await alice.write('Hello, World!');
+
+  alice.data().subscribe(x => {
+    console.log(`Client> server sent: ${x.toString('utf8')}`);
+    // await alice.end();
+    // await server.close();
   });
 
-  alice.data().subscribe(async x => {
-    console.log(`Client> server sent: ${x.toString('utf8')}`);
-    await alice.end();
-    await server.close();
-  });
+  alice
+    .connect(server.rsaPublicKey(), '127.0.0.1', 8444)
+    .then(() => console.log('Playground> alice is now connected'))
+    .then(() => delay(1000))
+    .then(() => {
+      console.log('Playground> sending message...');
+      alice.write('Hello, World!');
+
+
+      const m = new Message(MessageType.textMessage, ['foo@bar.com'], Buffer.from('Hello there, my friend!'));
+      const sealed = m.seal(alice.key());
+    });
+
+
 
 })();
