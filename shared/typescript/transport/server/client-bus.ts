@@ -14,25 +14,45 @@
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
 import {BinaryLike}           from 'crypto';
+import {MessageEnvelop}       from '../message';
 import {TitpClientConnection} from './client-connection';
 
 export class TitpClientBus {
   private _clients: { [username: string]: TitpClientConnection } = { };
 
+  /**
+   *
+   * @param client
+   */
   public pushClient(client: TitpClientConnection) {
     this._registerNewClient(client);
+    // TODO send pending messages to client
   }
 
+  /**
+   *
+   * @param client
+   * @private
+   */
   private _registerNewClient(client: TitpClientConnection) {
+    console.log('Client bus> new client ' + client.username());
     this._clients[client.username()] = client;
     client.on('close').subscribe(() => {
       delete this._clients[client.username()];
     });
     client.data().subscribe(x => {
-      console.log('Some Data> ' + x.toString('utf-8'));
-    })
+      const envelop = MessageEnvelop.deserialize(x);
+      // for (const r of envelop.recipients()) {
+      //   this.forwardMessageTo(r, envelop.content());
+      // }
+    });
   }
 
+  /**
+   *
+   * @param username
+   * @param message
+   */
   public async forwardMessageTo(username: string, message: BinaryLike) {
     const client = this._clients[username];
     if (!client) {
