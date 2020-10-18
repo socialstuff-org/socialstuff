@@ -18,8 +18,9 @@ import {generateRsaKeyPair}                                       from '@socials
 import {createECDH, createPrivateKey, createPublicKey, KeyObject} from 'crypto';
 import fs                                                         from 'fs';
 import path                                                       from 'path';
-import {TitpClient}                                               from '../client';
-import {Message, MessageType}                                     from '../message';
+import {TitpClient}             from '../client';
+import {decryptRsa, encryptRsa} from '../crypto';
+import {Message, MessageType}   from '../message';
 import {TitpServer}                                               from '../server';
 import {TitpClientBus}                                            from '../server/client-bus';
 
@@ -101,13 +102,18 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
     .connect(server.rsaPublicKey(), '127.0.0.1', 8444)
     .then(() => console.log('Playground> alice is now connected'))
     .then(() => delay(1000))
-    .then(() => {
+    .then(async () => {
       console.log('Playground> sending message...');
       alice.write('Hello, World!');
 
+      const keys = await loadOrGenerateKeys('alice');
+      const enc = encryptRsa(Buffer.from('Hello, this is some random text I would like to submit encrypted!'), keys.pub);
+      const plain = decryptRsa(enc, keys.priv);
+      console.log('plain>', plain.toString('utf-8'));
 
-      const m = new Message(MessageType.textMessage, ['foo@bar.com'], Buffer.from('Hello there, my friend!'));
-      const sealed = m.seal(alice.key());
+
+      // const m = new Message(MessageType.textMessage, ['foo@bar.com'], Buffer.from('Hello there, my friend!'));
+      // const sealed = m.seal(alice.key());
     });
 
 
