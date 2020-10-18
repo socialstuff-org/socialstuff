@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {createVerify}     from "crypto";
-import {fromEvent}        from 'rxjs';
-import {SIGN}             from '../../../constants/crypto-algorithms';
-import {CommonTitpClient} from '../../common';
-import {Handshake}        from '../index';
-import {HandshakeState}   from '../state';
+import {createVerify}   from 'crypto';
+import {fromEvent}      from 'rxjs';
+import {SIGN}           from '../../../constants/crypto-algorithms';
+import {encryptAes384}  from '../../../crypto';
+import {Handshake}      from '../index';
+import {HandshakeState} from '../state';
 
 export class WaitForEcdh extends HandshakeState {
   enter(handshake: Handshake) {
@@ -39,7 +39,7 @@ export class WaitForEcdh extends HandshakeState {
         return;
       }
       handshake._syncKey = handshake.ecdh.computeSecret(ecdhPub);
-      handshake._write(CommonTitpClient.encrypt(handshake.username.padEnd(20, ' '), handshake._syncKey))
+      handshake._write(encryptAes384(handshake.username.padEnd(20, ' '), handshake._syncKey))
         .then(() => {
           handshake._handshakeResult.next();
           handshake._handshakeResult.complete();

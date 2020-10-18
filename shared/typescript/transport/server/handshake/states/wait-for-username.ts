@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {createVerify}         from "crypto";
+import {createVerify}         from 'crypto';
 import {fromEvent}            from 'rxjs';
-import {CommonTitpClient}     from '../../../client/common';
 import {SIGN}                 from '../../../constants/crypto-algorithms';
+import {decryptAes384}        from '../../../crypto';
 import {TitpClientConnection} from '../../client-connection';
 import {Handshake}            from '../index';
 import {HandshakeState}       from '../state';
@@ -25,7 +25,7 @@ export class WaitForUsername extends HandshakeState {
   enter(handshake: Handshake) {
     const sub = fromEvent<Buffer>(handshake.socket, 'data').subscribe(async data => {
       sub.unsubscribe();
-      const usernameBytes = CommonTitpClient.decrypt(data, handshake._syncKey);
+      const usernameBytes = decryptAes384(data, handshake._syncKey);
       const username = usernameBytes.toString('utf-8').trimEnd();
       const userRsa = await handshake._userKeyRegistry.fetchRsa(username);
       {

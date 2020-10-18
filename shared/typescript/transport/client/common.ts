@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {BinaryLike, createCipheriv, createDecipheriv, randomBytes} from 'crypto';
-import {Socket}                                                    from 'net';
-import {Observable, Subject}                                       from 'rxjs';
-import {SYMMETRIC}                                                 from '../constants/crypto-algorithms';
-import {makeWriteP}                                                from '../socket';
+import {BinaryLike}                   from 'crypto';
+import {Socket}                       from 'net';
+import {Observable, Subject}          from 'rxjs';
+import {decryptAes384, encryptAes384} from '../crypto';
+import {makeWriteP}                   from '../socket';
 
 /**
  *
@@ -51,45 +51,9 @@ export abstract class CommonTitpClient {
    */
   protected _init(): void {
     this._socket.on('data', data => {
-      const decrypted = CommonTitpClient.decrypt(data, this._key);
+      const decrypted = decryptAes384(data, this._key);
       this._onData.next(decrypted);
     });
-  }
-
-  /**
-   * Encrypts the given data using a 384 bit key.
-   * The decryption expects the incoming data to be properly formatted.
-   * @param data The data to be decrypted.
-   * @param key The 384 bit key to be used for the decryption.
-   */
-  public static decrypt(data: Buffer, key: Buffer): Buffer {
-    const ivB = data.slice(0, 16);
-    const encB = data.slice(16);
-    const decipherB = createDecipheriv(SYMMETRIC, key.slice(24), ivB);
-    const decB = Buffer.concat([decipherB.update(encB), decipherB.final()]);
-    const ivA = decB.slice(0, 16);
-    const encA = decB.slice(16);
-    const decipherA = createDecipheriv(SYMMETRIC, key.slice(0, 24), ivA);
-    return Buffer.concat([decipherA.update(encA), decipherA.final()]);
-  }
-
-  /**
-   * Encrypts the given data using a 384 bit key.
-   * The encryption is performed by applying aes-192 twice, with two varying initialization vectors.
-   * @param data The data to be encrypted.
-   * @param key
-   * @param config
-   */
-  public static encrypt(data: BinaryLike, key: Buffer, config?: { iv?: Buffer }): Buffer {
-    const ivA = config?.iv?.slice(0, 16) || randomBytes(16);
-    const ivB = config?.iv?.slice(16) || randomBytes(16);
-    const keyA = key.slice(0, 24);
-    const keyB = key.slice(24);
-    const cipherA = createCipheriv(SYMMETRIC, keyA, ivA);
-    const cipherB = createCipheriv(SYMMETRIC, keyB, ivB);
-    const encA = Buffer.concat([ivA, cipherA.update(data), cipherA.final()]);
-    const encB = Buffer.concat([cipherB.update(encA), cipherB.final()]);
-    return Buffer.concat([ivB, encB]);
   }
 
   /**
@@ -104,7 +68,7 @@ export abstract class CommonTitpClient {
    * @param data The data to be sent.
    */
   public write(data: BinaryLike): Promise<void> {
-    const enc = CommonTitpClient.encrypt(data, this._key);
+    const enc = encryptAes384(data, this._key);
     return this._write!(enc);
   }
 }

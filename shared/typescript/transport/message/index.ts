@@ -1,5 +1,20 @@
-import {randomBytes}      from 'crypto';
-import {CommonTitpClient} from '../client/common';
+// This file is part of the TITP.
+//
+// TITP is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// TITP is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with TITP.  If not, see <https://www.gnu.org/licenses/>.
+
+import {randomBytes}   from 'crypto';
+import {encryptAes384} from '../crypto';
 
 export enum MessageType {
   textMessage,
@@ -55,10 +70,16 @@ export class MessageEnvelop {
 export class Message {
   constructor(
     private _type: MessageType,
+    private _sender: string,
     private _recipients: string[],
     private _content: Buffer,
     private _attachments: MessageAttachment[] = [],
-  ) { }
+  ) {
+  }
+
+  public sender() {
+    return this._sender;
+  }
 
   public attachments() {
     return this._attachments;
@@ -91,13 +112,13 @@ export class Message {
     for (const attachment of this._attachments) {
       const t = Buffer.alloc(1, 0);
       t.writeInt32BE(MessageElementType.file);
-      const fileSize = Buffer.alloc(4 ,0);
+      const fileSize = Buffer.alloc(4, 0);
       fileSize.writeInt32BE(attachment.content.length);
       bufferParts.push(t, fileSize, attachment.content);
     }
     bufferParts.push(Buffer.alloc(4, 0));
     const serializedMessage = Buffer.concat(bufferParts);
-    const sealedMessage = CommonTitpClient.encrypt(serializedMessage, key, { iv });
+    const sealedMessage = encryptAes384(serializedMessage, key, {iv});
     return new MessageEnvelop(this._recipients, sealedMessage);
   }
 }
