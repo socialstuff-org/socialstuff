@@ -42,9 +42,9 @@ export class TitpClientBus {
     });
     client.data().subscribe(x => {
       const envelop = MessageEnvelop.deserialize(x);
-      // for (const r of envelop.recipients()) {
-      //   this.forwardMessageTo(r, envelop.content());
-      // }
+      for (const r of envelop.recipients()) {
+        this.forwardMessageTo(r, envelop.content());
+      }
     });
   }
 
