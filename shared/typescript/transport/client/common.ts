@@ -24,7 +24,7 @@ import {makeWriteP}                   from '../socket';
  */
 export abstract class CommonTitpClient {
   protected abstract _key: Buffer;
-  protected _write?: (data: (Uint8Array | string)) => Promise<void>;
+  protected _write: (data: (Uint8Array | string)) => Promise<void>;
   protected _onData = new Subject<Buffer>();
 
   protected constructor(protected _username: string, protected _socket: Socket) {
@@ -69,6 +69,6 @@ export abstract class CommonTitpClient {
    */
   public write(data: BinaryLike): Promise<void> {
     const enc = encryptAes384(data, this._key);
-    return this._write!(enc);
+    return this._write(enc);
   }
 }
