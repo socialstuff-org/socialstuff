@@ -78,6 +78,6 @@ export function encryptAes384(data: BinaryLike, key: Buffer, config?: { iv?: Buf
   const cipherA = createCipheriv(SYMMETRIC, keyA, ivA);
   const cipherB = createCipheriv(SYMMETRIC, keyB, ivB);
   const encA = Buffer.concat([ivA, cipherA.update(data), cipherA.final()]);
-  const encB = Buffer.concat([cipherB.update(encA), cipherB.final()]);
-  return Buffer.concat([ivB, encB]);
+  const encB = Buffer.concat([ivB, cipherB.update(encA), cipherB.final()]);
+  return encB;
 }
