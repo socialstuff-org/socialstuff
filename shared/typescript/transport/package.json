@@ -34,8 +34,6 @@
       ".tsx?": "ts-jest"
     },
     "testRegex": ".*\\w+\\.(test|spec)\\.tsx?$",
-    "setupFiles": [
-      "./jest.init.js"
-    ]
+    "collectCoverage": true
   }
 }
