@@ -163,12 +163,12 @@ export function objectToDeserializationSchema(obj: Serializable | Serializable[]
   }
 }
 
-export function uIntToBuffer(n: number) {
-  n = Math.floor(n);
+export function uIntToBuffer(num: number) {
+  let n = Math.floor(num);
   let max = 256;
   let byteCount = 1;
   while (n > max) {
-    max  = max << 8 | 0xff;
+    max = max << 8 | 0xff;
     ++byteCount;
   }
   const bytes: number[] = [];
@@ -177,6 +177,7 @@ export function uIntToBuffer(n: number) {
     n >>= 8;
     bytes.push(byte);
   }
+  // console.log('foo bytes:', bytes.map(x => x.toString(16)), ';n:', num.toString(16));
   return Buffer.from(bytes);
 }
 
