@@ -16,7 +16,7 @@
 import {bufferToUInt, serialize, uIntToBuffer} from './index';
 
 describe('serial', () => {
-  describe('serialize', () => {
+  describe('serialize - object serialization', () => {
     it('should properly convert an object with a string to binary', () => {
       const obj = { foo: 'bar' };
       const serialized = serialize(obj);
@@ -71,6 +71,36 @@ describe('serial', () => {
         console.log(serializedNumber, serialized);
         expect(bufferToUInt(serialized.slice(8))).toEqual(n);
       }
-    })
+    });
+  });
+
+  describe('number serialization and deserialization', () => {
+    describe('uIntToBuffer', () => {
+      it('should properly convert numbers to buffers', () => {
+        const numbers = [0x4587, 0x2809, 0x6619, 0x54, 0x54762288, 0x568708];
+        const buffers = [
+          Buffer.from([0x87, 0x45]),
+          Buffer.from([0x09, 0x28]),
+          Buffer.from([0x19, 0x66]),
+          Buffer.from([0x54]),
+          Buffer.from([0x08, 0x22, 0x76, 0x54]),
+          Buffer.from([0x08, 0x87, 0x56]),
+        ];
+        for (let i = 0; i < buffers.length; ++i) {
+          const serialized = uIntToBuffer(numbers[i]);
+          if (!serialized.equals(buffers[i])) {
+            console.error('number:', numbers[i].toString(16), ';buffer:', buffers[i], ';serialized:', serialized);
+          }
+          expect(serialized.equals(buffers[i])).toBeTruthy();
+        }
+        process.exit(1);
+      });
+    });
+  });
+
+  describe('bufferToUInt', () => {
+    it('should properly convert buffers to numbers', () => {
+      // TODO
+    });
   });
 });
