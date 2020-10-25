@@ -18,9 +18,8 @@ import {generateRsaKeyPair}                                       from '@socials
 import {createECDH, createPrivateKey, createPublicKey, KeyObject} from 'crypto';
 import fs                                                         from 'fs';
 import path                                                       from 'path';
-import {TitpClient}             from '../client';
-import {decryptRsa, encryptRsa} from '../crypto';
-import {Message, MessageType}   from '../message';
+import {TitpClient}                                               from '../client';
+import {Message, MessageContentType, MessageEnvelop}              from '../message';
 import {TitpServer}                                               from '../server';
 import {TitpClientBus}                                            from '../server/client-bus';
 
@@ -89,7 +88,7 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
   userRsaKeys['alice'] = alice.rsaPublicKey();
   userRsaKeys['bob'] = bob.rsaPublicKey();
 
-  await server.listen({ host: '::', port: 8444 });
+  await server.listen({host: '::', port: 8444});
   console.log('server running');
 
   alice.data().subscribe(x => {
@@ -98,6 +97,8 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
     // await server.close();
   });
 
+  const source = await fs.promises.readFile(path.join(__dirname, 'playground.ts'));
+
   alice
     .connect(server.rsaPublicKey(), '127.0.0.1', 8444)
     .then(() => console.log('Playground> alice is now connected'))
@@ -105,17 +106,27 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
     .then(async () => {
       console.log('Playground> sending message...');
       alice.write('Hello, World!');
-
-      const keys = await loadOrGenerateKeys('alice');
-      const enc = encryptRsa(Buffer.from('Hello, this is some random text I would like to submit encrypted!'), keys.pub);
-      const plain = decryptRsa(enc, keys.priv);
-      console.log('plain>', plain.toString('utf-8'));
-
-
-      // const m = new Message(MessageType.textMessage, ['foo@bar.com'], Buffer.from('Hello there, my friend!'));
-      // const sealed = m.seal(alice.key());
+      const aliceKeys = await loadOrGenerateKeys('alice');
+      const bobKeys = await loadOrGenerateKeys('bob');
+      const conversationKey = Buffer.alloc(48, 0);
+      const message = new Message(
+        MessageContentType.textMessage,
+        'alice@joern-neumeyer.de',
+        new Date(),
+        ['maurits@joern-neumeyer.de', 'jneumeyer@student.fontys.nl'],
+        Buffer.from('This is just a message from alice to maurits!'),
+        [
+          {
+            content: source,
+            name:    'source.ts',
+          },
+        ]);
+      const envelop = message.seal(conversationKey, bob.rsaPublicKey());
+      console.log('envelop', envelop);
+      const serializedEnvelop = envelop.serialize();
+      const deserializedEnvelop = MessageEnvelop.deserialize(serializedEnvelop);
+      // const receivedMessage = deserializedEnvelop.open(bobKeys.priv, {'alice': conversationKey});
+      // console.log('unwrapped message content:', receivedMessage.content().toString('utf-8'));
+      // console.log('received:', receivedMessage);
     });
-
-
-
 })();
