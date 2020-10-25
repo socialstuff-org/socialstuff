@@ -39,7 +39,7 @@ export function serialize(foo: Serializable | SerializableField[]): Buffer {
         if (typeof element === 'string') {
           element = Buffer.from(element, 'utf-8');
         } else if (typeof element === 'number') {
-          element = uIntToBuffer(element);
+          element = uInt32ToBuffer(element);
         } else if (element instanceof Array) {
           element = Buffer.concat(element.map(serialize));
         } else if (element instanceof Date) {
@@ -61,7 +61,7 @@ function parseFieldBytes(type: SerializedField, data: Buffer): SerializableField
   if (type === 'string') {
     return data.toString('utf-8');
   } else if (type === 'number') {
-    return bufferToUInt(data);
+    return data.readInt32BE();
   } else if (type === 'Buffer') {
     return data;
   } else if (type === 'Date') {
