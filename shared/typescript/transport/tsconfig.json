@@ -4,7 +4,10 @@
     "rootDir": ".",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "removeComments": false
+    "removeComments": false,
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "exclude": [
     "**/*.test.ts",
