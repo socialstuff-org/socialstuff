@@ -24,33 +24,37 @@ type SerializedField = 'string' | 'Buffer' | DeserializationSchema | 'Date' | 'n
 type SerializableField = Buffer | string | number | Serializable | Date;
 
 export interface Serializable {
-  [field: string]: SerializableField | SerializableField[];
+  [field: string]: SerializableField | SerializableField[] | Serializable;
 }
 
-export function serialize(foo: Serializable) {
-  const result: Buffer[] = [];
-  for (const name in foo) {
-    let element = foo[name] as SerializableField;
-    const elementLength = Buffer.alloc(4, 0);
-    if (!(element instanceof Buffer)) {
-      if (typeof element === 'string') {
-        element = Buffer.from(element, 'utf-8');
-      } else if (typeof element === 'number') {
-        element = uIntToBuffer(element);
-      } else if (element instanceof Array) {
-        element = Buffer.concat(element.map(serialize));
-      } else if (element instanceof Date) {
-        element = Buffer.from(element.toISOString(), 'utf-8');
-      } else if (typeof element === 'object') {
-        element = serialize(element);
-      } else {
-        throw new Error(`Encountered unexpected type at element '${element}'!`);
+export function serialize(foo: Serializable | SerializableField[]): Buffer {
+  if (foo instanceof Array) {
+    return Buffer.concat(foo.map(x => serialize(x as any)));
+  } else {
+    const result: Buffer[] = [];
+    for (const name in foo) {
+      let element = foo[name] as SerializableField;
+      const elementLength = Buffer.alloc(4, 0);
+      if (!(element instanceof Buffer)) {
+        if (typeof element === 'string') {
+          element = Buffer.from(element, 'utf-8');
+        } else if (typeof element === 'number') {
+          element = uIntToBuffer(element);
+        } else if (element instanceof Array) {
+          element = Buffer.concat(element.map(serialize));
+        } else if (element instanceof Date) {
+          element = Buffer.from(element.toISOString(), 'utf-8');
+        } else if (typeof element === 'object') {
+          element = serialize(element);
+        } else {
+          throw new Error(`Encountered unexpected type at element '${element}'!`);
+        }
       }
+      elementLength.writeUInt32BE((element as Buffer).length);
+      result.push(elementLength, (element as Buffer));
     }
-    elementLength.writeUInt32BE(element.length);
-    result.push(elementLength, element);
+    return Buffer.concat(result);
   }
-  return Buffer.concat(result);
 }
 
 function parseFieldBytes(type: SerializedField, data: Buffer): SerializableField | null {
@@ -63,11 +67,12 @@ function parseFieldBytes(type: SerializedField, data: Buffer): SerializableField
   } else if (type === 'Date') {
     return new Date(data.toString('utf-8'));
   } else {
+    console.error(type);
     return null;
   }
 }
 
-export function deserialize(schema: DeserializationSchema, data: Buffer, _isArray: boolean = false) {
+export function deserialize<T = any>(schema: DeserializationSchema, data: Buffer, _isArray: boolean = false): T | T[] {
   let offset = 0;
   if (_isArray) {
     const result: any[] = [];
@@ -78,7 +83,9 @@ export function deserialize(schema: DeserializationSchema, data: Buffer, _isArra
         offset += 4;
         const elementBuffer = data.slice(offset, offset + elementLength);
         offset += elementLength;
-        tmp[key] = parseFieldBytes(schema[key].type, elementBuffer) || deserialize(schema, elementBuffer);
+        const type = typeof schema === 'object' ? schema[key].type : schema;
+        tmp[key] = parseFieldBytes(type, elementBuffer)
+          || deserialize(schema, elementBuffer);
       }
       result.push(tmp);
     }
@@ -92,6 +99,7 @@ export function deserialize(schema: DeserializationSchema, data: Buffer, _isArra
       offset += elementLength;
       let value;
       if (schema[name].isArray) {
+        console.log('result', result);
         value = deserialize(schema[name].type as any, elementBuffer, true);
       } else {
         value = parseFieldBytes(schema[name].type, elementBuffer);
@@ -101,46 +109,66 @@ export function deserialize(schema: DeserializationSchema, data: Buffer, _isArra
       }
       result[name] = value;
     }
-    return result;
+    return result as any;
   }
 }
 
-export function objectToDeserializationSchema(obj: Serializable) {
-  const result: DeserializationSchema = {};
-  for (const name in obj) {
-    let type: SerializedField;
-    let isArray = undefined;
-    if (obj[name] instanceof Buffer) {
-      type = 'Buffer';
-    } else if (typeof obj[name] === 'string') {
-      type = 'string';
-    } else if (typeof obj[name] === 'number') {
-      type = 'number';
-    } else if (obj[name] instanceof Date) {
-      type = 'Date';
-    } else if (obj[name] instanceof Array) {
-      const firstEntry = (obj[name] as Serializable[]).find(() => true) as Serializable;
-      type = objectToDeserializationSchema(firstEntry);
-      isArray = true;
-    } else if (typeof obj[name] === 'object') {
-      type = objectToDeserializationSchema(obj[name] as any);
-    } else {
-      throw new Error(`Given value '${obj[name]}' is of unfitting type!`);
-    }
-    result[name] = {
-      type,
-      isArray,
-    };
-  }
+export function uInt32ToBuffer(n: number) {
+  const result = Buffer.alloc(4, 0);
+  result.writeInt32BE(n);
   return result;
+}
+
+export function objectToDeserializationSchema(obj: Serializable | Serializable[]): DeserializationSchema {
+  if (typeof obj === 'string') {
+    return 'string' as any;
+  } else if (typeof obj === 'number') {
+    return 'number' as any;
+  } else if (obj instanceof Array) {
+    return objectToDeserializationSchema(obj[0]);
+  } else {
+    const result: DeserializationSchema = {};
+    for (const name in obj) {
+      if (name === '0') {
+        throw new Error(name);
+      }
+      let type: SerializedField;
+      let isArray = undefined;
+      if (obj[name] instanceof Buffer) {
+        type = 'Buffer';
+      } else if (typeof obj[name] === 'string') {
+        type = 'string';
+      } else if (typeof obj[name] === 'number') {
+        type = 'number';
+      } else if (obj[name] instanceof Date) {
+        type = 'Date';
+      } else if (obj[name] instanceof Array) {
+        const firstEntry = (obj[name] as Serializable[])[0];
+        if (!firstEntry) {
+          throw new Error('Missing example item for schema creation!');
+        }
+        type = objectToDeserializationSchema(firstEntry);
+        isArray = true;
+      } else if (typeof obj[name] === 'object') {
+        type = objectToDeserializationSchema(obj[name] as any);
+      } else {
+        throw new Error(`Given value '${obj[name]}' is of unfitting type!`);
+      }
+      result[name] = {
+        type,
+        isArray,
+      };
+    }
+    return result;
+  }
 }
 
 export function uIntToBuffer(n: number) {
   n = Math.floor(n);
   let max = 256;
   let byteCount = 1;
-  while (n >= max) {
-    max *= max;
+  while (n > max) {
+    max  = max << 8 | 0xff;
     ++byteCount;
   }
   const bytes: number[] = [];
@@ -156,6 +184,7 @@ export function bufferToUInt(n: Buffer) {
   let result = 0;
   for (let i = 0; i < n.length; ++i) {
     result += n.readUInt8(i) << (8 * i);
+    // console.log('current element:', Buffer.from([n.readInt8(i)]), 'sum', result);
   }
   return result;
 }
