@@ -1,0 +1,14 @@
+:host {
+
+}
+
+@import "../../../styles/colors";
+
+.header-container {
+  width: 100%;
+  border-bottom: 3px solid $coralRed;
+}
+
+.header-text {
+  font-size: 52px;
+}
