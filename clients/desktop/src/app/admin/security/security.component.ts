@@ -8,18 +8,26 @@ import {ApiService}          from '../../services/api.service';
   styleUrls: ['./security.component.scss']
 })
 export class SecurityComponent implements OnInit {
-  twoFactAuth: boolean;
-  twoFactAuthPhone: boolean;
-  twoFactAuthMail: boolean;
-  confirmedMailOnly: boolean;
-  individualPassReq: boolean;
-  reqUpperCase: boolean;
-  reqNumber: boolean;
-  reqCharacter: boolean;
-  ownRegex: boolean;
-  reqRegex: boolean;
-  invitesOnly: boolean;
-  invitesOnlyByAdmin: boolean;
+  public settings = {
+    'two_factor_auth': {
+      'on': false,
+      'phone': false,
+      'email': false
+    },
+    'confirmed_emails_only': false,
+    'individual_pwd_req': {
+      'on': false,
+      'upper_case': false,
+      'number': false,
+      'special_char': false,
+      'reg_ex': false,
+      'reg_ex_string': '[]'
+    },
+    'inv_only': {
+      'on': false,
+      'inv_only_by_adm': false
+    }
+  };
 
   public hostname = '127.0.0.1';
   public port = 3002;
@@ -30,7 +38,7 @@ export class SecurityComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.getCurrentSettings());
+    // console.log(this.getCurrentSettings());
   }
 
   public getCurrentSettings(): any {
