@@ -2,22 +2,30 @@ import {Request, Response, Router} from 'express';
 import postgresClient from "../postgres/postgres_client";
 const reportCreationInterface = Router();
 
-var mysql      = require('mysql');
-var connection = mysql.createConnection({
+const mysql = require('mysql2');
+const connection = mysql.createPool({
   host     : 'localhost',
   user     : 'root',
   password : 'root',
   database : 'socialstuff_admin_panel'
 });
 
-connection.connect();
+async function testConnection() {
+  mysql.createConnection()
+  const sql = "SELECT * FROM report_reason";
+  const [rows] = await connection.promise().query(sql);
+  console.log("Received rows: ", rows)
+  return rows;
+}
 
 function addReportReason() {
-  return connection.query('SELECT * FROM report')
+  return connection.query('SELECT * FROM report');
+
   //return undefined;
 }
 
 reportCreationInterface.post("/", addReportReason);
+reportCreationInterface.get("/", testConnection);
 reportCreationInterface.delete("/");
 
 export default reportCreationInterface
