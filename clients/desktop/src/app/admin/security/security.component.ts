@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {AdminSettings} from '../../services/ap-settings.service';
 import {ApiService}          from '../../services/api.service';
-import {AppConfigService}    from '../../services/app-config.service';
+
 @Component({
   selector: 'app-security',
   templateUrl: './security.component.html',
@@ -22,7 +22,7 @@ export class SecurityComponent implements OnInit {
   invitesOnlyByAdmin: boolean;
 
   public hostname = '127.0.0.1';
-  public port = 8080;
+  public port = 3002;
 
   constructor(
     private adminSettings: AdminSettings,
@@ -33,7 +33,7 @@ export class SecurityComponent implements OnInit {
     console.log(this.getCurrentSettings());
   }
 
-  public getCurrentSettings() {
+  public getCurrentSettings(): any {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     return this.adminSettings.getSettings();
   }

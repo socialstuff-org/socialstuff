@@ -13,10 +13,10 @@ export class AdminSettings {
   ) {
   }
 
-  public getSettings() {
-    this.http.get<any>(`${this.api.remoteEndpoint()}/security-settings`)
+  public getSettings(): void {
+    this.http.get<any>((this.api.remoteEndpoint() + '/security-settings'))
       .subscribe((response: HttpResponse) => {
-        console.log(response);
+        console.log(response.body);
         alert('logged in!');
       }, (error: HttpErrorResponse) => {
         if (error.status === 400) {
