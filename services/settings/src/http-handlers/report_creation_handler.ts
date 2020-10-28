@@ -1,5 +1,4 @@
 import {Request, Response, Router} from 'express';
-import postgresClient from "../postgres/postgres_client";
 const reportCreationInterface = Router();
 
 const mysql = require('mysql2');
