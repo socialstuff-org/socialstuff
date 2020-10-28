@@ -1,0 +1,23 @@
+<mat-sidenav-container id="sidenav-container">
+  <mat-sidenav #sidenav mode="side" opened id="sidenav">
+    <mat-list>
+      <mat-divider class="contact-list-divider"></mat-divider>
+
+      <div style="margin-top: 10px"></div>
+
+      <div style="text-align: center;">
+        <input type="text" placeholder="search contact ..." id="search-bar">
+      </div>
+
+      <div style="margin-top: 10px"></div>
+
+      <mat-divider class="contact-list-divider"></mat-divider>
+
+      <app-navigation-item [navigationItems]="navigationItems"></app-navigation-item>
+
+    </mat-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>
