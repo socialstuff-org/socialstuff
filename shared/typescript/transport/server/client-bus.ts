@@ -53,14 +53,12 @@ export class TitpClientBus {
           }
           for (const recipient in message.localRecipients) {
             if (!this._clients[recipient]) {
-              console.log('skipping', recipient);
+              console.log('skipping offline recipient:', recipient);
             }
             const t = Buffer.alloc(2, 0);
             t.writeInt16BE(ServerMessageType.chatMessage);
             const signatureLength = Buffer.alloc(2, 0);
-            console.log('signature length:', message.localRecipients[recipient].length);
             signatureLength.writeInt16BE(message.localRecipients[recipient].length);
-            console.log('a', message.localRecipients[recipient]);
             this._clients[recipient].write(Buffer.concat([t, signatureLength, message.localRecipients[recipient], message.content]));
           }
           break;

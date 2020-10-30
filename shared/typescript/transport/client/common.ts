@@ -13,11 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {BinaryLike}                   from 'crypto';
-import {Socket}                       from 'net';
-import {Observable, Subject}          from 'rxjs';
-import {decryptAes384, encryptAes384} from '../crypto';
-import {makeWriteP}                   from '../socket';
+import {BinaryLike, createVerify}                                                                    from 'crypto';
+import {Socket}                                                                                      from 'net';
+import {Observable, Subject}                                                                         from 'rxjs';
+import {decryptAes384, decryptRsa, encryptAes384}                                                    from '../crypto';
+import {makeWriteP}                                                                                  from '../socket';
+import {buildServerMessage, ChatMessage, ChatMessageType, deserializeChatMessage, ServerMessageType} from '../message';
 
 /**
  *
@@ -30,6 +31,7 @@ export abstract class CommonTitpClient {
   protected constructor(protected _username: string, protected _socket: Socket) {
     this._write = makeWriteP(this._socket);
   }
+
 
   /**
    * Exposes the negotiated key for the communication channel.

@@ -100,14 +100,12 @@ export function buildServerMessage(
     } else {
       // TODO populate remoteRecipients
     }
-    // const sig = makeSenderNameSignature(message.senderName, senderPrivateKey);
-    // rec[server].push(sig);
   }
   return {
     type:       ServerMessageType.chatMessage,
     content:    encryptAes384(serializeChatMessage(message), key),
     recipients: remoteRecipients,
-    localRecipients
+    localRecipients,
   };
 }
 

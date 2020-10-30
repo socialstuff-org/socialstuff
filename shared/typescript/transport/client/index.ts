@@ -13,24 +13,42 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Socket}                                             from 'net';
-import {promisify}                                          from 'util';
-import {createPrivateKey, createPublicKey, ECDH, KeyObject} from 'crypto';
-import {CommonTitpClient}                                   from './common';
-import {Handshake}                                          from './handshake';
+import {Socket}                                                           from 'net';
+import {promisify}                                                        from 'util';
+import {createPrivateKey, createPublicKey, createVerify, ECDH, KeyObject} from 'crypto';
+import {CommonTitpClient}                                                 from './common';
+import {Handshake}                                                        from './handshake';
+import {decryptAes384, decryptRsa}                                        from '../crypto';
+import {
+  buildServerMessage,
+  ChatMessage,
+  deserializeChatMessage, serializeChatMessage,
+  serializeServerMessage,
+  ServerMessageType,
+}                                                                         from '../message';
+import {UserKeyRegistry}                                                  from '../user-key-registry';
+import {ConversationKeyRegistry}                                          from '../conversation-key-registry';
+import {Observable, Subject}                                              from 'rxjs';
 
 export class TitpClient extends CommonTitpClient {
   private _rsa: { priv: KeyObject, pub: KeyObject };
   private _ecdh: ECDH;
   protected _key: Buffer = Buffer.alloc(0, 0);
+  protected _onIncomingMessage = new Subject<ChatMessage>();
 
   /**
    *
    * @param username
    * @param rsa The RSA key-pair of the user. If only a string is provided, it is assumed to be the private key, as the the key-pair will be generated from that string.
    * @param ecdh
+   * @param _keyRegistry
    */
-  constructor(username: string, rsa: { priv: KeyObject, pub: KeyObject } | string, ecdh: ECDH) {
+  constructor(
+    username: string,
+    rsa: { priv: KeyObject, pub: KeyObject } | string,
+    ecdh: ECDH,
+    private _keyRegistry: UserKeyRegistry & ConversationKeyRegistry,
+  ) {
     super(username, new Socket());
     if (typeof rsa === 'string') {
       this._rsa = {
@@ -41,6 +59,8 @@ export class TitpClient extends CommonTitpClient {
       this._rsa = rsa;
     }
     this._ecdh = ecdh;
+
+    this._onData.subscribe(this._interpretIncomingData.bind(this));
   }
 
   /**
@@ -71,5 +91,61 @@ export class TitpClient extends CommonTitpClient {
         res();
       });
     });
+  }
+
+  public async sendChatMessageTo(message: ChatMessage, recipients: string[], groupId?: string) {
+    if (recipients.length < 1) {
+      throw new Error('Please provide at least one recipient for the message!');
+    }
+    let conversationKey: Buffer;
+    if (groupId) {
+      conversationKey = await this._keyRegistry.fetchConversationKey('~' + groupId);
+    } else {
+      if (recipients.length !== 1) {
+        throw new Error('Please provide at exactly one recipient for the message, if it is not intended for a group chat!');
+      }
+      conversationKey = await this._keyRegistry.fetchConversationKey(recipients[0]);
+    }
+    const recipientsWithPublicKeys = await Promise.all(recipients.map(async name => ({
+      name, publicKey: await this._keyRegistry.fetchRsa(name),
+    })));
+    const serverMessage = buildServerMessage(message, this._rsa.priv, conversationKey, recipientsWithPublicKeys);
+    return this.write(serializeServerMessage(serverMessage));
+  }
+
+  public incomingMessage(): Observable<ChatMessage> {
+    return this._onIncomingMessage;
+  }
+
+  private async _parseChatMessage(data: Buffer) {
+    const signatureLength = data.readInt16BE();
+    const signature = decryptRsa(data.slice(2, signatureLength + 2), this._rsa.priv);
+    const senderNameLength = signature.readInt16BE();
+    const senderName = signature.slice(2, 2 + senderNameLength).toString('utf-8');
+    const senderNameSignature = signature.slice(2 + senderNameLength);
+    const senderRsa = await this._keyRegistry.fetchRsa(senderName);
+    {
+      const verifier = createVerify('RSA-SHA512');
+      verifier.update(senderName);
+      if (!verifier.verify(senderRsa, senderNameSignature)) {
+        throw new Error('Sender verification failed!');
+      }
+    }
+    const messageBuffer = data.slice(signatureLength + 2);
+    const decryptedSerializedChatMessage = decryptAes384(messageBuffer, await this._keyRegistry.fetchConversationKey(senderName));
+    return deserializeChatMessage(decryptedSerializedChatMessage);
+  }
+
+  private async _interpretIncomingData(data: Buffer) {
+    const messageType: ServerMessageType = data.readInt16BE();
+    switch (messageType) {
+      case ServerMessageType.chatMessage:
+        const message = await this._parseChatMessage(data.slice(2));
+        this._onIncomingMessage.next(message);
+        break;
+
+      default:
+        throw new Error('Unknown server message type!');
+    }
   }
 }
