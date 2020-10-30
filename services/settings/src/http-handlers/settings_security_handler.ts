@@ -1,6 +1,6 @@
 import {Request, Response, Router} from 'express';
 import secSettings from '../res/security_settings.json';
-import instantiate = WebAssembly.instantiate;
+//import instantiate = WebAssembly.instantiate;
 import {ErrorResponse} from '@socialstuff/utilities/responses';
 import {body, check, validationResult} from 'express-validator';
 

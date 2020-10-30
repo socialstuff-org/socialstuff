@@ -1,24 +1,14 @@
-import {Request, Response, Router} from 'express';
+import {Request, Response, Router} from 'express'
+import {getReports} from '../mysql/mysql'
 const reportCreationInterface = Router();
 
-const mysql = require('mysql2');
-const connection = mysql.createPool({
-  host     : 'localhost',
-  user     : 'root',
-  password : 'root',
-  database : 'socialstuff_admin_panel'
-});
-
 async function testConnection() {
-  mysql.createConnection()
-  const sql = "SELECT * FROM report_reason";
-  const [rows] = await connection.promise().query(sql);
-  console.log("Received rows: ", rows)
-  return rows;
+  console.log("report creation has been called");
+  return getReports();
 }
 
 function addReportReason() {
-  return connection.query('SELECT * FROM report');
+  //return connection.query('SELECT * FROM report');
 
   //return undefined;
 }

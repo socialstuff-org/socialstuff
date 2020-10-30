@@ -12,40 +12,21 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
-
+import {PrismaClient} from "@prisma/client"
 import * as mysql  from 'mysql2/promise';
 // @ts-ignore
 import migrate     from 'migrate';
 import {promisify} from 'util';
 
-const host = "localhost"
-//const ip = "127.0.0.1";
-const port = 5432;
-const user = "postgres";
-const password = "postgres";
-const database = "socialstuff_admin_panel"
+const prisma = new PrismaClient();
 
-export function createConnection() {
-  return mysql.createConnection({
-    host:     host,
-    user:     user,
-    password: password,
-    database: database,
-    port: port
-  });
+export async function getReports(){
+  const getReports = await prisma.report_reason.findMany();
+  console.log(getReports);
+  return getReports;
 }
-
-let _sharedConnection: Promise<mysql.Connection> | undefined;
-
-export function sharedConnection() {
-  if (!_sharedConnection) {
-    _sharedConnection = createConnection();
-  }
-  return _sharedConnection;
-}
-
-export async function rebuildDatabase() {
-  const set = await promisify(migrate.load.bind(migrate))({stateStore: '.migrate'});
-  await promisify(set.down.bind(set))();
-  await promisify(set.up.bind(set))();
-}
+//tReports().catch(e => {
+//    throw e
+//  }).finally(async () => {
+//    await prisma.$disconnect()
+//  })
