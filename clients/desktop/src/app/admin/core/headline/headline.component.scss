@@ -6,9 +6,33 @@
 
 .header-container {
   width: 100%;
+  display: flex;
   border-bottom: 3px solid $coralRed;
 }
 
 .header-text {
   font-size: 52px;
+  align-self: flex-start;
+}
+
+.save-btn {
+  align-self: flex-end;
+  border-radius: 100px;
+  border: none;
+  background-color: $coralRed;
+  color: $plainWhite;
+  font-size: 1em;
+  height: 36px;
+  width: 300px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.revert-btn {
+  margin-right: 20px;
+}
+
+.spacer {
+  align-self: center;
+  width: 100%;
 }

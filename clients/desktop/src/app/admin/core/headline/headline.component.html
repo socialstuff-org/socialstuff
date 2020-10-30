@@ -1,3 +1,6 @@
 <div class="header-container">
   <div class="header-text">{{headerText}}</div>
+  <div class="spacer"></div>
+  <button *ngIf="showSave" (click)="doRevert()" class="revert-btn" mat-button color="warn">Revert</button>
+  <button *ngIf="showSave" (click)="doSave()" class="save-btn">Save</button>
 </div>
