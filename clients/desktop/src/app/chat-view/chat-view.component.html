@@ -2,12 +2,23 @@
 <app-sidenav></app-sidenav>
 
 <div id="chat-view-container">
-  <div style="margin-top: 20px;"><!-- SPACER --></div>
   <div class="chat-message-list">
-    <div *ngFor="let message of messages">
-      <div class="message-row">
-        <app-chat-bubble [message]="message"></app-chat-bubble>
+
+    <app-message-box style="z-index: 100;"></app-message-box>
+
+    <cdk-virtual-scroll-viewport [itemSize]="100" class="example-viewport" style="z-index: 100">
+      <div *cdkVirtualFor="let message of messages;">
+        <div class="message-row">
+          <app-chat-bubble [message]="message"></app-chat-bubble>
+        </div>
       </div>
-    </div>
+    </cdk-virtual-scroll-viewport>
+
   </div>
+
+
 </div>
+
+
+
+<app-footer></app-footer>

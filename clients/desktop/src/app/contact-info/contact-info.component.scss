@@ -1,0 +1,78 @@
+@import "~app/styles/colors";
+
+#wrapper {
+  width: 300px;
+  margin: 0 auto;
+  z-index: 99;
+}
+
+#close {
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  background-color: $coralRed;
+  border: none;
+  color: $plainWhite;
+  margin-left: 15px;
+}
+
+#close:hover {
+  cursor: pointer;
+}
+
+#image-section {
+  width: 300px;
+  margin: 0 auto;
+}
+
+#contactImage {
+  width: 300px;
+  height: auto;
+  border-radius: 100%;
+}
+
+#realName {
+  width: 100%;
+  text-align: center;
+  font-size: 1.5em;
+}
+
+#username {
+  width: 100%;
+  text-align: center;
+  font-size: 1em;
+  margin-top: -10px;
+}
+
+.contact-info-divider {
+  border: 2px solid $elderberry;
+}
+
+#media-section {
+  width: 350px;
+  margin: 0 auto;
+}
+
+#media-link {
+  color: $coralRed;
+}
+
+#notifications {
+  width: 350px;
+  margin: 0 auto;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.checkbox-margin {
+  margin: 0 12px;
+}
+
+#information {
+  width: 350px;
+  margin: 0 auto;
+}
