@@ -1,20 +1,27 @@
 import {Request, Response, Router} from 'express'
-import {getReports} from '../mysql/mysql'
+import {getReportReasons} from '../mysql/mysql'
+import {addReportReason} from '../mysql/mysql'
+import secSettings from '../res/security_settings.json';
 const reportCreationInterface = Router();
 
-async function testConnection() {
+async function getAllReports(req:Request, res: Response) {
   console.log("report creation has been called");
-  return getReports();
+  const reports = await getReportReasons();
+  return res.json(reports).end();
 }
 
-function addReportReason() {
+async function addAReportReason(req: Request, res: Response) {
   //return connection.query('SELECT * FROM report');
-
+  //console.log("Adding reason: ", req.body);
+  await addReportReason(req, res);
+  console.log("reason should be added");
+  res.status(200);
   //return undefined;
 }
 
-reportCreationInterface.post("/", addReportReason);
-reportCreationInterface.get("/", testConnection);
+reportCreationInterface.post("/", addAReportReason);
+reportCreationInterface.get("/", getAllReports);
 reportCreationInterface.delete("/");
 
 export default reportCreationInterface
+

@@ -17,13 +17,45 @@ import * as mysql  from 'mysql2/promise';
 // @ts-ignore
 import migrate     from 'migrate';
 import {promisify} from 'util';
+import {Request, response, Response} from 'express';
 
 const prisma = new PrismaClient();
 
-export async function getReports(){
-  const getReports = await prisma.report_reason.findMany();
-  console.log(getReports);
-  return getReports;
+/**
+ * returns all Report reasons on the server
+ */
+export async function getReportReasons() {
+  const reportReasons = await prisma.report_reason.findMany();
+  console.log(reportReasons);
+  return reportReasons;
+}
+
+/**
+ * Adds a report reason to the Database
+ * @param reason: The reason in a json format:
+ * {
+ *   "reason": "some reason",
+ *   "max_report_violations": 5
+ * }
+ */
+export async function addReportReason(req: Request, res:Response) {
+  const body = req.body;
+  console.log(req.body);
+  //const existingReasons = prisma.report_reason.findOne({ where: {id = } })
+
+
+  await prisma.report_reason.create({
+    data: {
+      reason: "some",
+      max_report_violations: 5,
+      report: {create: {}}
+    }
+  }).catch(e => {
+    throw e
+  }).finally(async () => {
+      await prisma.$disconnect();
+    });
+  return body;
 }
 //tReports().catch(e => {
 //    throw e
