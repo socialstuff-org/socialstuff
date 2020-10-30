@@ -65,19 +65,4 @@ export class TitpClientBus {
       }
     });
   }
-
-  /**
-   *
-   * @param username
-   * @param message
-   */
-  public async forwardMessageTo(username: string, message: BinaryLike) {
-    const client = this._clients[username];
-    if (!client) {
-      // TODO persist message
-      return;
-    } else {
-      await client.write(message);
-    }
-  }
 }
