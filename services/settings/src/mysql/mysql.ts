@@ -41,7 +41,11 @@ export async function getReportReasons() {
 export async function addReportReason(req: Request, res:Response) {
   const body = req.body;
   console.log(req.body);
-  //const existingReasons = prisma.report_reason.findOne({ where: {id = } })
+  let existingReasons = [{a: "a"}];
+  //existingReasons = prisma.report_reason.findMany({ where: {reason: body.reason} });
+  for (let i = 0; i < existingReasons.length; i++) {
+
+  }
 
 
   await prisma.report_reason.create({

@@ -42,7 +42,7 @@ function changeSecuritySettings(req: Request, res: Response) {
   file.set('two_factor_auth.phone', body.two_factor_auth.phone);
   file.set('two_factor_auth.email', body.two_factor_auth.email);
   file.set('confirmed_emails_only', body.confirmed_emails_only);
-  file.set('individual_pwd_req.on', body.individual_pwd_req.individual_pwd_req);
+  file.set('individual_pwd_req.on', body.individual_pwd_req.on);
   file.set('individual_pwd_req.number', body.individual_pwd_req.number);
   file.set('individual_pwd_req.special_char', body.individual_pwd_req.special_char);
   file.set('individual_pwd_req.upper_case', body.individual_pwd_req.upper_case);
