@@ -29,6 +29,7 @@ export interface MessageAttachment {
 export interface ChatMessage {
   type: ChatMessageType;
   senderName: string;
+  groupId?: string;
   content: Buffer;
   attachments: MessageAttachment[];
   sentAt: Date;

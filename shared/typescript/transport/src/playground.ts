@@ -115,6 +115,9 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
     switch (message.type) {
       case ChatMessageType.text:
         console.log(`bob got a message from ${message.senderName}: ${message.content.toString('utf8')}`);
+        if (message.groupId) {
+          console.log(`this message is sent to the group '${message.groupId}'`);
+        }
     }
   });
 
@@ -127,7 +130,8 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
     sentAt: new Date(),
     type: ChatMessageType.text,
     content: Buffer.from('Hello, World! This is a chat message!'),
-    attachments: []
+    attachments: [],
+    groupId: 'someGroup'
   };
 
   alice.sendChatMessageTo(message, ['bob@localhost:8086']);
