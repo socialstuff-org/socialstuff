@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:root@localhost:3306/socialstuff_admin_panel"
+}
+
+model report {
+  id               Int               @id @default(autoincrement())
+  user_id          Int?
+  reason_id        Int?
+  report_reason    report_reason?    @relation(fields: [reason_id], references: [id])
+  socialstuff_user socialstuff_user? @relation(fields: [user_id], references: [id])
+
+  @@index([reason_id], name: "fk_reason_id")
+  @@index([user_id], name: "fk_user_id")
+}
+
+model report_reason {
+  id                    Int      @id @default(autoincrement())
+  reason                String?
+  max_report_violations Int?
+  report                report[]
+}
+
+model socialstuff_user {
+  id            Int      @id @default(autoincrement())
+  username_hash String?
+  banned        Boolean?
+  report        report[]
+}

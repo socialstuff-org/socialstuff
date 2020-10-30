@@ -1,30 +1,27 @@
-import {Request, Response, Router} from 'express';
+import {Request, Response, Router} from 'express'
+import {getReportReasons} from '../mysql/mysql'
+import {addReportReason} from '../mysql/mysql'
+import secSettings from '../res/security_settings.json';
 const reportCreationInterface = Router();
 
-const mysql = require('mysql2');
-const connection = mysql.createPool({
-  host     : 'localhost',
-  user     : 'root',
-  password : 'root',
-  database : 'socialstuff_admin_panel'
-});
-
-async function testConnection() {
-  mysql.createConnection()
-  const sql = "SELECT * FROM report_reason";
-  const [rows] = await connection.promise().query(sql);
-  console.log("Received rows: ", rows)
-  return rows;
+async function getAllReports(req:Request, res: Response) {
+  console.log("report creation has been called");
+  const reports = await getReportReasons();
+  return res.json(reports).end();
 }
 
-function addReportReason() {
-  return connection.query('SELECT * FROM report');
-
+async function addAReportReason(req: Request, res: Response) {
+  //return connection.query('SELECT * FROM report');
+  //console.log("Adding reason: ", req.body);
+  await addReportReason(req, res);
+  console.log("reason should be added");
+  res.status(200);
   //return undefined;
 }
 
-reportCreationInterface.post("/", addReportReason);
-reportCreationInterface.get("/", testConnection);
+reportCreationInterface.post("/", addAReportReason);
+reportCreationInterface.get("/", getAllReports);
 reportCreationInterface.delete("/");
 
 export default reportCreationInterface
+
