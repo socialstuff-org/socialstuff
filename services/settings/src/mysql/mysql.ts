@@ -37,17 +37,18 @@ export async function getReportReasons() {
  *   "reason": "some reason",
  *   "max_report_violations": 5
  * }
+ * @return 201 if insertion was successfull, 409 if report reason has already been detected in the database
  */
+//TODO use different signature
 export async function addReportReason(req: Request, res:Response) {
   const body = req.body;
   console.log(req.body);
-  let existingReasons = [{a: "a"}];
-  //existingReasons = prisma.report_reason.findMany({ where: {reason: body.reason} });
+  //let existingReasons = [{a: "a"}];
+  const existingReasons = await prisma.report_reason.findMany({ where: {reason: body.reason} });
+  //existingReasons.forEach()
   for (let i = 0; i < existingReasons.length; i++) {
-
+    return 409;
   }
-
-
   await prisma.report_reason.create({
     data: {
       reason: "some",
@@ -59,7 +60,7 @@ export async function addReportReason(req: Request, res:Response) {
   }).finally(async () => {
       await prisma.$disconnect();
     });
-  return body;
+  return 201;
 }
 //tReports().catch(e => {
 //    throw e
