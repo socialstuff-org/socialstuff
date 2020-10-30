@@ -27,7 +27,7 @@ export class WaitForUsername extends HandshakeState {
       sub.unsubscribe();
       const usernameBytes = decryptAes384(data, handshake._syncKey);
       const username = usernameBytes.toString('utf-8').trimEnd();
-      const userRsa = await handshake._userKeyRegistry.fetchRsa(username);
+      const userRsa = await handshake._userKeyRegistry.fetchRsa(username.split('@')[0]);
       {
         const verifier = createVerify(SIGN);
         verifier.update(handshake._ecdhPub);

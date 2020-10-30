@@ -13,12 +13,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {BinaryLike}           from 'crypto';
-import {MessageEnvelop}       from '../message';
-import {TitpClientConnection} from './client-connection';
+import {BinaryLike, sign}                            from 'crypto';
+import {deserializeServerMessage, ServerMessageType} from '../message';
+import {TitpClientConnection}                        from './client-connection';
 
 export class TitpClientBus {
-  private _clients: { [username: string]: TitpClientConnection } = { };
+  private _clients: { [username: string]: TitpClientConnection } = {};
+
+  constructor(private _endpoint: string) {
+  }
 
   /**
    *
@@ -41,9 +44,26 @@ export class TitpClientBus {
       delete this._clients[client.username()];
     });
     client.data().subscribe(x => {
-      const envelop = MessageEnvelop.deserialize(x);
-      for (const r of envelop.recipients()) {
-        this.forwardMessageTo(r, envelop.content());
+      const message = deserializeServerMessage(x);
+      switch (message.type) {
+        case ServerMessageType.chatMessage:
+          // TODO forward server message to other servers
+          if (Object.keys(message.localRecipients).length === 0) {
+            break;
+          }
+          for (const recipient in message.localRecipients) {
+            if (!this._clients[recipient]) {
+              console.log('skipping', recipient);
+            }
+            const t = Buffer.alloc(2, 0);
+            t.writeInt16BE(ServerMessageType.chatMessage);
+            const signatureLength = Buffer.alloc(2, 0);
+            console.log('signature length:', message.localRecipients[recipient].length);
+            signatureLength.writeInt16BE(message.localRecipients[recipient].length);
+            console.log('a', message.localRecipients[recipient]);
+            this._clients[recipient].write(Buffer.concat([t, signatureLength, message.localRecipients[recipient], message.content]));
+          }
+          break;
       }
     });
   }
