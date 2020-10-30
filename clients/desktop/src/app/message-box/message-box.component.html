@@ -1,0 +1,11 @@
+<div id="message-box">
+  <textarea [(ngModel)]="message" id="message-input" (keyup.enter)="sendMessage()" placeholder="start typing..."></textarea>
+
+  <button (click)="sendMessage()" id="send-button">
+    <mat-icon>send</mat-icon>
+  </button>
+
+</div>
+
+
+

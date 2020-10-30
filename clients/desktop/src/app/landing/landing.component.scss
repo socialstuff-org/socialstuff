@@ -1,0 +1,22 @@
+@import "../styles/colors";
+
+#landing-container {
+  height: calc(100vh - 120px);
+  width: calc(100% - 250px);
+  margin-left: 250px;
+  display: table;
+}
+
+#sub-landing-container {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+#logo {
+  margin-bottom: 20px;
+}
+
+.landing-text {
+  text-transform: uppercase;
+  color: $plainWhite;
+}
