@@ -6,8 +6,8 @@
   },
   "confirmed_emails_only": true,
   "individual_pwd_req": {
-    "on": false,
     "upper_case": true,
+    "on": false,
     "number": true,
     "special_char": true,
     "reg_ex": false,
