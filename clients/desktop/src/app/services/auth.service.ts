@@ -14,18 +14,17 @@ export class AuthService {
   }
 
   public login(username: string, password: string) {
-    this.http.post<any>(this.api.remoteEndpoint() + '/identity/login', {username, password})
-      .subscribe((response: HttpResponse) => {
-        console.log(response);
-        alert('logged in!');
-      }, (error: HttpErrorResponse) => {
-        if (error.status === 400) {
-          console.log('invalid credentials!');
-        } else {
-          console.log('unknown error!');
-        }
-        console.error(error.error.errors);
-        alert('log in failed!');
-      });
+    return new Promise<void>((res, rej) => {
+      this.http.post<any>(this.api.remoteEndpoint() + '/identity/login', {username, password})
+        .subscribe(response => {
+          res(response.data.token);
+        }, (error: HttpErrorResponse) => {
+          if (error.status === 400) {
+            rej('Invalid Credentials!')
+          } else {
+            rej(error.error.errors);
+          }
+        });
+    })
   }
 }
