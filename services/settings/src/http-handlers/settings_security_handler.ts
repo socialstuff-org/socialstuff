@@ -7,19 +7,17 @@ import {body, check, validationResult} from 'express-validator';
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
-function getSecSettings(req: Request, res: Response) {
-  console.log(secSettings);
+async function getSecSettings(req: Request, res: Response) {
+  //console.log(secSettings);
   //if (req.get("token") !=="admin") {
   //}//TODO
   //if (!verifyAdmin(req)) {
   //  return;
   //}
-  res.json(secSettings).end();
+  res.json(editJsonFile(__dirname + '/../res/security_settings.json').data).end();
 }
 
 const editJsonFile = require('edit-json-file');
-
-//let file = editJsonFile('D:/Documents/fontys/Semester_7/Project/socialstuff/services/settings/src/res/security_settings.json');
 let file = editJsonFile(__dirname + '/../res/security_settings.json');
 
 async function changeSecuritySettings(req: Request, res: Response) {
@@ -43,9 +41,7 @@ async function changeSecuritySettings(req: Request, res: Response) {
   await file.set('inv_only.on', body.inv_only.on);
   await file.set('inv_only.inv_only_by_adm', body.inv_only.inv_only_by_adm);
   await file.save()
-  //setTimeout(() => {res.json(secSettings)}, 2000);
-  //res.json(secSettings);
-  res.json(file.data)
+  res.json(editJsonFile(__dirname + '/../res/security_settings.json').data)
 }
 
 let validationParameters = [
