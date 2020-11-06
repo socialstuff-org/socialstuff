@@ -42,7 +42,7 @@ async function changeSecuritySettings(req: Request, res: Response) {
   await file.set('individual_pwd_req.reg_ex_string', body.individual_pwd_req.reg_ex_string);
   await file.set('inv_only.on', body.inv_only.on);
   await file.set('inv_only.inv_only_by_adm', body.inv_only.inv_only_by_adm);
-  file.save();
+  await file.save();
   await setTimeout(() => res.json(secSettings), 2000);
 
 
