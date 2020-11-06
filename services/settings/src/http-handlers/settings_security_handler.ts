@@ -22,7 +22,7 @@ const editJsonFile = require('edit-json-file');
 //let file = editJsonFile('D:/Documents/fontys/Semester_7/Project/socialstuff/services/settings/src/res/security_settings.json');
 let file = editJsonFile(__dirname + '/../res/security_settings.json');
 
-function changeSecuritySettings(req: Request, res: Response) {
+async function changeSecuritySettings(req: Request, res: Response) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log('Errors in the Json occurred!');
@@ -37,20 +37,20 @@ function changeSecuritySettings(req: Request, res: Response) {
 
 
   //secSettings.two_factor_auth = body.two_factor_auth;
-  file.set('two_factor_auth.on', body.two_factor_auth.on);
+  await file.set('two_factor_auth.on', body.two_factor_auth.on);
   //secSettings.two_factor_auth.on = body.two_factor_auth.on;
-  file.set('two_factor_auth.phone', body.two_factor_auth.phone);
-  file.set('two_factor_auth.email', body.two_factor_auth.email);
-  file.set('confirmed_emails_only', body.confirmed_emails_only);
-  file.set('individual_pwd_req.on', body.individual_pwd_req.on);
-  file.set('individual_pwd_req.number', body.individual_pwd_req.number);
-  file.set('individual_pwd_req.special_char', body.individual_pwd_req.special_char);
-  file.set('individual_pwd_req.upper_case', body.individual_pwd_req.upper_case);
-  file.set('individual_pwd_req.reg_ex', body.individual_pwd_req.reg_ex);
-  file.set('individual_pwd_req.reg_ex_string', body.individual_pwd_req.reg_ex_string);
-  file.set('inv_only.on', body.inv_only.on);
-  file.set('inv_only.inv_only_by_adm', body.inv_only.inv_only_by_adm);
-  file.save();
+  await file.set('two_factor_auth.phone', body.two_factor_auth.phone);
+  await file.set('two_factor_auth.email', body.two_factor_auth.email);
+  await file.set('confirmed_emails_only', body.confirmed_emails_only);
+  await file.set('individual_pwd_req.on', body.individual_pwd_req.on);
+  await file.set('individual_pwd_req.number', body.individual_pwd_req.number);
+  await file.set('individual_pwd_req.special_char', body.individual_pwd_req.special_char);
+  await file.set('individual_pwd_req.upper_case', body.individual_pwd_req.upper_case);
+  await file.set('individual_pwd_req.reg_ex', body.individual_pwd_req.reg_ex);
+  await file.set('individual_pwd_req.reg_ex_string', body.individual_pwd_req.reg_ex_string);
+  await file.set('inv_only.on', body.inv_only.on);
+  await file.set('inv_only.inv_only_by_adm', body.inv_only.inv_only_by_adm);
+  await file.save();
 
   res.json({data: secSettings});
 }
