@@ -16,6 +16,7 @@ export class HeadlineComponent implements OnInit {
 
   @Input() headerText = ''
   @Input() showSave = false
+  @Input() loading = false
   @Input() saveFn = () => {}
   @Input() revertFn = () => {}
   @Output() revert: EventEmitter<any> = new EventEmitter<any>()

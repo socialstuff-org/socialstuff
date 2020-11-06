@@ -1,13 +1,13 @@
 {
   "two_factor_auth": {
-    "on": false,
+    "on": true,
     "phone": true,
-    "email": false
+    "email": true
   },
   "confirmed_emails_only": true,
   "individual_pwd_req": {
     "upper_case": true,
-    "on": false,
+    "on": true,
     "number": true,
     "special_char": true,
     "reg_ex": false,

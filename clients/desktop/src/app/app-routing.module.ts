@@ -8,7 +8,7 @@ import {ForgotPasswordComponent} from './auth/forgot-password/forgot-password.co
 import {SettingsViewComponent} from './admin/settings-view/settings-view.component';
 import {SecurityComponent} from './admin/security/security.component';
 import {DashboardComponent} from './admin/dashboard/dashboard.component';
-import {CreateInviteComponent} from './admin/usersManagement/create-invite/create-invite.component';
+import {CreateInviteComponent} from './admin/usersManagement/CreateInvites/create-invite/create-invite.component';
 import {UsersComponent} from './admin/usersManagement/users/users.component';
 import {ReportSettingsComponent} from './admin/usersManagement/report-settings/report-settings.component';
 import {ReportedUsersComponent} from './admin/usersManagement/reported-users/reported-users.component';

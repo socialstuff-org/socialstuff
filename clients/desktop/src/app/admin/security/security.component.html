@@ -1,5 +1,5 @@
 <div>
-  <app-headline [showSave]="detectedChanges" (revert)="revertChanges()" (save)="saveSettings()" headerText="Security"></app-headline>
+  <app-headline [showSave]="detectedChanges" [loading]="loading" (revert)="revertChanges()" (save)="saveSettings()" headerText="Security"></app-headline>
   <div class="row">
     <mat-slide-toggle [(ngModel)]="settings.two_factor_auth.on">2 Factor authentication</mat-slide-toggle>
     <div class="sub-row">
@@ -40,7 +40,7 @@
   <div class="row">
     <mat-slide-toggle [(ngModel)]="settings.inv_only.on">Invites Only</mat-slide-toggle>
     <div class="sub-row">
-      <mat-slide-toggle [(ngModel)]="settings.inv_only.inv_only_by_admin">Only by Admin</mat-slide-toggle>
+      <mat-slide-toggle [disabled]="!settings.inv_only.on" [(ngModel)]="settings.inv_only.inv_only_by_admin">Only by Admin</mat-slide-toggle>
     </div>
   </div>
 </div>

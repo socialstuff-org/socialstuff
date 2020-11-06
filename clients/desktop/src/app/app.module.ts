@@ -37,7 +37,7 @@ import { NavigationItemComponent } from './admin/SideNav/navigation-item/navigat
 import { MatDividerModule } from '@angular/material/divider';
 import { SecurityComponent } from './admin/security/security.component';
 import { DashboardComponent } from './admin/dashboard/dashboard.component';
-import { CreateInviteComponent } from './admin/usersManagement/create-invite/create-invite.component';
+import { CreateInviteComponent } from './admin/usersManagement/CreateInvites/create-invite/create-invite.component';
 import { ReportSettingsComponent } from './admin/usersManagement/report-settings/report-settings.component';
 import { ReportedUsersComponent } from './admin/usersManagement/reported-users/reported-users.component';
 import { BlockedUsersComponent } from './admin/usersManagement/blocked-users/blocked-users.component';
@@ -46,6 +46,7 @@ import { HeadlineComponent } from './admin/core/headline/headline.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { CreateNewInviteComponent } from './admin/usersManagement/CreateInvites/create-new-invite/create-new-invite.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -75,7 +76,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ReportedUsersComponent,
     BlockedUsersComponent,
     UsersComponent,
-    HeadlineComponent],
+    HeadlineComponent,
+    CreateNewInviteComponent],
   imports: [
     BrowserModule,
     FormsModule,

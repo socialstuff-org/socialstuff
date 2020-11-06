@@ -13,6 +13,7 @@ export class SecurityComponent implements OnInit {
 
   public settingsBackup = defaultSettings();
   public settings = defaultSettings();
+  public loading = false;
   public hostname = '127.0.0.1';
   public port = 3002;
 
@@ -35,12 +36,19 @@ export class SecurityComponent implements OnInit {
     return this.adminSettings.getSettings().then((setting: ServerSettings) => {
       this.settings = _.cloneDeep(setting);
       this.settingsBackup  = _.cloneDeep(setting);
+      console.log(this.settings);
     });
   }
 
   public saveSettings(): void {
+    this.loading = true;
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
-    this.adminSettings.setSettings(this.settings);
+    this.adminSettings.setSettings(this.settings).then(response => {
+      this.loading = false;
+      console.log(response);
+      this.settings = _.cloneDeep(response);
+      this.settingsBackup = _.cloneDeep(response);
+    });
   }
 
   public revertChanges(): void {

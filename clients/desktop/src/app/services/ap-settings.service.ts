@@ -15,16 +15,11 @@ export class AdminSettings {
   }
 
   public getSettings(): Promise<ServerSettings> {
-    return this.http.get<any>(this.api.remoteEndpoint() + '/security-settings').toPromise();
+    return this.http.get<any>(this.api.remoteEndpoint() + '/settings/security').toPromise();
   }
 
-  public setSettings(currentSettings): void {
-    this.http.put<any>((this.api.remoteEndpoint() + '/security-settings'), currentSettings)
-      .subscribe((response: HttpResponse) => {
-        console.log(response.body);
-      }, (error: HttpErrorResponse) => {
-        console.error(error.error.errors);
-        alert('Could not receive current Settings');
-      });
+  public setSettings(currentSettings): Promise<ServerSettings> {
+    return this.http.put<any>((this.api.remoteEndpoint() + '/settings/security'), currentSettings).toPromise();
+
   }
 }
