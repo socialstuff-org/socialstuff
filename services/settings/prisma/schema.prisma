@@ -31,3 +31,11 @@ model socialstuff_user {
   banned        Boolean?
   report        report[]
 }
+
+model invite_code {
+  id              Int       @id @default(autoincrement())
+  max_usage       Int?
+  times_used      Int?      @default(0)
+  expiration_date DateTime?
+  active          Boolean?  @default(true)
+}
