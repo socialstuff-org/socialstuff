@@ -31,5 +31,5 @@ reportCreationInterface.post("/", addAReportReason);
 reportCreationInterface.get("/", getAllReports);
 reportCreationInterface.delete("/");
 
-export default reportCreationInterface
+export default reportCreationInterface;
 
