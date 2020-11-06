@@ -29,16 +29,8 @@ async function changeSecuritySettings(req: Request, res: Response) {
     return res.status(422).json({errors: errors.array()});
   }
 
-
   const body = req.body;// bodyParser.urlencoded(req.body);// req.body;
-
-  //body.individual_pwd_req.reg_ex_string instanceof String
-  //TODO express validator
-
-
-  //secSettings.two_factor_auth = body.two_factor_auth;
   await file.set('two_factor_auth.on', body.two_factor_auth.on);
-  //secSettings.two_factor_auth.on = body.two_factor_auth.on;
   await file.set('two_factor_auth.phone', body.two_factor_auth.phone);
   await file.set('two_factor_auth.email', body.two_factor_auth.email);
   await file.set('confirmed_emails_only', body.confirmed_emails_only);
@@ -52,7 +44,7 @@ async function changeSecuritySettings(req: Request, res: Response) {
   await file.set('inv_only.inv_only_by_adm', body.inv_only.inv_only_by_adm);
   await file.save();
 
-  res.json({data: secSettings});
+  res.json(secSettings);
 }
 
 let validationParameters = [
