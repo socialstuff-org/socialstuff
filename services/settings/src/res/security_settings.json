@@ -2,7 +2,7 @@
   "two_factor_auth": {
     "on": true,
     "phone": true,
-    "email": false
+    "email": true
   },
   "confirmed_emails_only": true,
   "individual_pwd_req": {
