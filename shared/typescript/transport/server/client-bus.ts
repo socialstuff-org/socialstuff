@@ -43,26 +43,28 @@ export class TitpClientBus {
     client.on('close').subscribe(() => {
       delete this._clients[client.username()];
     });
-    client.data().subscribe(x => {
-      const message = deserializeServerMessage(x);
-      switch (message.type) {
-        case ServerMessageType.chatMessage:
-          // TODO forward server message to other servers
-          if (Object.keys(message.localRecipients).length === 0) {
-            break;
-          }
-          for (const recipient in message.localRecipients) {
-            if (!this._clients[recipient]) {
-              console.log('skipping offline recipient:', recipient);
-            }
-            const t = Buffer.alloc(2, 0);
-            t.writeInt16BE(ServerMessageType.chatMessage);
-            const signatureLength = Buffer.alloc(2, 0);
-            signatureLength.writeInt16BE(message.localRecipients[recipient].length);
-            this._clients[recipient].write(Buffer.concat([t, signatureLength, message.localRecipients[recipient], message.content]));
-          }
+    client.data().subscribe(this._onClientData.bind(this, client));
+  }
+
+  private _onClientData(client: TitpClientConnection, data: Buffer) {
+    const message = deserializeServerMessage(data);
+    switch (message.type) {
+      case ServerMessageType.chatMessage:
+        // TODO forward server message to other servers
+        if (Object.keys(message.localRecipients).length === 0) {
           break;
-      }
-    });
+        }
+        for (const recipient in message.localRecipients) {
+          if (!this._clients[recipient]) {
+            console.log('skipping offline recipient:', recipient);
+          }
+          const t = Buffer.alloc(2, 0);
+          t.writeInt16BE(ServerMessageType.chatMessage);
+          const signatureLength = Buffer.alloc(2, 0);
+          signatureLength.writeInt16BE(message.localRecipients[recipient].length);
+          this._clients[recipient].write(Buffer.concat([t, signatureLength, message.localRecipients[recipient], message.content]));
+        }
+        break;
+    }
   }
 }
