@@ -62,6 +62,37 @@ export async function addReportReason(req: Request, res:Response) {
     });
   return 201;
 }
+
+
+export async function getAllInviteCodesFromSQL() {
+  prisma.invite_code.findMany();
+}
+let invite_code = {
+  active: true,
+  expiration_date: "",
+  max_usage: 5,
+  times_used: 0,
+  code: "abcdef"
+};
+
+export async function updateInviteCodeInSQL(id: number, data: Object) {
+
+  await prisma.invite_code.update({where: {
+                               id: id
+                             },
+                             data: {
+                               active: data.active,
+                               expiration_date: data.expiration_date,
+                               max_usage: data.max_usage,
+                               code: data.code
+                             }})
+    .catch(e => {
+      throw e
+    }).finally(async () => {
+      await prisma.$disconnect();
+    });
+  return 201;
+}
 //tReports().catch(e => {
 //    throw e
 //  }).finally(async () => {

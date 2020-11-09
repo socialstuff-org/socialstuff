@@ -35,7 +35,8 @@ model socialstuff_user {
 model invite_code {
   id              Int       @id @default(autoincrement())
   max_usage       Int?
-  times_used      Int?      @default(0)
+  times_used      Int       @default(0)
   expiration_date DateTime?
-  active          Boolean?  @default(true)
+  active          Boolean   @default(true)
+  code            String
 }
