@@ -75,7 +75,7 @@ let invite_code = {
   code: "abcdef"
 };
 
-export async function updateInviteCodeInSQL(id: number, data: Object) {
+export async function updateInviteCodeInSQL(id: number, data: any) {
 
   await prisma.invite_code.update({where: {
                                id: id
@@ -92,6 +92,34 @@ export async function updateInviteCodeInSQL(id: number, data: Object) {
       await prisma.$disconnect();
     });
   return 201;
+}
+
+export async function addInviteCodeToSQL(invCodeToAdd: any) {
+  await prisma.invite_code.create(
+    {
+      data: {
+        code: invCodeToAdd.code,
+        max_usage: invCodeToAdd.max_usage,
+        expiration_date: invCodeToAdd.expiration_date,
+        active: invCodeToAdd.active
+      }
+    })
+  .catch(e => {
+    throw e
+  }).finally(async () => {
+    await prisma.$disconnect();
+  });
+  return 201;
+}
+
+export async function deleteInviteCodeFromSQL(invCodeId: number) {
+  prisma.invite_code.delete({where: {id: invCodeId}})
+    .catch(e => {
+      throw e
+    }).finally(async () => {
+      await prisma.$disconnect();
+  })
+  return 200;
 }
 //tReports().catch(e => {
 //    throw e
