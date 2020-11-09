@@ -84,6 +84,9 @@ export class TitpClient extends CommonTitpClient {
     this._init();
   }
 
+  /**
+   * Terminates the server connection.
+   */
   public end() {
     return new Promise(res => {
       this._socket.end(() => {
@@ -93,6 +96,12 @@ export class TitpClient extends CommonTitpClient {
     });
   }
 
+  /**
+   * Instruct the server to forward a message to its respective recipients.
+   * @param message The message to be sent.
+   * @param recipients A list of recipients. Each name must follow the schema <name>[@<server>[:<port>]].
+   * @param groupId Optional: An identifier, which indicates the association of a message to a group chat.
+   */
   public async sendChatMessageTo(message: ChatMessage, recipients: string[], groupId?: string) {
     if (recipients.length < 1) {
       throw new Error('Please provide at least one recipient for the message!');
@@ -113,10 +122,18 @@ export class TitpClient extends CommonTitpClient {
     return this.write(serializeServerMessage(serverMessage));
   }
 
+  /**
+   * Returns an Observable, which emits successfully parsed messages, which have been forwarded to the client.
+   */
   public incomingMessage(): Observable<ChatMessage> {
     return this._onIncomingMessage;
   }
 
+  /**
+   * Converts incoming raw data into a ChatMessage.
+   * @param data The incoming data to be converted/parsed.
+   * @private
+   */
   private async _parseChatMessage(data: Buffer) {
     const signatureLength = data.readInt16BE();
     const signature = decryptRsa(data.slice(2, signatureLength + 2), this._rsa.priv);
@@ -136,6 +153,11 @@ export class TitpClient extends CommonTitpClient {
     return deserializeChatMessage(decryptedSerializedChatMessage);
   }
 
+  /**
+   *
+   * @param data
+   * @private
+   */
   private async _interpretIncomingData(data: Buffer) {
     const messageType: ServerMessageType = data.readInt16BE();
     switch (messageType) {
