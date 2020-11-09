@@ -37,6 +37,8 @@ export class SecurityComponent implements OnInit {
       this.settings = _.cloneDeep(setting);
       this.settingsBackup  = _.cloneDeep(setting);
       console.log(this.settings);
+    }).catch(error => {
+      console.log(error);
     });
   }
 

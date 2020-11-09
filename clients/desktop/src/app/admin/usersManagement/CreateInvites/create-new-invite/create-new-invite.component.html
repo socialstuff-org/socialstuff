@@ -1,1 +1,29 @@
-<p>create-new-invite works!</p>
+<table class="table">
+  <tr>
+    <td class="column">
+      Expiration Date
+    </td>
+    <td class="column">
+      Usage Limitation
+    </td>
+    <td class="column">
+      Invite Code
+    </td>
+    <td class="column">
+    </td>
+  </tr>
+  <tr>
+    <td class="column">
+      <input type="text" label="Expiration Date" placeholder="12/03/2020 14:43pm" class="text-field">
+    </td>
+    <td class="column">
+      <input type="text" label="Usage Limitation" placeholder="5" class="text-field">
+    </td>
+    <td class="column">
+      <input type="text" label="Invite Code" placeholder="COME_IN_PLEASE" class="text-field">
+    </td>
+    <td class="column">
+      <button [class.spinner]="loading" class="save-btn">Save</button>
+    </td>
+  </tr>
+</table>

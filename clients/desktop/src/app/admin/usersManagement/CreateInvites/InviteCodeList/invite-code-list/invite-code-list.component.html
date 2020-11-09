@@ -1,0 +1,20 @@
+<table>
+  <tr>
+    <td>
+      Invite Code
+    </td>
+    <td>
+      Expiration Date
+    </td>
+    <td>
+      Usage Limitation
+    </td>
+    <td>
+      Times Used
+    </td>
+    <td></td>
+  </tr>
+</table>
+<table>
+  <app-invite-code-row *ngFor="let inviteCode of inviteCodes" [inviteCode]="inviteCode"></app-invite-code-row>
+</table>

@@ -1,16 +1,24 @@
-@import "../../../../styles/colors";
+@import "../../../../../styles/colors";
 
-.table {
+table {
   border-collapse: collapse;
+  border-spacing: 0 !important;
   width: 100%;
   color: black; // TODO White
+  table-layout: auto;
 }
 
-.column {
+tr {
+  width: 100%;
+}
+
+td {
   text-align: left;
   padding: 8px;
   min-width: 200px;
+  width: 100%;
 }
+
 
 .text-field {
   border-radius: 50px;
@@ -22,7 +30,7 @@
   height: 20px;
 }
 
-.text-field::placeholder {
+.search-bar::placeholder {
   color: $plainWhite;
 }
 

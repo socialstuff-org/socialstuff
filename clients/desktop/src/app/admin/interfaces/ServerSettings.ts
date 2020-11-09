@@ -1,5 +1,3 @@
-import {Message} from '../../models/Message';
-
 export interface ServerSettings {
   two_factor_auth: {
     on: boolean,

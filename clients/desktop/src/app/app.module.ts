@@ -47,6 +47,8 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { CreateNewInviteComponent } from './admin/usersManagement/CreateInvites/create-new-invite/create-new-invite.component';
+import { InviteCodeListComponent } from './admin/usersManagement/CreateInvites/InviteCodeList/invite-code-list/invite-code-list.component';
+import { InviteCodeRowComponent } from './admin/usersManagement/CreateInvites/InviteCodeList/invite-code-row/invite-code-row.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -77,7 +79,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     BlockedUsersComponent,
     UsersComponent,
     HeadlineComponent,
-    CreateNewInviteComponent],
+    CreateNewInviteComponent,
+    InviteCodeListComponent,
+    InviteCodeRowComponent],
   imports: [
     BrowserModule,
     FormsModule,

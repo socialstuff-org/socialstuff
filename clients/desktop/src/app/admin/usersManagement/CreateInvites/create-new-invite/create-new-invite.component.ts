@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { InviteCode, defaultInviteCode } from '../../../interfaces/InviteCode';
 
 @Component({
   selector: 'app-create-new-invite',
@@ -8,6 +9,8 @@ import { Component, OnInit } from '@angular/core';
 export class CreateNewInviteComponent implements OnInit {
 
   constructor() { }
+  public loading = false;
+
 
   ngOnInit(): void {
   }
