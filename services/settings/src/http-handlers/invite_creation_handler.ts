@@ -1,13 +1,14 @@
 import {Request, response, Response, Router} from 'express';
 import {getAllInviteCodesFromSQL, updateInviteCodeInSQL, addInviteCodeToSQL, deleteInviteCodeFromSQL} from '../mysql/mysql'
 
-const inviteManagementInterface = Router();
 
 async function getAllInvitations(req: Request, res: Response) {
-  return res.json(getAllInviteCodesFromSQL()).end();
+  console.log('getting all invitations')
+  return res.json(await getAllInviteCodesFromSQL());
 }
 
 async function editInviteCode(req:Request, res: Response) {
+  console.log('Put invite code called')
   const newInvCode = req.body;
   const codeId = newInvCode.id;
   const responseCode = await updateInviteCodeInSQL(codeId, newInvCode);
@@ -27,8 +28,9 @@ async function deleteInviteCode(req: Request, res: Response) {
   res.status(responseCode);
 }
 
+const inviteManagementInterface = Router();
 inviteManagementInterface.get("/", getAllInvitations);
 inviteManagementInterface.put("/", editInviteCode);
 inviteManagementInterface.post("/", addInviteCode);
 inviteManagementInterface.delete("/", deleteInviteCode);
-export default inviteManagementInterface
+export default inviteManagementInterface;
