@@ -18,7 +18,7 @@ import argon               from 'argon2';
 
 const ENCRYPTION_ALGORITHM = 'aes-256-cbc';
 
-export const USERNAME_REGEX = /[\w\d_.]{5,20}/.compile();
+export const USERNAME_REGEX = /[a-z\d_.]{5,20}/.compile();
 
 const LOWER_WORD_CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const UPPER_WORD_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

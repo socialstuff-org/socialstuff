@@ -1,11 +1,13 @@
 @import "~app/styles/colors";
 
-* {
+mat-toolbar {
+  height: 60px;
   background-color: $plumViolet;
 }
 
-mat-toolbar {
-  height: 60px;
+#socialstuff {
+  text-decoration: none;
+  color: $plainWhite;
 }
 
 .example-spacer {
@@ -20,4 +22,43 @@ mat-icon {
   height: 40px;
   width: auto;
   margin-right: 10px;
+}
+
+#profile-picture {
+  width: 40px;
+  height: 40px;
+  border: 2px solid $frenchRasperry;
+  border-radius: 40px;
+  text-align: center;
+  line-height: 40px;
+  float: left;
+  background-color: $elderberry;
+  position: absolute;
+  left: 275px;
+}
+
+#profile-picture:hover {
+  cursor: pointer;
+}
+
+#username {
+  position: absolute;
+  left: 340px;
+}
+
+#username:hover {
+  cursor: pointer;
+}
+
+#logout-btn {
+  width: 40px;
+  height: 40px;
+  color: $plainWhite;
+  background-color: $coralRed;
+  border: none;
+  border-radius: 3px;
+}
+
+#logout-btn:hover {
+  cursor: pointer;
 }

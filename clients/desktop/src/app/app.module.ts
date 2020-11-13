@@ -31,21 +31,13 @@ import {ChatViewComponent}       from './chat-view/chat-view.component';
 import {ChatAppComponent}        from './chat-app/chat-app.component';
 import { SidenavComponent } from './sidenav/sidenav.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
-import { SettingsViewComponent } from './admin/settings-view/settings-view.component';
-import { NavigationContainerComponent } from './admin/SideNav/navigation-container/navigation-container.component';
-import { NavigationItemComponent } from './admin/SideNav/navigation-item/navigation-item.component';
-import { MatDividerModule } from '@angular/material/divider';
-import { SecurityComponent } from './admin/security/security.component';
-import { DashboardComponent } from './admin/dashboard/dashboard.component';
-import { CreateInviteComponent } from './admin/usersManagement/create-invite/create-invite.component';
-import { ReportSettingsComponent } from './admin/usersManagement/report-settings/report-settings.component';
-import { ReportedUsersComponent } from './admin/usersManagement/reported-users/reported-users.component';
-import { BlockedUsersComponent } from './admin/usersManagement/blocked-users/blocked-users.component';
-import { UsersComponent } from './admin/usersManagement/users/users.component';
-import { HeadlineComponent } from './admin/core/headline/headline.component';
-import {MatGridListModule} from '@angular/material/grid-list';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { ContactInfoComponent } from './contact-info/contact-info.component';
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import { LogoutComponent } from './auth/logout/logout.component';
+import { LandingComponent } from './landing/landing.component';
+import {ScrollingModule} from "@angular/cdk/scrolling";
+import { MessageBoxComponent } from './message-box/message-box.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -53,29 +45,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent,
-    RegisterComponent,
-    ChatListComponent,
-    HeaderComponent,
-    FooterComponent,
-    ChatBubbleComponent,
-    ChatViewComponent,
-    ChatAppComponent,
-    SidenavComponent,
-    ForgotPasswordComponent,
-    SettingsViewComponent,
-    NavigationContainerComponent,
-    NavigationItemComponent,
-    SecurityComponent,
-    DashboardComponent,
-    CreateInviteComponent,
-    ReportSettingsComponent,
-    ReportedUsersComponent,
-    BlockedUsersComponent,
-    UsersComponent,
-    HeadlineComponent],
+  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent, ContactInfoComponent, LogoutComponent, LandingComponent, MessageBoxComponent],
   imports: [
     BrowserModule,
     FormsModule,
@@ -96,10 +66,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MatListModule,
     BrowserAnimationsModule,
     MatInputModule,
-    MatDividerModule,
-    MatGridListModule,
-    MatSlideToggleModule,
-    MatCheckboxModule
+    MatDialogModule,
+    MatCheckboxModule,
+    ScrollingModule,
   ],
   providers:    [],
   bootstrap:    [AppComponent],

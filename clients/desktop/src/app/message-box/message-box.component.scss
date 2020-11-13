@@ -1,0 +1,38 @@
+@import "~app/styles/colors";
+
+#message-box {
+  background-color: $boysenberry;
+  color: $plainWhite;
+  border-radius: 5px;
+  width: 70%;
+  min-height: 28px;
+  max-height: 120px;
+  margin-top: 10px;
+}
+
+#message-input {
+  background-color: transparent;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: none;
+  width: calc(100% - 30px - 70px);
+  margin-left: 15px;
+  color: $plainWhite;
+  min-height: 28px;
+  max-height: 100px;
+  min-width: calc(100% - 30px - 70px);
+  max-width: calc(100% - 30px - 70px);
+}
+
+#send-button {
+  width: 40px;
+  color: $plainWhite;
+  background-color: transparent;
+  position: relative;
+  bottom: 10px;
+  border: none;
+}
+
+#send-button:hover {
+  cursor: pointer;
+}

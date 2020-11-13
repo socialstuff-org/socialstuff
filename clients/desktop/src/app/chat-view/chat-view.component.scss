@@ -1,3 +1,5 @@
+@import "~app/styles/colors";
+
 #chat-view-container {
   margin-left: 250px;
   width: calc(100% - 250px);
@@ -15,5 +17,17 @@
 .message-row {
   margin-bottom: 20px;
   display: grid;
-  grid-template-columns: 70%;
+  grid-template-columns: 100%;
+}
+
+.example-viewport {
+  height: calc(100vh - 300px);
+  width: 70%;
+  // border: 1px solid $coralRed; // DEBUG ONLY
+}
+
+#message-box-wrapper {
+  width: 90%;
+  margin: 10px auto 0;
+  z-index: 100;
 }

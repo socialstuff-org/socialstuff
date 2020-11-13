@@ -2,10 +2,24 @@
   <span>
     <img src="https://cdn.code-lake.com/socialstuff/img/eye.svg" alt="img unavailable" id="logo">
   </span>
-  <span>SocialStuff</span>
+  <a routerLink="/landing" id="socialstuff">SocialStuff</a>
   <span class="example-spacer"></span>
-  <span>{{chatPartner}}</span>
-  <button (click)="logout()" mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
+  <div id="profile-picture" *ngIf="chatPartner">
+    <span *ngIf="chatPartner.realName; else noRealName">{{chatPartner.acronym}}</span>
+    <ng-template #noRealName>
+      <mat-icon style="margin-top: 7px;">person</mat-icon>
+    </ng-template>
+  </div>
+  <div id="username" (click)="openContactInfo()"  *ngIf="chatPartner">
+    <div *ngIf="chatPartner.realName; else onlyUsername">{{chatPartner.realName}}<br>
+      @{{chatPartner.username}}
+    </div>
+    <ng-template #onlyUsername>
+      <span style="line-height: 40px;">@{{chatPartner.username}}</span>
+    </ng-template>
+  </div>
+  <span class="example-spacer"></span>
+  <button (click)="logout()" id="logout-btn">
     <mat-icon>exit_to_app</mat-icon>
   </button>
 </mat-toolbar>
