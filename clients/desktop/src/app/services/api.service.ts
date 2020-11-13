@@ -4,15 +4,21 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ApiService {
-  private endpoint = 'http://127.0.0.1:8080';
+  private endpoint = 'http://127.0.0.1:8086';
+  public hostname: string = '';
+  public port: number = 8086;
 
   constructor() { }
 
-  public remoteEndpoint() {
+  /**
+   * The remove endpoint of the reverse proxy via which all services may be accessed.
+   */
+  public remoteEndpoint(): string {
+    // return `http://${this.hostname}:${this.port}`;
     return this.endpoint;
   }
 
-  public updateRemoteEndpoint(endpoint: string) {
+  public updateRemoteEndpoint(endpoint: string): void {
     this.endpoint = endpoint;
   }
 }

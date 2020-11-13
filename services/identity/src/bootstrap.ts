@@ -15,8 +15,8 @@
 
 /* istanbul ignore file */
 
-import crypto                                                from 'crypto';
-import path                                                  from 'path';
+import crypto, {createPublicKey} from 'crypto';
+import path                      from 'path';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
 import {v1}                                                  from 'uuid';
@@ -56,6 +56,9 @@ export default (async () => {
     }
   }
 
+  const serverPublicRsaString = fs.readFileSync(path.join(__dirname, '..', 'priv.pem')).toString('utf-8');
+  const serverRsaPublicKey = createPublicKey(serverPublicRsaString);
+
   const db = await sharedConnection();
 
   if (ENV !== 'dev') {
@@ -65,7 +68,7 @@ export default (async () => {
   const ecdh = crypto.createECDH('secp256k1');
   ecdh.generateKeys();
   process.env.ECDH_PRIVATE_KEY = ecdh.getPrivateKey().toString('base64');
-  const publicKey = ecdh.getPrivateKey().toString('base64');
+  // const publicKey = ecdh.getPrivateKey().toString('base64');
   const password = crypto.randomBytes(16).toString('hex');
   const username = 'root';
 
@@ -80,7 +83,7 @@ export default (async () => {
   console.log('sample invite code:      ', id);
   const addUserSql = 'INSERT INTO users (id,username,password,public_key, can_login) VALUES (unhex(?),?,?,?,1);';
   const userID = v1().replace(/-/g, '');
-  await db.query(addUserSql, [userID, username, await hashUnique(password), publicKey]);
+  await db.query(addUserSql, [userID, username, await hashUnique(password), serverRsaPublicKey.export({ type: 'pkcs1', format: 'pem' })]);
   const secret = v1().replace(/-/g, '');
   const secretHash = await hashHmac(secret);
   const addUSerRegistrationConfirmation = 'INSERT INTO registration_confirmations (expires_at, secret_hash, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY),?,unhex(?));';
