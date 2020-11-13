@@ -31,13 +31,13 @@ export function encryptRsa(data: BinaryLike, publicKey: KeyObject): Buffer {
   const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
   const encryptedKeys = publicEncrypt(publicKey, Buffer.concat([key, iv]));
   const keysLength = Buffer.alloc(2);
-  keysLength.writeInt16BE(encryptedKeys.length);
+  keysLength.writeInt16BE(encryptedKeys.length, 0);
   return Buffer.concat([keysLength, encryptedKeys, encrypted]);
 }
 
 export function decryptRsa(data: Buffer, privateKey: KeyObject): Buffer {
   const keysLength = data.slice(0, 2);
-  const keysBytesCount = keysLength.readInt16BE();
+  const keysBytesCount = keysLength.readInt16BE(0);
   const keyBytes = privateDecrypt(privateKey, data.slice(2, keysBytesCount + 2));
   data = data.slice(keysBytesCount + 2);
   const key = keyBytes.slice(0, 32);

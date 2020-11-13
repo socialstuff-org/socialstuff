@@ -77,7 +77,7 @@ export class TitpClient extends CommonTitpClient {
    * @param port
    */
   public async connect(hostRsaPub: KeyObject, host: string, port: number = 8086) {
-    await promisify<number, string>(this._socket.connect.bind(this._socket))(port, host);
+    await (promisify<number, string>(this._socket.connect.bind(this._socket)) as any)(port, host);
     const handshake = new Handshake(this._username, this._socket, this._ecdh, this._rsa, hostRsaPub);
     await handshake._handshakeResult.toPromise();
     this._key = handshake._syncKey;
@@ -135,9 +135,9 @@ export class TitpClient extends CommonTitpClient {
    * @private
    */
   private async _parseChatMessage(data: Buffer) {
-    const signatureLength = data.readInt16BE();
+    const signatureLength = data.readInt16BE(0);
     const signature = decryptRsa(data.slice(2, signatureLength + 2), this._rsa.priv);
-    const senderNameLength = signature.readInt16BE();
+    const senderNameLength = signature.readInt16BE(0);
     const senderName = signature.slice(2, 2 + senderNameLength).toString('utf-8');
     const senderNameSignature = signature.slice(2 + senderNameLength);
     const senderRsa = await this._keyRegistry.fetchRsa(senderName);
@@ -159,7 +159,7 @@ export class TitpClient extends CommonTitpClient {
    * @private
    */
   private async _interpretIncomingData(data: Buffer) {
-    const messageType: ServerMessageType = data.readInt16BE();
+    const messageType: ServerMessageType = data.readInt16BE(0);
     switch (messageType) {
       case ServerMessageType.chatMessage:
         const message = await this._parseChatMessage(data.slice(2));

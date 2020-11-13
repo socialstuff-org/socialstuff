@@ -113,7 +113,7 @@ export function buildServerMessage(
 export function makeSenderNameSignature(senderName: string, senderPrivateKey: KeyObject, recipientPublicKey: KeyObject) {
   const senderNameLength = Buffer.alloc(2, 0);
   const senderNameBytes = Buffer.from(senderName, 'utf-8');
-  senderNameLength.writeInt16BE(senderNameBytes.length);
+  senderNameLength.writeInt16BE(senderNameBytes.length, 0);
   const signer = createSign('RSA-SHA512');
   signer.update(senderNameBytes);
   const senderNameSignature = signer.sign(senderPrivateKey);
@@ -123,7 +123,7 @@ export function makeSenderNameSignature(senderName: string, senderPrivateKey: Ke
 
 export function verifySenderNameSignature(signature: Buffer, senderPublicKey: KeyObject, recipientPrivateKey: KeyObject) {
   const data = decryptRsa(signature, recipientPrivateKey);
-  const senderNameLength = data.readInt16BE();
+  const senderNameLength = data.readInt16BE(0);
   const senderName = data.slice(2, 2 + senderNameLength);
   const senderNameSignature = data.slice(2 + senderNameLength);
   const verifier = createVerify('RSA-SHA512');
