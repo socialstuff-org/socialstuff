@@ -3,12 +3,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "The Trale transport/communication protocol.",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "prepublishOnly": "npm test && tsc"
+    "test": "jest"
   },
   "author": {
     "name": "Jörn Neumeyer",
@@ -17,7 +16,6 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "@socialstuff/utilities": "^0.6.0",
-    "argon2": "^0.27.0",
     "rxjs": "^6.6.3",
     "uuid": "^8.3.0"
   },
