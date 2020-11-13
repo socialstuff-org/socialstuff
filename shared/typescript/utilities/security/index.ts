@@ -28,7 +28,7 @@ import {
   createVerify, publicEncrypt, privateDecrypt,
 
 } from 'crypto';
-import argon from 'argon2';
+import * as argon from 'argon2';
 
 const ENCRYPTION_ALGORITHM = 'aes-256-cbc';
 
