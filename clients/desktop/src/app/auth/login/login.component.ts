@@ -32,6 +32,7 @@ export class LoginComponent implements OnInit {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
       const token = await this.auth.login(this.username, this.password);
+      // TODO load local encryption keys
       console.log('token', token);
       await this.router.navigateByUrl('/landing');
     } catch (e) {
