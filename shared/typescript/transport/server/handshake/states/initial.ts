@@ -22,7 +22,7 @@ import {WaitForUsername} from './wait-for-username';
 const ECDH_END_INDEX = 97;
 const ECDH_SIG_END_INDEX = ECDH_END_INDEX + 512;
 
-export class Initial extends HandshakeState {
+export class Initial implements HandshakeState {
   enter(handshake: Handshake) {
     let dataBuffer = Buffer.alloc(0);
     const sub = fromEvent<Buffer>(handshake.socket, 'data').subscribe(async data => {

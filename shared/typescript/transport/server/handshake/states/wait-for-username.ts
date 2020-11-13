@@ -21,7 +21,7 @@ import {TitpClientConnection} from '../../client-connection';
 import {Handshake}            from '../index';
 import {HandshakeState}       from '../state';
 
-export class WaitForUsername extends HandshakeState {
+export class WaitForUsername implements HandshakeState {
   enter(handshake: Handshake) {
     const sub = fromEvent<Buffer>(handshake.socket, 'data').subscribe(async data => {
       sub.unsubscribe();
