@@ -17,8 +17,14 @@ import {Socket} from 'net';
 
 export function makeWriteP(socket: Socket) {
   return function writeP(data: Uint8Array | string, encoding?: BufferEncoding): Promise<void> {
-    return new Promise((res, rej) => {
-      socket.write(data, encoding, err => (err ? rej : res)(err as void));
+    return new Promise<void>((res, rej) => {
+      socket.write(data, encoding, err => {
+        if (err) {
+          rej(err);
+        } else {
+          res();
+        }
+      });
     });
   };
 }
