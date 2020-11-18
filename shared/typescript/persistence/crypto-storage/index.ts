@@ -100,7 +100,8 @@ export class TextRecordStorage {
     if (encrypted instanceof Promise) {
       encrypted = await encrypted;
     }
-    await this._handle.appendFile(encrypted.toString('base64') + '\n');
+    const stat = await this._handle.stat();
+    await this._handle.write(encrypted.toString('base64') + '\n', stat.size);
   }
 
   close() {
