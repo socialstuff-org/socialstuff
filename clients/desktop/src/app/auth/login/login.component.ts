@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import {AuthService}         from '../../services/auth.service';
-import {ApiService}          from '../../services/api.service';
-import {AppConfigService}    from '../../services/app-config.service';
-import {Router} from "@angular/router";
-import sweetalert from 'sweetalert2';
+import { Component, OnInit }  from '@angular/core';
+import {AuthService}          from '../../services/auth.service';
+import {ApiService}           from '../../services/api.service';
+import {AppConfigService}     from '../../services/app-config.service';
+import {Router}               from '@angular/router';
+import sweetalert             from 'sweetalert2';
+import {createHash}           from 'crypto';
+import {CryptoStorageService} from '../../services/crypto-storage.service';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +25,7 @@ export class LoginComponent implements OnInit {
     private api: ApiService,
     private config: AppConfigService,
     private router: Router,
+    private storage: CryptoStorageService,
   ) { }
 
   ngOnInit(): void {
@@ -32,8 +35,12 @@ export class LoginComponent implements OnInit {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
       const token = await this.auth.login(this.username, this.password);
+      const userHandle = `${this.username}@${this.hostname}:${this.port}`;
       // TODO load local encryption keys
       console.log('token', token);
+      const hash = createHash('sha512');
+      hash.update(this.password);
+      await this.storage.load(userHandle, hash.digest());
       await this.router.navigateByUrl('/landing');
     } catch (e) {
       if (typeof e === 'string') {
