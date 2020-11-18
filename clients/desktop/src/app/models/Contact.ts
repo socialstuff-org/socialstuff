@@ -11,5 +11,5 @@ export interface Contact {
 }
 
 export interface ContactWithLastMessage extends Contact {
-  lastMessage: Message
+  lastMessage?: Message
 }
