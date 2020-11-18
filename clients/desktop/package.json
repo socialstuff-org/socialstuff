@@ -92,7 +92,7 @@
     "@angular/forms": "^10.0.0 || ^11.0.0-0",
     "@angular/material": "10.2.0",
     "@socialstuff/utilities": "0.6.2",
-    "@trale/persistence": "0.1.2",
+    "@trale/persistence": "0.1.3",
     "@trale/transport": "0.1.3",
     "idb": "5.0.6",
     "sweetalert2": "10.9.0",
