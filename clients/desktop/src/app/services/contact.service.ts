@@ -74,13 +74,20 @@ export class ContactService {
     const foo = contacts.map(async contact => {
       const records = await this.storage.storage.openTextRecordStorage([contact.usernameHash, 'chat.log']);
       const lastMessageString = await records.records().next();
-      const lastMessage = JSON.parse((lastMessageString.value as Buffer).toString('utf-8')) as Message;
+
+      const lastMessage = lastMessageString.done
+        ? null
+        : JSON.parse((lastMessageString.value as Buffer).toString('utf-8')) as Message;
       return {
         ...contact,
         lastMessage,
       }
     });
     return Promise.all(foo);
+  }
+
+  public async openChat(contact: Contact) {
+    return this.storage.storage.openTextRecordStorage(['chats', contact.usernameHash, 'chat.log']);
   }
 
   public async addContact(contact: Contact) {
