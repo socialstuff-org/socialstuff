@@ -13,9 +13,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with Trale Persistence.  If not, see <https://www.gnu.org/licenses/>.
 
-import fs                 from 'fs';
 import path               from 'path';
-import {FileHandle, open} from 'fs/promises';
+import * as fs from 'fs';
 import {BinaryLike}       from 'crypto';
 
 const RECORD_DELIMITER = Buffer.from('\n', 'ascii');
@@ -29,17 +28,17 @@ export class CryptoStorage {
   constructor(private _storageDirectory: string, private _crypt: CryptoProvider) {
   }
 
-  async openTextRecordStorage(file: string[] | FileHandle) {
+  async openTextRecordStorage(file: string[] | fs.promises.FileHandle) {
     if (file instanceof Array) {
-      file = await open(path.join(this._storageDirectory, ...file), 'r+');
+      file = await fs.promises.open(path.join(this._storageDirectory, ...file), 'r+');
     }
     return new TextRecordStorage(file, this._crypt);
   }
 
-  async loadFileContent(file: string[] | FileHandle) {
+  async loadFileContent(file: string[] | fs.promises.FileHandle) {
     const fileOpenedByMethod = file instanceof Array;
     if (file instanceof Array) {
-      file = await open(path.join(this._storageDirectory, ...file), 'r');
+      file = await fs.promises.open(path.join(this._storageDirectory, ...file), 'r');
     }
     const content = await file.readFile();
     if (fileOpenedByMethod) {
@@ -53,7 +52,7 @@ export class CryptoStorage {
   }
 
   async persistFileContent(file: string[], content: Buffer) {
-    const fd = await open(path.join(this._storageDirectory, ...file), 'w');
+    const fd = await fs.promises.open(path.join(this._storageDirectory, ...file), 'w');
     let encrypted = this._crypt.encrypt(content);
     if (encrypted instanceof Promise) {
       encrypted = await encrypted;
@@ -64,7 +63,7 @@ export class CryptoStorage {
 }
 
 export class TextRecordStorage {
-  constructor(private _handle: FileHandle, private _crypt: CryptoProvider) {
+  constructor(private _handle: fs.promises.FileHandle, private _crypt: CryptoProvider) {
   }
 
   async *records() {
