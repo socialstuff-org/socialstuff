@@ -11,7 +11,7 @@ import {LandingComponent} from "./landing/landing.component";
 const routes: Routes = [
   {
     path:       '',
-    redirectTo: 'register',
+    redirectTo: 'login',
     pathMatch:  'full',
   },
   {path: 'login', component: LoginComponent},
