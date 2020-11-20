@@ -1,35 +1,114 @@
-import { Component, OnInit } from '@angular/core';
-import {CryptoStorageService} from "../../services/crypto-storage.service";
-import {createHash} from "crypto";
+import {Component, OnInit}                                                                         from '@angular/core';
+import {createHash, createPrivateKey, createPublicKey, generateKeyPair, KeyObject, privateDecrypt} from 'crypto';
+import {HttpClient, HttpResponse}                                                                  from '@angular/common/http';
+import {ApiService}                                                                    from '../../services/api.service';
+import {CryptoStorageService}                                          from '../../services/crypto-storage.service';
+import sweetalert                                                      from 'sweetalert2';
+import {DataResponse}                                                  from '@socialstuff/utilities/responses';
+
+function newKeyPair(mod) {
+  return new Promise((res, rej) => {
+    generateKeyPair('rsa', {
+      modulusLength:      mod,
+      publicKeyEncoding:  {
+        type:   'spki',
+        format: 'pem',
+      },
+      privateKeyEncoding: {
+        type:   'pkcs8',
+        format: 'pem',
+      },
+    }, (err, pub, priv) => {
+      if (err) {
+        rej(err);
+      } else {
+        res({ priv: createPrivateKey(priv), pub: createPublicKey(pub) });
+      }
+    });
+  })
+}
 
 @Component({
-  selector: 'app-register',
+  selector:    'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls:   ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit {
 
-  public username = '';
-  public password = '';
-  public password_confirm = '';
+  public username = 'foobar';
+  public password = 'Somepassword1!';
+  public password_confirm = 'Somepassword1!';
   public hostname = '127.0.0.1';
-  public port = 8080;
+  public port = 8086;
+  public inviteCodeRequired = false;
+  public inviteCode = '';
 
   constructor(
-    private cryptoStorage: CryptoStorageService,
-  ) { }
-
-  async ngOnInit(): Promise<void> {
-    const hash = createHash('sha-512');
-    hash.update('master_password');
-    console.time('Crypto init');
-    await this.cryptoStorage.load('maurits@code-lake.com:12345', hash.digest());
-    console.timeEnd('Crypto init');
-    console.log('Crypto Storage initialized!');
+    private http: HttpClient,
+    private api: ApiService,
+    private storage: CryptoStorageService,
+  ) {
   }
 
-  public register() {
-    // TODO
+  async ngOnInit(): Promise<void> {
+
+  }
+
+  public async register() {
+    const keys = (await newKeyPair(1024)) as { pub: KeyObject, priv: KeyObject };
+    let decryptedToken: Buffer;
+    try {
+      const response = await this.http.post<DataResponse<{message: string, mfa_seed: string, token: string}>>
+      (this.api.remoteEndpoint() + '/identity/register', {
+        username: this.username,
+        password: this.password,
+        public_key: keys.pub.export({ type: 'pkcs1', format: 'pem' }).toString(),
+        invite: this.inviteCode,
+      }).toPromise();
+      console.log('token:', response.data.token);
+      decryptedToken = privateDecrypt(keys.priv, Buffer.from(response.data.token, 'base64'));
+    } catch (e) {
+      if (e.error?.errors?.invite) {
+        this.inviteCodeRequired = true;
+      }
+      console.log(e);
+      let errorMessage = '';
+      for (const name in e.error.errors) {
+        errorMessage += `${name}: ${e.error.errors[name].msg}\n`;
+      }
+      await sweetalert.fire({
+        text: errorMessage,
+        title: 'Something\'s wrong, I can feel it!',
+        showCloseButton: true,
+      });
+      return;
+    }
+    try {
+      await this.http.post<DataResponse<{ message: string }>>(this.api.remoteEndpoint() + '/identity/register/confirm', {
+        token: decryptedToken.toString('utf-8')
+      }).toPromise();
+    } catch (e) {
+      console.log(e);
+      await sweetalert.fire({
+        title: 'Registration confirmation failed!',
+        showCloseButton: true,
+      });
+      return;
+    }
+    const hash = (() => {
+      const hash = createHash('sha256');
+      hash.update(this.password);
+      return hash.digest();
+    })();
+    await this.storage.load(this.username, hash);
+    await Promise.all([
+      this.storage.storage.persistFileContent(['priv.pem'], Buffer.from(keys.priv.export({ format: 'pem', type: 'pkcs1' }).toString(), 'utf-8')),
+    this.storage.storage.persistFileContent(['pub.pem'], Buffer.from(keys.pub.export({ format: 'pem', type: 'pkcs1' }).toString(), 'utf-8')),
+    ]);
+    await sweetalert.fire({
+      title: 'Registration confirmation successful!',
+      showCloseButton: true,
+    });
   }
 
 }

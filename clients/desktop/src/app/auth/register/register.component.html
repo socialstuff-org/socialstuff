@@ -22,8 +22,11 @@
       <div class="input-wrapper">
         <input [(ngModel)]="password_confirm" name="password_confirm" class="custom-input-field wide-input-field" placeholder="confirm password" type="password"/>
       </div>
+      <div class="input-wrapper" *ngIf="inviteCodeRequired">
+        <input [(ngModel)]="inviteCode" name="inviteCode" class="custom-input-field wide-input-field" placeholder="Invite Code" type="text"/>
+      </div>
       <div class="input-wrapper">
-        <button (click)="register()" class="custom-button">register</button>
+        <button (click)="register()" class="custom-button" [disabled]="password !== password_confirm || !password">register</button>
       </div>
       <div class="input-wrapper">
         <a routerLink="/login">Already have an account?</a>
