@@ -1,0 +1,42 @@
+host {
+
+}
+
+@import '../../clients/desktop/src/app/styles/colors';
+#chat-view-container {
+  margin: 125px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.chat-message-list {
+  width: 90%;
+  margin: 0 auto;
+  grid-area: chat-message-list;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 0 20px;
+}
+
+.message-row {
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 70%;
+}
+.profile-picture {
+  width: 40px;
+  height: 40px;
+  border: 2px solid $frenchRasperry;
+  border-radius: 40px;
+  text-align: center;
+  line-height: 40px;
+  float: left;
+  background-color: $elderberry;
+}
+#logo {
+  height: 40px;
+  width: auto;
+  margin-right: 10px;
+}
