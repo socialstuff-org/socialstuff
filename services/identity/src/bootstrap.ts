@@ -78,6 +78,7 @@ export default (async () => {
   console.log('seeding some data...');
   const id = v1().replace(/-/g, '');
   const token = await hashHmac(id);
+  console.log('Token: ' + token);
   await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
   console.log('root password:           ', password);
   console.log('sample invite code:      ', id);
