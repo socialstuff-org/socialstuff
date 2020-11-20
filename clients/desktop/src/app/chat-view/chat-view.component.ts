@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {createEmptyMessage, Message} from "../models/Message";
+import {ChatPartner, createEmptyChatPartner} from "../models/ChatPartner";
+import {UtilService} from "../services/util.service";
 
 @Component({
   selector: 'app-chat-view',
@@ -9,11 +11,17 @@ import {createEmptyMessage, Message} from "../models/Message";
 export class ChatViewComponent implements OnInit {
 
   public messages: Message[];
-  public chatPartner: string;
+  public chatPartner: ChatPartner;
 
-  constructor() {
+  constructor(
+    private utils: UtilService,
+  ) {
     this.messages = [];
-    this.chatPartner = 'Jörn Neumeyer';
+    this.chatPartner = createEmptyChatPartner();
+    this.chatPartner.realName = 'Max Mustermann';
+    this.chatPartner.username = 'maxmustermann99';
+    this.chatPartner.imageUrl = 'https://cdn.code-lake.com/mergery/users/vanderzee.jpg';
+    this.chatPartner.acronym = this.utils.generateAcronym(this.chatPartner.realName);
 
     // sample data for UI testing
     const message = createEmptyMessage();
@@ -50,6 +58,15 @@ export class ChatViewComponent implements OnInit {
     fifthMessage.isSender = false;
     fifthMessage.delivered = true;
     this.messages.push(fifthMessage);
+
+    for (let  i = 0; i < 30; i++) {
+      let message = createEmptyMessage();
+      message.message = 'This is some longer chat message so we can test proper sizing on the chat bubbles.';
+      message.time = '20:41';
+      message.isSender = Math.random() >= 0.5;
+      message.delivered = true;
+      this.messages.push(message);
+    }
 
     // later on the messages will be retrieved by the server in the correct order
     this.messages = this.messages.slice().reverse();
