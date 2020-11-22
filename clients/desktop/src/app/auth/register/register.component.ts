@@ -35,9 +35,9 @@ function newKeyPair(mod) {
 })
 export class RegisterComponent implements OnInit {
 
-  public username = 'foobar';
-  public password = 'Somepassword1!';
-  public password_confirm = 'Somepassword1!';
+  public username = '';
+  public password = '';
+  public password_confirm = '';
   public hostname = '127.0.0.1';
   public port = 8086;
   public inviteCodeRequired = false;
@@ -95,6 +95,7 @@ export class RegisterComponent implements OnInit {
       });
       return;
     }
+
     const hash = (() => {
       const hash = createHash('sha256');
       hash.update(this.password);
@@ -103,7 +104,7 @@ export class RegisterComponent implements OnInit {
     await this.storage.load(this.username, hash);
     await Promise.all([
       this.storage.storage.persistFileContent(['priv.pem'], Buffer.from(keys.priv.export({ format: 'pem', type: 'pkcs1' }).toString(), 'utf-8')),
-    this.storage.storage.persistFileContent(['pub.pem'], Buffer.from(keys.pub.export({ format: 'pem', type: 'pkcs1' }).toString(), 'utf-8')),
+      this.storage.storage.persistFileContent(['pub.pem'], Buffer.from(keys.pub.export({ format: 'pem', type: 'pkcs1' }).toString(), 'utf-8')),
     ]);
     await sweetalert.fire({
       title: 'Registration confirmation successful!',
