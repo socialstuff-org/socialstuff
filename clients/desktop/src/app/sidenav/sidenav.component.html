@@ -13,28 +13,32 @@
 
       <mat-divider class="contact-list-divider"></mat-divider>
 
-      <mat-list-item routerLinkActive="active-list-item" class="contactListItem" *ngFor="let chat of chats">
-        <mat-divider class="contact-list-divider"></mat-divider>
-        <a class="sidenav-link" [routerLink]="['/chatview/1']" routerLinkActive="active-link-item">
-          <div style="width: 100%;">
-            <div class="profile-picture">
-              <span *ngIf="chat.realName; else noRealName">{{chat.acronym}}</span>
-              <ng-template #noRealName>
-                <mat-icon style="margin-top: 7px;">person</mat-icon>
-              </ng-template>
-            </div>
-            <div class="username">
-              <div *ngIf="chat.realName; else onlyUsername">{{chat.realName}}<br>
-                @{{chat.username}}
+      <div *ngIf="loadingContacts; else chatList">loading chats...</div>
+      <ng-template #chatList>
+        <mat-list-item routerLinkActive="active-list-item" class="contactListItem" *ngFor="let chat of chats">
+          <mat-divider class="contact-list-divider"></mat-divider>
+          <a class="sidenav-link" [routerLink]="['/chatview/1']" routerLinkActive="active-link-item">
+            <div style="width: 100%;">
+              <div class="profile-picture">
+                <span *ngIf="chat.realName; else noRealName">{{chat.acronym}}</span>
+                <ng-template #noRealName>
+                  <mat-icon style="margin-top: 7px;">person</mat-icon>
+                </ng-template>
               </div>
-              <ng-template #onlyUsername>
-                <span style="line-height: 40px;">@{{chat.username}}</span>
-              </ng-template>
+              <div class="username">
+                <div *ngIf="chat.realName; else onlyUsername">{{chat.realName}}<br>
+                  @{{chat.username}}
+                </div>
+                <ng-template #onlyUsername>
+                  <span style="line-height: 40px;">@{{chat.username}}</span>
+                </ng-template>
+              </div>
             </div>
-          </div>
-        </a>
-        <mat-divider class="contact-list-divider"></mat-divider>
-      </mat-list-item>
+          </a>
+          <mat-divider class="contact-list-divider"></mat-divider>
+        </mat-list-item>
+      </ng-template>
+      <span *ngIf="chats.length === 0">No chats logs found.</span>
 
     </mat-list>
   </mat-sidenav>

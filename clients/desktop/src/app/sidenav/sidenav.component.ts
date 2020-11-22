@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit }                   from '@angular/core';
 import {ChatMenuItem, createEmptyChatMenuItem} from "../models/ChatMenuItem";
-import {UtilService} from "../services/util.service";
+import {UtilService}                           from "../services/util.service";
+import {ContactService}                        from '../services/contact.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -8,36 +9,21 @@ import {UtilService} from "../services/util.service";
   styleUrls: ['./sidenav.component.scss']
 })
 export class SidenavComponent implements OnInit {
-
-  // sample data
   public chats: ChatMenuItem[];
+  public loadingContacts = true;
 
   constructor(
     private utils: UtilService,
+    private contacts: ContactService,
   ) { }
 
   ngOnInit(): void {
     this.chats = [];
 
-    const contactNeumeyer = createEmptyChatMenuItem();
-    contactNeumeyer.id = 1;
-    contactNeumeyer.username = 'bitcrusher';
-    contactNeumeyer.realName = 'Jörn Neumeyer';
-    contactNeumeyer.acronym = this.utils.generateAcronym(contactNeumeyer.realName);
-    this.chats.push(contactNeumeyer);
-
-    const contactVanderZee = createEmptyChatMenuItem();
-    contactVanderZee.id = 1;
-    contactVanderZee.username = 'codeLakeFounder';
-    contactVanderZee.realName = 'Maurits van der Zee';
-    contactVanderZee.acronym = this.utils.generateAcronym(contactVanderZee.realName);
-    this.chats.push(contactVanderZee);
-
-    const ContactJansen = createEmptyChatMenuItem();
-    ContactJansen.id = 1;
-    ContactJansen.username = 'mx30';
-    ContactJansen.acronym = this.utils.generateAcronym(ContactJansen.realName);
-    this.chats.push(ContactJansen);
+    this.contacts.isLoaded.subscribe(() => {
+      this.chats = this.contacts.readContacts().map(x => ({ id: 0, username: x.username, realName: x.displayName, acronym: this.utils.generateAcronym(x.displayName || '') }));
+      this.loadingContacts = false;
+    });
   }
 
 }
