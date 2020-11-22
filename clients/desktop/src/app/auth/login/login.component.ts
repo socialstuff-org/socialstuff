@@ -6,6 +6,7 @@ import {Router}               from '@angular/router';
 import sweetalert             from 'sweetalert2';
 import {createHash}           from 'crypto';
 import {CryptoStorageService} from '../../services/crypto-storage.service';
+import {DebugService}         from '../../services/debug.service';
 
 @Component({
   selector: 'app-login',
@@ -26,9 +27,15 @@ export class LoginComponent implements OnInit {
     private config: AppConfigService,
     private router: Router,
     private storage: CryptoStorageService,
+    private debug: DebugService,
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    const session = await this.debug.loadSession();
+    if (session === false) {
+      return;
+    }
+    this.router.navigateByUrl('/landing');
   }
 
   public async login() {
@@ -36,12 +43,13 @@ export class LoginComponent implements OnInit {
     try {
       const token = await this.auth.login(this.username, this.password);
       const userHandle = `${this.username}@${this.hostname}:${this.port}`;
-      // TODO load local encryption keys
-      console.log('token', token);
-      const hash = createHash('sha512');
+      const hash = createHash('sha256');
       hash.update(this.password);
-      await this.storage.load(userHandle, hash.digest());
-      await this.router.navigateByUrl('/landing');
+      const key = hash.digest();
+      await this.storage.load(userHandle, key);
+      await this.storage.storage.persistFileContent(['session.token'], Buffer.from(token, 'utf8'));
+      await this.debug.persistSession(userHandle, key);
+      this.router.navigateByUrl('/landing');
     } catch (e) {
       if (typeof e === 'string') {
         await sweetalert.fire({
@@ -50,6 +58,7 @@ export class LoginComponent implements OnInit {
           showCloseButton: true,
         });
       } else {
+        console.error(e);
         // TODO print custom error messages
       }
     }
