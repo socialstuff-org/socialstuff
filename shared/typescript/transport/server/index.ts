@@ -56,7 +56,6 @@ export class TitpServer {
   private async _handleIncomingConnection(socket: Socket) {
     const handshake = new Handshake(socket, this._ecdh, this._rsa, this._userKeyRegistry);
     const con = await handshake._handshakeResult.toPromise();
-    console.log(`Server> new successful connection with user '${con.username()}'.`);
     this._newConnection.next(con);
   }
 
