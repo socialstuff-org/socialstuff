@@ -10,8 +10,8 @@
       </div>
 
       <div class="input-wrapper">
-        <input [(ngModel)]="hostname" name="domain" class="custom-input-field" id="custom-input-field-type-2" placeholder="domain"/>
-        <input [(ngModel)]="port" name="port" class="custom-input-field" id="custom-input-field-type-3" placeholder="port" type="number" min="1" max="65535"/>
+        <input [(ngModel)]="hostname" name="domain" class="custom-input-field" id="custom-input-field-type-2" placeholder="domain" (focusout)="foo()"/>
+        <input [(ngModel)]="port" name="port" class="custom-input-field" id="custom-input-field-type-3" placeholder="port" type="number" min="1" max="65535" (focusout)="foo()"/>
       </div>
       <div class="input-wrapper">
         <input [(ngModel)]="username" name="username" class="custom-input-field wide-input-field" placeholder="username"/>

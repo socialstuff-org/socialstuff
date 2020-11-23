@@ -1,10 +1,17 @@
-import {Component, OnInit}                                                                         from '@angular/core';
-import {createHash, createPrivateKey, createPublicKey, generateKeyPair, KeyObject, privateDecrypt} from 'crypto';
-import {HttpClient, HttpResponse}                                                                  from '@angular/common/http';
-import {ApiService}                                                                    from '../../services/api.service';
-import {CryptoStorageService}                                          from '../../services/crypto-storage.service';
-import sweetalert                                                      from 'sweetalert2';
-import {DataResponse}                                                  from '@socialstuff/utilities/responses';
+import {Component}                   from '@angular/core';
+import {
+  createHash,
+  createPrivateKey,
+  createPublicKey,
+  generateKeyPair,
+  KeyObject,
+  privateDecrypt,
+}                                    from 'crypto';
+import {HttpClient}                  from '@angular/common/http';
+import {ApiService}                  from '../../services/api.service';
+import {CryptoStorageService}        from '../../services/crypto-storage.service';
+import sweetalert                    from 'sweetalert2';
+import {DataResponse, ErrorResponse} from '@socialstuff/utilities/responses';
 
 function newKeyPair(mod) {
   return new Promise((res, rej) => {
@@ -22,10 +29,10 @@ function newKeyPair(mod) {
       if (err) {
         rej(err);
       } else {
-        res({ priv: createPrivateKey(priv), pub: createPublicKey(pub) });
+        res({priv: createPrivateKey(priv), pub: createPublicKey(pub)});
       }
     });
-  })
+  });
 }
 
 @Component({
@@ -33,7 +40,7 @@ function newKeyPair(mod) {
   templateUrl: './register.component.html',
   styleUrls:   ['./register.component.scss'],
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent {
 
   public username = '';
   public password = '';
@@ -50,22 +57,27 @@ export class RegisterComponent implements OnInit {
   ) {
   }
 
-  async ngOnInit(): Promise<void> {
-
+  async foo() {
+    try {
+      await this.http.post<ErrorResponse>(this.api.remoteEndpoint() + '/identity/register', {}).toPromise();
+    } catch (e) {
+      if (e.error.errors.invite) {
+        this.inviteCodeRequired = true;
+      }
+    }
   }
 
   public async register() {
-    const keys = (await newKeyPair(1024)) as { pub: KeyObject, priv: KeyObject };
+    const keys = (await newKeyPair(4096)) as { pub: KeyObject, priv: KeyObject };
     let decryptedToken: Buffer;
     try {
-      const response = await this.http.post<DataResponse<{message: string, mfa_seed: string, token: string}>>
+      const response = await this.http.post<DataResponse<{ message: string, mfa_seed: string, token: string }>>
       (this.api.remoteEndpoint() + '/identity/register', {
-        username: this.username,
-        password: this.password,
-        public_key: keys.pub.export({ type: 'pkcs1', format: 'pem' }).toString(),
-        invite: this.inviteCode,
+        username:   this.username,
+        password:   this.password,
+        public_key: keys.pub.export({type: 'pkcs1', format: 'pem'}).toString(),
+        invite:     this.inviteCode,
       }).toPromise();
-      console.log('token:', response.data.token);
       decryptedToken = privateDecrypt(keys.priv, Buffer.from(response.data.token, 'base64'));
     } catch (e) {
       if (e.error?.errors?.invite) {
@@ -77,20 +89,20 @@ export class RegisterComponent implements OnInit {
         errorMessage += `${name}: ${e.error.errors[name].msg}\n`;
       }
       await sweetalert.fire({
-        text: errorMessage,
-        title: 'Something\'s wrong, I can feel it!',
+        text:            errorMessage,
+        title:           'Something\'s wrong, I can feel it!',
         showCloseButton: true,
       });
       return;
     }
     try {
       await this.http.post<DataResponse<{ message: string }>>(this.api.remoteEndpoint() + '/identity/register/confirm', {
-        token: decryptedToken.toString('utf-8')
+        token: decryptedToken.toString('utf-8'),
       }).toPromise();
     } catch (e) {
       console.log(e);
       await sweetalert.fire({
-        title: 'Registration confirmation failed!',
+        title:           'Registration confirmation failed!',
         showCloseButton: true,
       });
       return;
@@ -101,13 +113,20 @@ export class RegisterComponent implements OnInit {
       hash.update(this.password);
       return hash.digest();
     })();
-    await this.storage.load(this.username, hash);
+    const userHandle = this.username + '@' + this.hostname + ':' + this.port;
+    await this.storage.load(userHandle, hash);
     await Promise.all([
-      this.storage.storage.persistFileContent(['priv.pem'], Buffer.from(keys.priv.export({ format: 'pem', type: 'pkcs1' }).toString(), 'utf-8')),
-      this.storage.storage.persistFileContent(['pub.pem'], Buffer.from(keys.pub.export({ format: 'pem', type: 'pkcs1' }).toString(), 'utf-8')),
+      this.storage.storage.persistFileContent(['priv.pem'], Buffer.from(keys.priv.export({
+        format: 'pem',
+        type:   'pkcs1',
+      }).toString(), 'utf-8')),
+      this.storage.storage.persistFileContent(['pub.pem'], Buffer.from(keys.pub.export({
+        format: 'pem',
+        type:   'pkcs1',
+      }).toString(), 'utf-8')),
     ]);
     await sweetalert.fire({
-      title: 'Registration confirmation successful!',
+      title:           'Registration confirmation successful!',
       showCloseButton: true,
     });
   }
