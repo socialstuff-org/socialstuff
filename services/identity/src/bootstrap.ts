@@ -47,8 +47,8 @@ export default (async () => {
     }
   }
 
+  const keysPath = path.join(__dirname, '..', '..', 'priv.pem');
   {
-    const keysPath = path.join(__dirname, '..', 'priv.pem');
     if (!fs.existsSync(keysPath)) {
       const keys = crypto.generateKeyPairSync('rsa', {modulusLength: 4096});
       fs.writeFileSync(keysPath, keys.privateKey.export({format: 'pem', type: 'pkcs1'}));
@@ -56,7 +56,7 @@ export default (async () => {
     }
   }
 
-  const serverPublicRsaString = fs.readFileSync(path.join(__dirname, '..', 'priv.pem')).toString('utf-8');
+  const serverPublicRsaString = fs.readFileSync(keysPath).toString('utf-8');
   const serverRsaPublicKey = createPublicKey(serverPublicRsaString);
 
   const db = await sharedConnection();
@@ -69,18 +69,20 @@ export default (async () => {
   ecdh.generateKeys();
   process.env.ECDH_PRIVATE_KEY = ecdh.getPrivateKey().toString('base64');
   // const publicKey = ecdh.getPrivateKey().toString('base64');
-  const password = crypto.randomBytes(16).toString('hex');
+  const password = 'rootrootroot';
   const username = 'root';
 
   console.log('Setting up database...');
   await rebuildDatabase();
   console.log('Database ready for use!');
   console.log('seeding some data...');
-  const id = v1().replace(/-/g, '');
-  const token = await hashHmac(id);
-  await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
+  for (let i = 0; i < 5; ++i) {
+    const id = v1().replace(/-/g, '');
+    const token = await hashHmac(id);
+    await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
+    console.log('sample invite code:      ', id);
+  }
   console.log('root password:           ', password);
-  console.log('sample invite code:      ', id);
   const addUserSql = 'INSERT INTO users (id,username,password,public_key, can_login) VALUES (unhex(?),?,?,?,1);';
   const userID = v1().replace(/-/g, '');
   await db.query(addUserSql, [userID, username, await hashUnique(password), serverRsaPublicKey.export({ type: 'pkcs1', format: 'pem' })]);
