@@ -51,15 +51,13 @@ export class CryptoStorageService {
     } catch (e) {
       await fs.promises.mkdir(this._path);
     }
-    const usernameHash = (() => {
-      const sha = createHash('sha512');
-      sha.update(username);
-      return sha.digest().toString('hex');
-    })();
+    const usernameHash = createHash('sha512')
+      .update(username)
+      .digest()
+      .toString('hex');
     // Trale user folder
     this._path = path.join(this._path, usernameHash);
     try {
-      await fs.promises.stat(this._path);
       await fs.promises.stat(this._path);
     } catch (e) {
       await fs.promises.mkdir(this._path);
@@ -80,7 +78,7 @@ export class CryptoStorageService {
         await fs.promises.writeFile(masterKeyPath, maskedKey);
       }
     }
-    const traleUserSpaceFolders = ['chats', 'media'];
+    const traleUserSpaceFolders = ['chats', 'media', 'handshakes'];
     // user space chat folder
     {
       for (const f of traleUserSpaceFolders) {
