@@ -1,0 +1,5 @@
+*.priv.pem
+*.js
+*.d.ts
+*.d.ts.map
+coverage/

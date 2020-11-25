@@ -21,6 +21,7 @@ import {rejectOnValidationError}    from '@socialstuff/utilities/express';
 import {RequestWithDependencies}    from '../request-with-dependencies';
 import {hashHmac, verifyHashUnique} from '@socialstuff/utilities/security';
 import {DataResponse}               from '@socialstuff/utilities/responses';
+import { injectDatabaseConnectionIntoRequest } from '../utilities';
 
 const middleware = [
   body('username').isString().custom(async (username: string) => {
@@ -35,6 +36,7 @@ const middleware = [
   }).withMessage('This is not a valid username.'),
   body('password').isString().isLength({min: 10, max: 40}).withMessage('This is not a valid password.'),
   rejectOnValidationError,
+  injectDatabaseConnectionIntoRequest
 ];
 
 async function login(req: Request, res: Response) {

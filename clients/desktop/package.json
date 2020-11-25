@@ -51,7 +51,6 @@
     "@ngx-translate/http-loader": "6.0.0",
     "@types/jasmine": "3.5.12",
     "@types/jasminewd2": "2.0.8",
-    "@types/lodash": "4.14.164",
     "@types/mocha": "8.0.2",
     "@types/node": "12.12.6",
     "@typescript-eslint/eslint-plugin": "3.9.0",
@@ -88,18 +87,14 @@
     "node": ">=10.13.0"
   },
   "dependencies": {
-    "@angular-material-components/datetime-picker": "4.0.5",
     "@angular/animations": "^10.0.0 || ^11.0.0-0",
     "@angular/cdk": "10.2.0",
     "@angular/forms": "^10.0.0 || ^11.0.0-0",
     "@angular/material": "10.2.0",
     "@socialstuff/utilities": "0.5.0",
-    "deep-diff": "1.0.2",
+    "@trale/transport": "file:../../shared/typescript/transport",
     "idb": "5.0.6",
-    "lodash": "4.17.20",
-    "moment": "2.29.1",
-    "npm-lifecycle": "3.1.5",
-    "observe": "1.4.1",
+    "sweetalert2": "10.9.0",
     "systeminformation": "4.27.7"
   }
 }

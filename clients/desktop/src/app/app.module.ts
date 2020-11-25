@@ -31,36 +31,13 @@ import {ChatViewComponent}       from './chat-view/chat-view.component';
 import {ChatAppComponent}        from './chat-app/chat-app.component';
 import { SidenavComponent } from './sidenav/sidenav.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
-import { SettingsViewComponent } from './admin/settings-view/settings-view.component';
-import { NavigationContainerComponent } from './admin/SideNav/navigation-container/navigation-container.component';
-import { NavigationItemComponent } from './admin/SideNav/navigation-item/navigation-item.component';
-import { MatDividerModule } from '@angular/material/divider';
-import { SecurityComponent } from './admin/security/security.component';
-import { DashboardComponent } from './admin/dashboard/dashboard.component';
-import { CreateInviteComponent } from './admin/usersManagement/CreateInvites/create-invite/create-invite.component';
-import { ReportSettingsComponent } from './admin/usersManagement/ReportSystem/ReportSettings/report-settings/report-settings.component';
-import { ReportedUsersComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/reported-users/reported-users.component';
-import { BlockedUsersComponent } from './admin/usersManagement/blocked-users/blocked-users.component';
-import { UsersComponent } from './admin/usersManagement/users/users.component';
-import { HeadlineComponent } from './admin/core/headline/headline.component';
-import {MatGridListModule} from '@angular/material/grid-list';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatCheckboxModule} from '@angular/material/checkbox';
-import { CreateNewInviteComponent } from './admin/usersManagement/CreateInvites/create-new-invite/create-new-invite.component';
-import { InviteCodeListComponent } from './admin/usersManagement/CreateInvites/InviteCodeList/invite-code-list/invite-code-list.component';
-import { InviteCodeRowComponent } from './admin/usersManagement/CreateInvites/InviteCodeList/invite-code-row/invite-code-row.component';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatNativeDateModule} from '@angular/material/core';
-import {
-  NgxMatDatetimePickerModule, NgxMatNativeDateModule,
-  NgxMatTimepickerModule,
-  NgxNativeDateModule
-} from '@angular-material-components/datetime-picker';
-import { ReportReasonsComponent } from './admin/usersManagement/ReportSystem/ReportSettings/ReportReasons/report-reasons/report-reasons.component';
-import { ReportReasonEntryComponent } from './admin/usersManagement/ReportSystem/ReportSettings/ReportReasons/report-reason-entry/report-reason-entry.component';
-import { ReportListComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/report-list/report-list.component';
-import { ReportRowComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/report-row/report-row.component';
-import { ReasonsForReportComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/reasons-for-report/reasons-for-report.component';
+import { ContactInfoComponent } from './contact-info/contact-info.component';
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import { LogoutComponent } from './auth/logout/logout.component';
+import { LandingComponent } from './landing/landing.component';
+import {ScrollingModule} from "@angular/cdk/scrolling";
+import { MessageBoxComponent } from './message-box/message-box.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -68,37 +45,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent,
-    RegisterComponent,
-    ChatListComponent,
-    HeaderComponent,
-    FooterComponent,
-    ChatBubbleComponent,
-    ChatViewComponent,
-    ChatAppComponent,
-    SidenavComponent,
-    ForgotPasswordComponent,
-    SettingsViewComponent,
-    NavigationContainerComponent,
-    NavigationItemComponent,
-    SecurityComponent,
-    DashboardComponent,
-    CreateInviteComponent,
-    ReportSettingsComponent,
-    ReportedUsersComponent,
-    BlockedUsersComponent,
-    UsersComponent,
-    HeadlineComponent,
-    CreateNewInviteComponent,
-    InviteCodeListComponent,
-    InviteCodeRowComponent,
-    ReportReasonsComponent,
-    ReportReasonEntryComponent,
-    ReportListComponent,
-    ReportRowComponent,
-    ReasonsForReportComponent],
+  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent, ContactInfoComponent, LogoutComponent, LandingComponent, MessageBoxComponent],
   imports: [
     BrowserModule,
     FormsModule,
@@ -119,16 +66,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MatListModule,
     BrowserAnimationsModule,
     MatInputModule,
-    MatDividerModule,
-    MatGridListModule,
-    MatSlideToggleModule,
+    MatDialogModule,
     MatCheckboxModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    NgxMatDatetimePickerModule,
-    NgxMatTimepickerModule,
-    NgxNativeDateModule,
-    NgxMatNativeDateModule
+    ScrollingModule,
   ],
   providers:    [],
   bootstrap:    [AppComponent],

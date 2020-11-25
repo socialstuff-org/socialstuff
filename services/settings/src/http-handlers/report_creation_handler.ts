@@ -21,7 +21,7 @@ async function addAReportReason(req: Request, res: Response) {
   //console.log("Adding reason: ", req.body);
   const responseCode = await addReportReason(req, res);
   //responseBody
-  console.log("Status code: ", responseCode);
+  console.log("Status code addAReportReason: ", responseCode);
   res.status(responseCode);
   //res.json(responseBody);
   //return undefined;
