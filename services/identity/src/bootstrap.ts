@@ -15,15 +15,15 @@
 
 /* istanbul ignore file */
 
-import crypto, {createPublicKey} from 'crypto';
-import path                      from 'path';
+import crypto                                                from 'crypto';
+import path                                                  from 'path';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
 import {v1}                                                  from 'uuid';
 import fs                                                    from 'fs';
 import {createConnection, rebuildDatabase, sharedConnection} from './mysql';
 import {delay}                                               from '@socialstuff/utilities/common';
-import {hashHmac, hashUnique}                                from '@socialstuff/utilities/security';
+import {hashHmac}                                            from '@socialstuff/utilities/security';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env();
@@ -56,10 +56,12 @@ export default (async () => {
     }
   }
 
-  const serverPublicRsaString = fs.readFileSync(keysPath).toString('utf-8');
-  const serverRsaPublicKey = createPublicKey(serverPublicRsaString);
+  // const serverPublicRsaString = fs.readFileSync(keysPath).toString('utf-8');
+  // const serverRsaPublicKey = createPublicKey(serverPublicRsaString);
 
-  const db = await sharedConnection();
+  // TODO add rsa keys to version control
+
+  const db = await createConnection({ multipleStatements: true });
 
   if (ENV !== 'dev') {
     return;
@@ -68,9 +70,6 @@ export default (async () => {
   const ecdh = crypto.createECDH('secp256k1');
   ecdh.generateKeys();
   process.env.ECDH_PRIVATE_KEY = ecdh.getPrivateKey().toString('base64');
-  // const publicKey = ecdh.getPrivateKey().toString('base64');
-  const password = 'rootrootroot';
-  const username = 'root';
 
   console.log('Setting up database...');
   await rebuildDatabase();
@@ -82,13 +81,9 @@ export default (async () => {
     await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
     console.log('sample invite code:      ', id);
   }
-  console.log('root password:           ', password);
-  const addUserSql = 'INSERT INTO users (id,username,password,public_key, can_login) VALUES (unhex(?),?,?,?,1);';
-  const userID = v1().replace(/-/g, '');
-  await db.query(addUserSql, [userID, username, await hashUnique(password), serverRsaPublicKey.export({ type: 'pkcs1', format: 'pem' })]);
-  const secret = v1().replace(/-/g, '');
-  const secretHash = await hashHmac(secret);
-  const addUSerRegistrationConfirmation = 'INSERT INTO registration_confirmations (expires_at, secret_hash, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY),?,unhex(?));';
-  await db.query(addUSerRegistrationConfirmation, [secretHash, userID]);
-  console.log('sample registration code:', secret);
+  const dump = await fs.promises.readFile(path.join(__dirname, '..', 'identity-dump.sql'));
+  await db.query(dump.toString('utf8'));
+  await db.end();
+  await sharedConnection();
+  console.log('finished db initialization');
 })();
