@@ -1,27 +1,28 @@
-import {Injectable}                      from '@angular/core';
-import {Message}                         from '../models/Message';
-import {CryptoStorageService}            from './crypto-storage.service';
-import {Contact, ContactWithLastMessage} from '../models/Contact';
-import {TextRecordStorage}               from '@trale/persistence/crypto-storage';
-import {createHmac, createPublicKey}     from 'crypto';
-import {ChatProperties}                  from '../models/ChatProperties';
-import * as fs                           from 'fs';
-import * as path                         from 'path';
-import {Subject}                         from 'rxjs';
+import {Injectable}                              from '@angular/core';
+import {Message}                                 from '../models/Message';
+import {CryptoStorageService}                    from './crypto-storage.service';
+import {Contact, ContactWithLastMessage}         from '../models/Contact';
+import {TextRecordStorage}                       from '@trale/persistence/crypto-storage';
+import {createHash, createHmac, createPublicKey} from 'crypto';
+import {ChatProperties}                          from '../models/ChatProperties';
+import * as fs                                   from 'fs';
+import * as path                                 from 'path';
+import {Subject}                                 from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContactService {
   get isLoaded(): Subject<void> {
     return this._isLoaded;
   }
+
   private _contactStorage: TextRecordStorage;
   private _contacts: Contact[] = [];
   private _isLoaded = new Subject<void>();
 
   constructor(
-    private storage: CryptoStorageService
+    private storage: CryptoStorageService,
   ) {
     storage.isLoaded.subscribe(async () => {
       if (this._contactStorage) {
@@ -60,10 +61,10 @@ export class ContactService {
       const properties = JSON.parse(propertiesContent.toString('utf-8')) as ChatProperties;
       const contact: Contact = {
         username,
-        displayName: properties.customDisplayName,
+        displayName:     properties.customDisplayName,
         conversationKey: Buffer.from(properties.conversationKey, 'base64'),
-        rsaPublicKey: createPublicKey(properties.rsaPublicKey),
-        usernameHash
+        rsaPublicKey:    createPublicKey(properties.rsaPublicKey),
+        usernameHash,
       };
       return contact;
     });
@@ -76,14 +77,43 @@ export class ContactService {
       const lastMessageString = await records.records().next();
 
       const lastMessage = lastMessageString.done
-        ? null
-        : JSON.parse((lastMessageString.value as Buffer).toString('utf-8')) as Message;
+                          ? null
+                          : JSON.parse((lastMessageString.value as Buffer).toString('utf-8')) as Message;
       return {
         ...contact,
         lastMessage,
-      }
+      };
     });
     return Promise.all(foo);
+  }
+
+  public async exists(username: string) {
+    const usernameHash = createHash('sha512')
+      .update(username)
+      .digest()
+      .toString('hex');
+    try {
+      await fs.promises.stat(path.join(this.storage.storage.storageDirectory, 'chats', usernameHash));
+      return usernameHash;
+    } catch {
+      return false;
+    }
+  }
+
+  public async load(username: string) {
+    const usernameHash = await this.exists(username);
+    if (usernameHash === false) {
+      return false;
+    }
+    const propertiesStr = await this.storage.storage.loadFileContent(['chats', usernameHash, 'chat.properties']);
+    const properties: ChatProperties = JSON.parse(propertiesStr.toString('utf-8'));
+    const c: Contact = {
+      username,
+      usernameHash,
+      rsaPublicKey: createPublicKey(properties.rsaPublicKey),
+      conversationKey: Buffer.from(properties.conversationKey, 'base64'),
+    };
+    return c;
   }
 
   public async openChat(contact: Contact) {
@@ -107,13 +137,23 @@ export class ContactService {
     }
     await fs.promises.writeFile(path.join(contactDirectory, 'chat.log'), '');
     const properties: ChatProperties = {
-      rsaPublicKey: contact.rsaPublicKey.export({ format: 'pem', type: 'pkcs1' }).toString('utf8'),
-      conversationKey: contact.conversationKey.toString('base64'),
+      rsaPublicKey:      contact.rsaPublicKey.export({format: 'pem', type: 'pkcs1'}).toString('utf8'),
+      conversationKey:   contact.conversationKey.toString('base64'),
       customDisplayName: contact.displayName,
     };
     const serializedProperties = Buffer.from(JSON.stringify(properties), 'utf8');
     await this.storage.storage.persistFileContent(['chats', usernameHash, 'chat.properties'], serializedProperties);
     await this._contactStorage.addRecord(Buffer.from(contact.username, 'utf-8'));
+  }
+
+  public async update(contact: Contact) {
+    const properties: ChatProperties = {
+      rsaPublicKey: contact.rsaPublicKey.export({ type: 'pkcs1', format: 'pem' }).toString(),
+      customDisplayName: contact.displayName,
+      conversationKey: contact.conversationKey.toString('base64'),
+    }
+    const serializedProperties = Buffer.from(JSON.stringify(properties), 'utf8');
+    await this.storage.storage.persistFileContent(['chats', contact.usernameHash, 'chat.properties'], serializedProperties);
   }
 
   public readContacts(): Contact[] {
