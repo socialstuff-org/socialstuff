@@ -38,7 +38,7 @@ const LOWER_WORD_CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const UPPER_WORD_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const NUMBER_CHARS = '1234567890';
 const SPECIAL_CHARS = '!@#$%^&*()-_=+[]{};\'":,.<>/?`~€';
-export const REQUIRED_PASSWORD_LENGTH = {min: 10, max: 40};
+export const REQUIRED_PASSWORD_LENGTH = {min: 10, max: 50};
 
 export function passwordIssues(password: string) {
   let hasLower = false;
