@@ -13,22 +13,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Socket}                                                           from 'net';
-import {promisify}                                                        from 'util';
-import {createPrivateKey, createPublicKey, createVerify, ECDH, KeyObject} from 'crypto';
-import {CommonTitpClient}                                                 from './common';
-import {Handshake}                                                        from './handshake';
-import {decryptAes384, decryptRsa}                                        from '../crypto';
+import {Socket}                                                                       from 'net';
+import {promisify}                                                                    from 'util';
+import {createPrivateKey, createPublicKey, createSign, createVerify, ECDH, KeyObject} from 'crypto';
+import {CommonTitpClient}                                                             from './common';
+import {Handshake}                                                                    from './handshake';
+import {decryptAes384, decryptRsa, encryptRsa}                                        from '../crypto';
 import {
   buildServerMessage,
   ChatMessage,
-  deserializeChatMessage, serializeChatMessage,
+  ChatMessageType,
+  deserializeChatMessage,
   serializeServerMessage,
   ServerMessageType,
-}                                                                         from '../message';
-import {UserKeyRegistry}                                                  from '../user-key-registry';
-import {ConversationKeyRegistry}                                          from '../conversation-key-registry';
-import {Observable, Subject}                                              from 'rxjs';
+}                                                                                     from '../message';
+import {UserKeyRegistry}                                                              from '../user-key-registry';
+import {ConversationKeyRegistry}                                                      from '../conversation-key-registry';
+import {Observable, Subject}                                                          from 'rxjs';
 
 export class TitpClient extends CommonTitpClient {
   private _rsa: { priv: KeyObject, pub: KeyObject };
@@ -153,6 +154,49 @@ export class TitpClient extends CommonTitpClient {
     return deserializeChatMessage(decryptedSerializedChatMessage);
   }
 
+  public async negotiateKeyWith(username: string, ecdh: ECDH = this._ecdh) {
+    const recipientRsaPublicKey = await this._keyRegistry.fetchRsa(username);
+    const ecdhSig = createSign('RSA-SHA512')
+      .update(ecdh.getPublicKey())
+      .sign(this._rsa.priv);
+    const e = Buffer.concat([this._ecdh.getPublicKey(), ecdhSig]);
+    const messageContent = encryptRsa(e, recipientRsaPublicKey);
+    const message: ChatMessage = {
+      senderName:  username,
+      sentAt:      new Date(),
+      attachments: [],
+      type:        ChatMessageType.handshake,
+      content:     messageContent,
+    };
+    const recipient = [{name: username, publicKey: recipientRsaPublicKey}];
+    const serverMessage = buildServerMessage(message, this._rsa.priv, Buffer.alloc(0), recipient, x => x);
+    await this._keyRegistry.saveEcdhForHandshake(username, ecdh);
+    await this.write(serializeServerMessage(serverMessage));
+  }
+
+  private async _parseInitialHandshake(data: Buffer) {
+    const message = deserializeChatMessage(data);
+    const senderRsaPublicKey = await this._keyRegistry.fetchRsa(message.senderName);
+    const keys = decryptRsa(message.content, this._rsa.priv);
+    if (keys.length !== 609) {
+      throw new Error('Data length mismatch!');
+    }
+    const ecdhPub = keys.slice(0, 97);
+    const ecdhPubSig = keys.slice(97);
+    const signatureMatches = createVerify('RSA-SHA512').update(ecdhPub).verify(senderRsaPublicKey, ecdhPubSig);
+    if (!signatureMatches) {
+      throw new Error('Signature mismatch!');
+    }
+    const conversationKey = this._ecdh.computeSecret(ecdhPub);
+    await this._keyRegistry.saveConversationKey(message.senderName, conversationKey);
+    const savedEcdhKey = await this._keyRegistry.loadEcdhForHandshake(message.senderName);
+    if (savedEcdhKey === false) {
+      return;
+    }
+    await this.negotiateKeyWith(message.senderName, savedEcdhKey);
+    await this._keyRegistry.removeEcdhForHandshake(message.senderName);
+  }
+
   /**
    *
    * @param data
@@ -164,6 +208,10 @@ export class TitpClient extends CommonTitpClient {
       case ServerMessageType.chatMessage:
         const message = await this._parseChatMessage(data.slice(2));
         this._onIncomingMessage.next(message);
+        break;
+
+      case ServerMessageType.initialHandshake:
+        this._parseInitialHandshake(data.slice(2));
         break;
 
       default:
