@@ -1,0 +1,6 @@
+<div *ngFor="let reportReason of userReport.report_reasons" class="reasons">
+  <div class="reason">
+    <span class="reason-name">{{reportReason.reason}}</span>
+    <span [class]="'times-reported ' + getClassificationColor(reportReason.times_reported)">{{reportReason.times_reported}}</span>
+  </div>
+</div>

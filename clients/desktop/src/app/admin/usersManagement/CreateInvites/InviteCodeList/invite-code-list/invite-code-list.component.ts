@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {defaultInviteCode} from '../../../../interfaces/InviteCode';
+import {InviteCode, defaultInviteCode} from '../../../../interfaces/InviteCode';
 import utils from '../../../../utils/utils';
 
 @Component({
@@ -9,7 +9,7 @@ import utils from '../../../../utils/utils';
 })
 export class InviteCodeListComponent implements OnInit {
 
-  public inviteCodes = []
+  public inviteCodes: Array<InviteCode> = []
 
   constructor() { }
 

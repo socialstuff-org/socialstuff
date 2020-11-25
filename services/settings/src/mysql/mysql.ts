@@ -62,6 +62,65 @@ export async function addReportReason(req: Request, res:Response) {
     });
   return 201;
 }
+
+
+export async function getAllInviteCodesFromSQL() {
+  prisma.invite_code.findMany();
+}
+let invite_code = {
+  active: true,
+  expiration_date: "",
+  max_usage: 5,
+  times_used: 0,
+  code: "abcdef"
+};
+
+export async function updateInviteCodeInSQL(id: number, data: any) {
+
+  await prisma.invite_code.update({where: {
+                               id: id
+                             },
+                             data: {
+                               active: data.active,
+                               expiration_date: data.expiration_date,
+                               max_usage: data.max_usage,
+                               code: data.code
+                             }})
+    .catch(e => {
+      throw e
+    }).finally(async () => {
+      await prisma.$disconnect();
+    });
+  return 201;
+}
+
+export async function addInviteCodeToSQL(invCodeToAdd: any) {
+  await prisma.invite_code.create(
+    {
+      data: {
+        code: invCodeToAdd.code,
+        max_usage: invCodeToAdd.max_usage,
+        expiration_date: invCodeToAdd.expiration_date,
+        active: invCodeToAdd.active
+      }
+    })
+  .catch(e => {
+    throw e
+  }).finally(async () => {
+    await prisma.$disconnect();
+  });
+  return 201;
+}
+
+export async function deleteInviteCodeFromSQL(invCodeId: number) {
+  prisma.invite_code.delete({where: {id: invCodeId}})
+    .catch(e => {
+      throw e
+    }).finally(async () => {
+      await prisma.$disconnect();
+  })
+  return 200;
+}
 //tReports().catch(e => {
 //    throw e
 //  }).finally(async () => {

@@ -1,7 +1,7 @@
 import {Component, KeyValueDiffer, OnInit} from '@angular/core';
 import {AdminSettings} from '../../services/ap-settings.service';
 import {ApiService}          from '../../services/api.service';
-import { ServerSettings, defaultSettings } from '../interfaces/ServerSettings';
+import { SecuritySettings, defaultSettings } from '../interfaces/SecuritySettings';
 import *as _ from 'lodash';
 
 @Component({
@@ -33,7 +33,7 @@ export class SecurityComponent implements OnInit {
 
   public getSettings(): any {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
-    return this.adminSettings.getSettings().then((setting: ServerSettings) => {
+    return this.adminSettings.getSecuritySettings().then((setting: SecuritySettings) => {
       this.settings = _.cloneDeep(setting);
       this.settingsBackup  = _.cloneDeep(setting);
       console.log(this.settings);
@@ -45,7 +45,7 @@ export class SecurityComponent implements OnInit {
   public saveSettings(): void {
     this.loading = true;
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
-    this.adminSettings.setSettings(this.settings).then(response => {
+    this.adminSettings.setSecuritySettings(this.settings).then(response => {
       this.loading = false;
       console.log(response);
       this.settings = _.cloneDeep(response);

@@ -1,0 +1,39 @@
+@import "../../../../../../styles/colors";
+
+.reasons {
+  display: inline-flex;
+}
+
+.reason {
+  border: none;
+  background-color: $plumViolet;
+  border-radius: 5px;
+  width: fit-content;
+  padding: 15px;
+  margin: 15px;
+}
+
+.reason-name {
+
+}
+
+.times-reported {
+  padding-left: 50px;
+  font-size: 34px;
+}
+
+.ok {
+  color: #61eea3;
+}
+
+.low {
+  color: #e0ee61;
+}
+
+.middle {
+  color: #ee9961;
+}
+
+.high {
+  color: #ee6161;
+}

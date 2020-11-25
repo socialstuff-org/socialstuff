@@ -1,0 +1,8 @@
+<app-headline headerText="Report Settings"></app-headline>
+<div class="row">
+  <mat-slide-toggle [(ngModel)]="settings.report_system.on">Report System</mat-slide-toggle>
+  <div class="sub-row">
+    <mat-slide-toggle [disabled]="!settings.report_system.on" [(ngModel)]="settings.report_system.automatic_ban">Automatic ban</mat-slide-toggle>
+  </div>
+</div>
+<app-report-reasons class="report-reasons"></app-report-reasons>

@@ -2,7 +2,7 @@ import {Injectable}                      from '@angular/core';
 import {ApiService}                      from './api.service';
 import {HttpClient}                      from '@angular/common/http';
 import {HttpErrorResponse, HttpResponse} from '../types';
-import {ServerSettings} from '../admin/interfaces/ServerSettings';
+import {SecuritySettings} from '../admin/interfaces/SecuritySettings';
 
 @Injectable({
   providedIn: 'root',
@@ -14,11 +14,11 @@ export class AdminSettings {
   ) {
   }
 
-  public getSettings(): Promise<ServerSettings> {
+  public getSecuritySettings(): Promise<SecuritySettings> {
     return this.http.get<any>(this.api.remoteEndpoint() + '/settings/security').toPromise();
   }
 
-  public setSettings(currentSettings): Promise<ServerSettings> {
+  public setSecuritySettings(currentSettings): Promise<SecuritySettings> {
     return this.http.put<any>((this.api.remoteEndpoint() + '/settings/security'), currentSettings).toPromise();
 
   }

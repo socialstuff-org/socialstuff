@@ -38,8 +38,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { SecurityComponent } from './admin/security/security.component';
 import { DashboardComponent } from './admin/dashboard/dashboard.component';
 import { CreateInviteComponent } from './admin/usersManagement/CreateInvites/create-invite/create-invite.component';
-import { ReportSettingsComponent } from './admin/usersManagement/report-settings/report-settings.component';
-import { ReportedUsersComponent } from './admin/usersManagement/reported-users/reported-users.component';
+import { ReportSettingsComponent } from './admin/usersManagement/ReportSystem/ReportSettings/report-settings/report-settings.component';
+import { ReportedUsersComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/reported-users/reported-users.component';
 import { BlockedUsersComponent } from './admin/usersManagement/blocked-users/blocked-users.component';
 import { UsersComponent } from './admin/usersManagement/users/users.component';
 import { HeadlineComponent } from './admin/core/headline/headline.component';
@@ -49,6 +49,18 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { CreateNewInviteComponent } from './admin/usersManagement/CreateInvites/create-new-invite/create-new-invite.component';
 import { InviteCodeListComponent } from './admin/usersManagement/CreateInvites/InviteCodeList/invite-code-list/invite-code-list.component';
 import { InviteCodeRowComponent } from './admin/usersManagement/CreateInvites/InviteCodeList/invite-code-row/invite-code-row.component';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatNativeDateModule} from '@angular/material/core';
+import {
+  NgxMatDatetimePickerModule, NgxMatNativeDateModule,
+  NgxMatTimepickerModule,
+  NgxNativeDateModule
+} from '@angular-material-components/datetime-picker';
+import { ReportReasonsComponent } from './admin/usersManagement/ReportSystem/ReportSettings/ReportReasons/report-reasons/report-reasons.component';
+import { ReportReasonEntryComponent } from './admin/usersManagement/ReportSystem/ReportSettings/ReportReasons/report-reason-entry/report-reason-entry.component';
+import { ReportListComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/report-list/report-list.component';
+import { ReportRowComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/report-row/report-row.component';
+import { ReasonsForReportComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/reasons-for-report/reasons-for-report.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -81,7 +93,12 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     HeadlineComponent,
     CreateNewInviteComponent,
     InviteCodeListComponent,
-    InviteCodeRowComponent],
+    InviteCodeRowComponent,
+    ReportReasonsComponent,
+    ReportReasonEntryComponent,
+    ReportListComponent,
+    ReportRowComponent,
+    ReasonsForReportComponent],
   imports: [
     BrowserModule,
     FormsModule,
@@ -105,7 +122,13 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MatDividerModule,
     MatGridListModule,
     MatSlideToggleModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    NgxMatDatetimePickerModule,
+    NgxMatTimepickerModule,
+    NgxNativeDateModule,
+    NgxMatNativeDateModule
   ],
   providers:    [],
   bootstrap:    [AppComponent],

@@ -1,26 +1,32 @@
 <table class="table">
-  <tr>
+  <tr class="label-row">
     <td class="column">
-      Expiration Date
+      <label *ngIf="expDate">Expiration Date</label>
     </td>
     <td class="column">
-      Usage Limitation
+      <label *ngIf="useLimit">Usage Limitation</label>
     </td>
     <td class="column">
-      Invite Code
+      <label *ngIf="inviteCode">Invite Code</label>
     </td>
     <td class="column">
     </td>
   </tr>
   <tr>
+  <tr>
     <td class="column">
-      <input type="text" label="Expiration Date" placeholder="12/03/2020 14:43pm" class="text-field">
+      <mat-form-field class="date-time-field" appearance="none">
+        <input (click)="picker.open()" [(ngModel)]="expDate" [min]="minDate" type="text"[ngxMatDatetimePicker]="picker" matInput placeholder="Expiration Date">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
+      </mat-form-field>
     </td>
     <td class="column">
-      <input type="text" label="Usage Limitation" placeholder="5" class="text-field">
+      <input type="text" [(ngModel)]="useLimit" placeholder="Usage Limitation" class="text-field">
     </td>
-    <td class="column">
-      <input type="text" label="Invite Code" placeholder="COME_IN_PLEASE" class="text-field">
+    <td class="column invite-field">
+      <input type="text" label="Invite Code" [(ngModel)]="inviteCode" placeholder="COME_IN_PLEASE" class="text-field form-control">
+      <button class="gen-inv-code-btn" (click)="genInvite()" >Generate</button>
     </td>
     <td class="column">
       <button [class.spinner]="loading" class="save-btn">Save</button>

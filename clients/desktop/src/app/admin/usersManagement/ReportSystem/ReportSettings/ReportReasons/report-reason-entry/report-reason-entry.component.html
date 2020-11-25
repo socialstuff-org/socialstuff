@@ -1,0 +1,49 @@
+<div class="reason-container">
+  <table *ngIf="!editable && newEntry">
+    <tr>
+      <td class="add-entry" (click)="editReportReason()">
+        <mat-icon class="add-entry-icon">add</mat-icon>
+      </td>
+    </tr>
+  </table>
+  <table *ngIf="!editable && !newEntry">
+    <tr>
+      <td class="value">
+        {{reportReason.reason}}
+      </td>
+      <td class="value">
+        {{reportReason.max_report_violations}}
+      </td>
+      <td class="value">
+        <div class="button-container">
+          <button class="fab-button" mat-fab color="success" (click)="editReportReason()" aria-label="Save">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button class="fab-button" mat-fab color="warn" (click)="cancelEditing()" aria-label="Cancel">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <table *ngIf="editable">
+    <tr>
+      <td class="value">
+        <input type="text" [(ngModel)]="reportReason.reason" placeholder="Reason" class="text-field">
+      </td>
+      <td class="value">
+        <input type="text" [(ngModel)]="reportReason.max_report_violations" placeholder="Reason" class="text-field">
+      </td>
+      <td class="value">
+        <div class="button-container">
+          <button class="fab-button" mat-fab color="#ed3330" aria-label="Save">
+            <mat-icon>done</mat-icon>
+          </button>
+          <button class="fab-button" mat-fab (click)="cancelEditing()" color="warn" aria-label="Cancel">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

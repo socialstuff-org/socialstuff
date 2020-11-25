@@ -88,6 +88,7 @@
     "node": ">=10.13.0"
   },
   "dependencies": {
+    "@angular-material-components/datetime-picker": "4.0.5",
     "@angular/animations": "^10.0.0 || ^11.0.0-0",
     "@angular/cdk": "10.2.0",
     "@angular/forms": "^10.0.0 || ^11.0.0-0",
@@ -96,6 +97,7 @@
     "deep-diff": "1.0.2",
     "idb": "5.0.6",
     "lodash": "4.17.20",
+    "moment": "2.29.1",
     "npm-lifecycle": "3.1.5",
     "observe": "1.4.1",
     "systeminformation": "4.27.7"

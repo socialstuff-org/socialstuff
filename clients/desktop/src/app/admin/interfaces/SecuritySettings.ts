@@ -1,4 +1,4 @@
-export interface ServerSettings {
+export interface SecuritySettings {
   two_factor_auth: {
     on: boolean,
     phone: boolean,
@@ -19,7 +19,7 @@ export interface ServerSettings {
   }
 }
 
-export const defaultSettings = (): ServerSettings => ({
+export const defaultSettings = (): SecuritySettings => ({
   two_factor_auth: {
     on: false,
     phone: false,
