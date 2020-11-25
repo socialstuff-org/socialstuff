@@ -19,6 +19,7 @@ import {decryptRsa, encryptAes384, encryptRsa}     from '../crypto';
 export enum ChatMessageType {
   text,
   voice,
+  handshake,
 }
 
 export interface MessageAttachment {
@@ -88,6 +89,7 @@ export function buildServerMessage(
   senderPrivateKey: KeyObject,
   key: Buffer,
   recipients: { name: string, publicKey: KeyObject }[],
+  encrypt: (data: Buffer, key: Buffer) => Buffer = encryptAes384,
 ): ServerMessage {
   // TODO encode participants
   const senderServer = message.senderName.split('@')[1];
@@ -104,7 +106,7 @@ export function buildServerMessage(
   }
   return {
     type:       ServerMessageType.chatMessage,
-    content:    encryptAes384(serializeChatMessage(message), key),
+    content:    encrypt(serializeChatMessage(message), key),
     recipients: remoteRecipients,
     localRecipients,
   };
