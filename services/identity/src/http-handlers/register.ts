@@ -31,6 +31,7 @@ import {injectDatabaseConnectionIntoRequest}                  from '../utilities
 export const middleware: ValidationChain[] = [
   body('username')
     .isString()
+    .isLength({ min: 5, max: 20 })
     .matches(USERNAME_REGEX)
     .withMessage('Please pick a username containing regular characters (a-zA-Z), numbers, and \'_\' and \'.\', with a length between 5 and 20 characters!'),
   body('username').custom(async username => {
