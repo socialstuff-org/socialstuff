@@ -16,8 +16,9 @@ import {PrismaClient} from "@prisma/client"
 import * as mysql  from 'mysql2/promise';
 // @ts-ignore
 import migrate     from 'migrate';
-import {promisify} from 'util';
+import {log, promisify} from 'util';
 import {Request, response, Response} from 'express';
+import DateTimeFormat = Intl.DateTimeFormat;
 
 const prisma = new PrismaClient();
 
@@ -56,7 +57,8 @@ export async function addReportReason(req: Request, res:Response) {
       report: {create: {}}
     }
   }).catch(e => {
-    throw e
+    //throw e
+    return 409;
   }).finally(async () => {
       await prisma.$disconnect();
     });
@@ -64,8 +66,30 @@ export async function addReportReason(req: Request, res:Response) {
 }
 
 
-export async function getAllInviteCodesFromSQL() {
-  prisma.invite_code.findMany();
+export async function getAllInviteCodesFromSQL(rowsPerPage:number, currentPage:number, ) {
+
+  const res:any = prisma.invite_code.findMany();
+  if (!isNaN(res.length)) {
+    const numPages = res.length / rowsPerPage;
+    console.log('num_pages: ', numPages);
+    const endIndex = currentPage * numPages;
+    const startIndex = endIndex - rowsPerPage;
+    const entities = res.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(numPages);
+    return {
+      rows_per_page: rowsPerPage,
+      current_page: currentPage,
+      total_pages: totalPages,
+      rows: entities
+    };
+  } else {
+    return {
+      rows_per_page: rowsPerPage,
+      current_page: 0,
+      total_pages: 0,
+      rows: []
+    }
+  }
 }
 let invite_code = {
   active: true,
@@ -76,13 +100,12 @@ let invite_code = {
 };
 
 export async function updateInviteCodeInSQL(id: number, data: any) {
-
   await prisma.invite_code.update({where: {
                                id: id
                              },
                              data: {
                                active: data.active,
-                               expiration_date: data.expiration_date,
+                               expiration_date: new Date(data.expiration_date),
                                max_usage: data.max_usage,
                                code: data.code
                              }})
@@ -93,18 +116,21 @@ export async function updateInviteCodeInSQL(id: number, data: any) {
     });
   return 201;
 }
-
+//Todo the request keeps looping here. Cant figure out why. Insertion is successful but nothing is returned
 export async function addInviteCodeToSQL(invCodeToAdd: any) {
+  console.log("adding inv code to sql");
   await prisma.invite_code.create(
     {
       data: {
         code: invCodeToAdd.code,
         max_usage: invCodeToAdd.max_usage,
-        expiration_date: invCodeToAdd.expiration_date,
+        expiration_date: new Date(invCodeToAdd.expiration_date),
         active: invCodeToAdd.active
       }
     })
   .catch(e => {
+    console.log("Insert not successful");
+    //return 409;
     throw e
   }).finally(async () => {
     await prisma.$disconnect();

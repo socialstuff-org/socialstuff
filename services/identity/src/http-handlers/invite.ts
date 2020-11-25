@@ -2,8 +2,9 @@ import {Request, Response, Router} from 'express';
 import {RequestWithDependencies} from '../request-with-dependencies';
 import {body, ValidationChain} from 'express-validator';
 import {rejectOnValidationError} from '@socialstuff/utilities/express';
+import {sharedConnection} from '../mysql';
+import {RowDataPacket} from 'mysql2/promise';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
-import {register} from './register';
 
 export const middleware: ValidationChain[] = [
   body('max_usage')
@@ -12,22 +13,34 @@ export const middleware: ValidationChain[] = [
   body('times_used')
     .isInt()
     .withMessage('pick an Integer as times_used!'),
-  body('expiration_date')
-    .isDate(),
+  //body('expiration_date')
+  //  .isDate(),
   body('active')
     .isBoolean(),
-  body('vode')
-    .isString()
+  body('code')
+    .isString().custom(async code => {
+      console.log('checking code: ' + code);
+      const db = await sharedConnection();
+      const sql = 'SELECT COUNT(*) AS numcodes FROM invite_code WHERE code = ?;';
+      const [[{numcodes}]] = await db.query<RowDataPacket[]>(sql, [code]);
+      console.log('Number of codes already in db with inv_code: ' + numcodes);
+      if (numcodes === 0) {
+        console.log('Returning true');
+        return;
+      } else {
+        console.log('Rejecting promise');
+        throw new Error('Already exists');
+        //return Promise.reject('Username is already taken!');
+      }
+
+    })
 ];
-
-const final: any[] = [];
-final.push(...middleware, rejectOnValidationError, injectDatabaseConnectionIntoRequest, register);
-
 
 
 async function getAllInvitations(req: Request, res: Response) {
+  const db = (req as RequestWithDependencies).dbHandle; //await sharedConnection();
   const headers = req.headers;
-  const db = (req as RequestWithDependencies).dbHandle;
+  //const db = (req as RequestWithDependencies).dbHandle;
 
   console.log('getting all invitations');
   //console.log(headers);
@@ -38,10 +51,11 @@ async function getAllInvitations(req: Request, res: Response) {
   const startIndex = (rpp * (currentPage)) - rpp;
   const endIndex = startIndex + rpp;
   console.log('current page:  ', currentPage);
+  console.log('');
   const sql = 'SELECT * FROM invite_code LIMIT ?,?';
   const response1 = await db.query(sql, [startIndex, endIndex]);
 
-  return res.status(200).json({ret: response1});
+  return res.status(200).json({ret: response1[0]});
 }
 
 async function editInviteCode(req:Request, res: Response) {
@@ -65,11 +79,17 @@ async function editInviteCode(req:Request, res: Response) {
 
 async function addInviteCode(req: Request, res: Response){
   const invCodeToAdd = req.body;
+  console.log('Adding inv_code: ' + invCodeToAdd.code);
   try {
     const db = (req as RequestWithDependencies).dbHandle;
-    const sql = 'INSERT INTO invite_code (max_usage,  times_used, expiration_date, active, code) VALUES (?, ?, ?, ?, ?); SELECT LAST_INSERT_ID();';
-    const [retId] = await db.query(sql, [invCodeToAdd.max_usage, invCodeToAdd.times_used, invCodeToAdd.expiration_date, invCodeToAdd.active, invCodeToAdd.code]);
-    res.status(200).json({id: retId});
+    const sql = 'INSERT INTO invite_code (max_usage,  times_used, expiration_date, active, code) VALUES (?, ?, ?, ?, ?);';
+    const sqlLastId =  'SELECT LAST_INSERT_ID() as id;';
+    console.log('About to insert data');
+    await db.query(sql, [invCodeToAdd.max_usage, invCodeToAdd.times_used, invCodeToAdd.expiration_date, invCodeToAdd.active, invCodeToAdd.code]);
+    console.log('data inserted');
+    const [retId] = await db.query(sqlLastId);
+
+    res.status(200).json(retId);
   } catch (e) {
     res.status(500);
   }
@@ -89,9 +109,14 @@ async function deleteInviteCode(req: Request, res: Response) {
 }
 
 const inviteManagementInterface = Router();
+inviteManagementInterface.use(injectDatabaseConnectionIntoRequest);
+
 inviteManagementInterface.get('/', getAllInvitations);
 inviteManagementInterface.put('/', editInviteCode);
-inviteManagementInterface.post('/', addInviteCode);
+inviteManagementInterface.post('/', middleware, rejectOnValidationError, addInviteCode);
 inviteManagementInterface.delete('/', deleteInviteCode);
+
+//const final: any[] = [];
+//final.push(middleware, rejectOnValidationError, injectDatabaseConnectionIntoRequest, addInviteCode);
 
 export default inviteManagementInterface;

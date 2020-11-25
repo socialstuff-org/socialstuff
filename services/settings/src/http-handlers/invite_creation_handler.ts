@@ -3,8 +3,15 @@ import {getAllInviteCodesFromSQL, updateInviteCodeInSQL, addInviteCodeToSQL, del
 
 
 async function getAllInvitations(req: Request, res: Response) {
+  const headers = req.headers;
+
   console.log('getting all invitations')
-  return res.json(await getAllInviteCodesFromSQL());
+  //console.log(headers);
+  let rpp = Number(headers.rows_per_page);
+  console.log('rows per page: ', rpp);
+  let currentPage = Number(headers.current_page);
+  console.log('current page: ', currentPage);
+  return res.json(await getAllInviteCodesFromSQL(rpp, currentPage));
 }
 
 async function editInviteCode(req:Request, res: Response) {
@@ -19,6 +26,7 @@ async function addInviteCode(req: Request, res: Response){
   const invCodeToAdd = req.body;
 
   const responseCode = await addInviteCodeToSQL(invCodeToAdd);
+  console.log(responseCode);
   res.status(responseCode);
 }
 

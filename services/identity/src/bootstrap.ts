@@ -15,7 +15,7 @@
 
 /* istanbul ignore file */
 
-import crypto, {createPublicKey} from 'crypto';
+import crypto from 'crypto';
 import path                      from 'path';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
@@ -23,7 +23,7 @@ import {v1}                                                  from 'uuid';
 import fs                                                    from 'fs';
 import {createConnection, rebuildDatabase, sharedConnection} from './mysql';
 import {delay}                                               from '@socialstuff/utilities/common';
-import {hashHmac, hashUnique}                                from '@socialstuff/utilities/security';
+import {hashHmac}                                from '@socialstuff/utilities/security';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env();
@@ -56,8 +56,10 @@ export default (async () => {
     }
   }
 
-  const serverPublicRsaString = fs.readFileSync(path.join(__dirname, '..', 'priv.pem')).toString('utf-8');
+  /*
+   const serverPublicRsaString = fs.readFileSync(path.join(__dirname, '..', 'priv.pem')).toString('utf-8');
   const serverRsaPublicKey = createPublicKey(serverPublicRsaString);
+ */
 
   const db = await sharedConnection();
 
@@ -70,7 +72,8 @@ export default (async () => {
   process.env.ECDH_PRIVATE_KEY = ecdh.getPrivateKey().toString('base64');
   // const publicKey = ecdh.getPrivateKey().toString('base64');
   const password = crypto.randomBytes(16).toString('hex');
-  const username = 'root';
+  // eslint-disable-next-line no-unused-vars
+  //const username = 'root';
 
   console.log('Setting up database...');
   await rebuildDatabase();
@@ -82,12 +85,6 @@ export default (async () => {
   await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
   console.log('root password:           ', password);
   console.log('sample invite code:      ', id);
-  const addUserSql = 'INSERT INTO users (id,username,password,public_key, can_login) VALUES (unhex(?),?,?,?,1);';
-  const userID = v1().replace(/-/g, '');
-  await db.query(addUserSql, [userID, username, await hashUnique(password), serverRsaPublicKey.export({ type: 'pkcs1', format: 'pem' })]);
-  const secret = v1().replace(/-/g, '');
-  const secretHash = await hashHmac(secret);
-  const addUSerRegistrationConfirmation = 'INSERT INTO registration_confirmations (expires_at, secret_hash, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY),?,unhex(?));';
-  await db.query(addUSerRegistrationConfirmation, [secretHash, userID]);
-  console.log('sample registration code:', secret);
+  //  const addUserSql = 'INSERT INTO users (id,username,password,public_key, can_login) VALUES (unhex(?),?,?,?,1);';
+
 })();
