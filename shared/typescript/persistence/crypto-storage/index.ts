@@ -28,6 +28,10 @@ export class CryptoStorage {
   constructor(private _storageDirectory: string, private _crypt: CryptoProvider) {
   }
 
+  get storageDirectory() {
+    return this._storageDirectory;
+  }
+
   async openTextRecordStorage(file: string[] | fs.promises.FileHandle) {
     if (file instanceof Array) {
       file = await fs.promises.open(path.join(this._storageDirectory, ...file), 'r+');
