@@ -13,14 +13,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {BinaryLike, sign}                            from 'crypto';
 import {deserializeServerMessage, ServerMessageType} from '../message';
 import {TitpClientConnection}                        from './client-connection';
+import {Observable, Subject}                         from 'rxjs';
+import {CommonTitpClient}                            from '../client/common';
 
 export class TitpClientBus {
   private _clients: { [username: string]: TitpClientConnection } = {};
+  private _onDisconnect = new Subject<CommonTitpClient>();
 
   constructor(private _endpoint: string) {
+  }
+
+  public onDisconnect(): Observable<CommonTitpClient> {
+    return this._onDisconnect;
   }
 
   /**
@@ -38,9 +44,9 @@ export class TitpClientBus {
    * @private
    */
   private _registerNewClient(client: TitpClientConnection) {
-    console.log('Client bus> new client ' + client.username());
     this._clients[client.username()] = client;
     client.on('close').subscribe(() => {
+      this._onDisconnect.next(client);
       delete this._clients[client.username()];
     });
     client.data().subscribe(this._onClientData.bind(this, client));
