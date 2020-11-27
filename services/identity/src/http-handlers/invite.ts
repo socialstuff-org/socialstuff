@@ -7,6 +7,28 @@ import {RowDataPacket} from 'mysql2/promise';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
 
 export const middleware: ValidationChain[] = [
+/*  header("user_token")
+    .isString()
+    .custom(async token => {
+      const request = require('request');
+const options = {
+  method: 'GET',
+  url: 'http://127.0.0.1:3002/settings/security',
+  headers: {
+  }
+};
+let result:boolean = true;
+await request(options, function (error:any, response:Response) {
+  if (error) throw new Error(error);
+  result = ('true' === response.get('inv_only.inv_only_by_admin') || ('1' === response.get('inv_only.inv_only_by_admin')));
+});
+
+if (result) {
+  //TODO check if user is admin
+}
+
+
+    }),*/
   body('max_usage')
     .isInt()
     .withMessage('Pick an Integer as max_usage!'),
@@ -80,23 +102,6 @@ async function editInviteCode(req:Request, res: Response) {
 }
 
 async function addInviteCode(req: Request, res: Response){
-  /*const request = require('request');
-  const options = {
-    method: 'GET',
-    url: 'http://127.0.0.1:3002/settings/security',
-    headers: {
-    }
-  };
-  let result:boolean = true;
-  await request(options, function (error:any, response:Response) {
-    if (error) throw new Error(error);
-    result = ('true' === response.get('inv_only.inv_only_by_admin') || ('1' === response.get('inv_only.inv_only_by_admin')));
-  });
-
-  if (result) {
-    //TODO check if user is admin
-  }
-*/
 
   const invCodeToAdd = req.body;
   console.log('Adding inv_code: ' + invCodeToAdd.code);
