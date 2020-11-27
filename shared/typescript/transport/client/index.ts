@@ -169,7 +169,7 @@ export class TitpClient extends CommonTitpClient {
       content:     messageContent,
     };
     const recipient = [{name: username, publicKey: recipientRsaPublicKey}];
-    const serverMessage = buildServerMessage(message, this._rsa.priv, Buffer.alloc(0), recipient, x => x);
+    const serverMessage = buildServerMessage(message, this._rsa.priv, Buffer.alloc(0), recipient, ServerMessageType.initialHandshake, x => x);
     await this._keyRegistry.saveEcdhForHandshake(username, ecdh);
     await this.write(serializeServerMessage(serverMessage));
   }
