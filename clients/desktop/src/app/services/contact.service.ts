@@ -47,6 +47,9 @@ export class ContactService {
     });
   }
 
+  public async unLoad() {
+    await this._contactStorage.close();
+  }
 
   private async _loadContacts() {
     const usernames = [];
@@ -121,6 +124,8 @@ export class ContactService {
   }
 
   public async addContact(contact: Contact) {
+    console.log('adding contact:', contact);
+    console.log('existing contact names: ', this._contacts.map(x => x.username));
     if (this._contacts.some(x => x.username === contact.username)) {
       return;
     }
