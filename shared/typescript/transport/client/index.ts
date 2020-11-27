@@ -173,7 +173,7 @@ export class TitpClient extends CommonTitpClient {
       .sign(this._rsa.priv);
     const e = Buffer.concat([this._ecdh.getPublicKey(), ecdhSig]);
     const message: ChatMessage = {
-      senderName:  username,
+      senderName:  this._username,
       sentAt:      new Date(),
       attachments: [],
       type:        ChatMessageType.handshake,
