@@ -40,25 +40,21 @@ export const middleware: ValidationChain[] = [
 async function getAllInvitations(req: Request, res: Response) {
   const db = (req as RequestWithDependencies).dbHandle; //await sharedConnection();
   const headers = req.headers;
-  //const db = (req as RequestWithDependencies).dbHandle;
 
   console.log('getting all invitations');
-  //console.log(headers);
   const rpp = Number(headers.rows_per_page);
   console.log('rows per page: ', rpp);
   const currentPage = Number(headers.current_page);
 
   const startIndex = (rpp * (currentPage)) - rpp;
   const endIndex = startIndex + rpp;
-  console.log('current page:  ', currentPage);
-  console.log('');
   let response ;
-  if (headers.sortParam !== null) {
+  if (headers.sortparam !== null) {
     const sql = 'SELECT * FROM invite_code ORDER BY ?, id LIMIT ?,?';
-    response = await db.query(sql, [headers.sortParam, startIndex, endIndex]);
+    response = await db.query(sql, [headers.sort_param, startIndex, endIndex]);
   } else {
     const sql = 'SELECT * FROM invite_code ORDER BY id LIMIT ?,?';
-    response = await db.query(sql, [headers.sortParam, startIndex, endIndex]);
+    response = await db.query(sql, [startIndex, endIndex]);
   }
 
   return res.status(200).json({ret: response[0]});
