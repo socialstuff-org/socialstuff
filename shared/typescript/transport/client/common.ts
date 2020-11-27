@@ -13,12 +13,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {BinaryLike, createVerify}                                                                    from 'crypto';
-import {Socket}                                                                                      from 'net';
-import {Observable, Subject}                                                                         from 'rxjs';
-import {decryptAes384, decryptRsa, encryptAes384}                                                    from '../crypto';
-import {makeWriteP}                                                                                  from '../socket';
-import {buildServerMessage, ChatMessage, ChatMessageType, deserializeChatMessage, ServerMessageType} from '../message';
+import {BinaryLike}                   from 'crypto';
+import {Socket}                       from 'net';
+import {Observable, Subject}          from 'rxjs';
+import {decryptAes384, encryptAes384} from '../crypto';
+import {makeWriteP}                   from '../socket';
 
 /**
  *
