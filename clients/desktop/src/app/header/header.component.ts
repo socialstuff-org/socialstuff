@@ -1,8 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
-import {ChatPartner} from "../models/ChatPartner";
-import {MatDialog} from "@angular/material/dialog";
-import {ContactInfoComponent} from "../contact-info/contact-info.component";
+import {Router}                   from "@angular/router";
+import {ChatPartner}              from "../models/ChatPartner";
+import {MatDialog}                from "@angular/material/dialog";
+import {ContactInfoComponent}     from "../contact-info/contact-info.component";
+import {TitpServiceService}       from '../services/titp-service.service';
 
 @Component({
   selector: 'app-header',
@@ -17,6 +18,7 @@ export class HeaderComponent implements OnInit {
   constructor(
     private router: Router,
     public dialog: MatDialog,
+    public titp: TitpServiceService,
   ) { }
 
   ngOnInit(): void {
