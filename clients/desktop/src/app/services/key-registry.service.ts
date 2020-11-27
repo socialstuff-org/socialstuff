@@ -37,7 +37,7 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
       this._conversationKeys[username] = contact.conversationKey;
       return contact.conversationKey;
     } else {
-      throw new Error('Could not load conversation key!');
+      throw new Error(`Could not load conversation key for user '${username}'!`);
     }
   }
 
@@ -57,10 +57,14 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
   }
 
   async loadEcdhForHandshake(username: string): Promise<ECDH | false> {
-    const ecdhPrivateKey = await this.storage.storage.loadFileContent(['handshakes', hashUsername(username)]);
-    const ecdh = createECDH(CURVE);
-    ecdh.setPrivateKey(ecdhPrivateKey);
-    return ecdh;
+    try {
+      const ecdhPrivateKey = await this.storage.storage.loadFileContent(['handshakes', hashUsername(username)]);
+      const ecdh = createECDH(CURVE);
+      ecdh.setPrivateKey(ecdhPrivateKey);
+      return ecdh;
+    } catch {
+      return false;
+    }
   }
 
   async removeEcdhForHandshake(username: string): Promise<void> {
