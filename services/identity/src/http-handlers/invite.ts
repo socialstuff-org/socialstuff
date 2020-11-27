@@ -41,6 +41,9 @@ if (result) {
     .isBoolean(),
   body('code')
     .isString().custom(async code => {
+      if (code === '') {
+        throw new Error('Code was empty');
+      }
       console.log('checking code: ' + code);
       const db = await sharedConnection();
       const sql = 'SELECT COUNT(*) AS numcodes FROM invite_code WHERE code = ?;';
@@ -121,6 +124,7 @@ async function addInviteCode(req: Request, res: Response){
 }
 
 async function deleteInviteCode(req: Request, res: Response) {
+  console.log('delete invite was called');
   const invId = req.body.id;
   try {
     const sql = 'DELETE FROM invite_code WHERE id = ?';
