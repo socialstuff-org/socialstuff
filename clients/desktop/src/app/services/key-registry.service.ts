@@ -19,13 +19,18 @@ import * as path                                      from 'path';
 export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegistry {
   private _rsaKeys: { [username: string]: KeyObject } = {};
   private _conversationKeys: { [username: string]: Buffer } = {};
+  private _serverAddress: string = '';
 
   constructor(
     private api: ApiService,
     private http: HttpClient,
     private contacts: ContactService,
-    private storage: CryptoStorageService,
+    private storage: CryptoStorageService
   ) {
+  }
+
+  set serverAddress(a: string) {
+    this._serverAddress = a;
   }
 
   async fetchConversationKey(username: string) {
@@ -50,6 +55,12 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
       this._rsaKeys[username] = contact.rsaPublicKey;
       return contact.rsaPublicKey;
     }
+    if (username.endsWith(this._serverAddress)) {
+      username = username.split('@')[0];
+      console.log('on same server');
+    } else {
+      console.log('different server');
+    }
     const {data: {public_key}} = await this.http.get<DataResponse<{ public_key: string }>>(this.api.remoteEndpoint() + '/identity/public-key-of/' + username).toPromise();
     const rsa = createPublicKey(public_key);
     this._rsaKeys[username] = rsa;
@@ -73,16 +84,18 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
 
   async saveConversationKey(username: string, key: Buffer): Promise<void> {
     let contact = await this.contacts.load(username);
-    if (contact === false) {
+    if (contact) {
+      contact.conversationKey = key;
+      await this.contacts.update(contact);
+    } else {
       contact = {
         username,
         usernameHash: hashUsername(username),
-        conversationKey: undefined,
+        conversationKey: key,
         rsaPublicKey: await this.fetchRsa(username),
       };
+      await this.contacts.addContact(contact);
     }
-    contact.conversationKey = key;
-    await this.contacts.update(contact);
   }
 
   async saveEcdhForHandshake(username: string, ecdh: ECDH): Promise<void> {
