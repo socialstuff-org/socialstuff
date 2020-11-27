@@ -13,12 +13,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Socket}                                                                       from 'net';
-import {promisify}                                                                    from 'util';
-import {createPrivateKey, createPublicKey, createSign, createVerify, ECDH, KeyObject} from 'crypto';
-import {CommonTitpClient}                                                             from './common';
-import {Handshake}                                                                    from './handshake';
-import {decryptAes384, decryptRsa, encryptRsa}                                        from '../crypto';
+import {Socket}                  from 'net';
+import {promisify}               from 'util';
+import {
+  createPrivateKey,
+  createPublicKey,
+  createSign,
+  createVerify,
+  ECDH,
+  KeyObject,
+}                                from 'crypto';
+import {CommonTitpClient}        from './common';
+import {Handshake}               from './handshake';
+import {
+  decryptAes384,
+  decryptRsa,
+  encryptRsa,
+}                                from '../crypto';
 import {
   buildServerMessage,
   ChatMessage,
@@ -26,10 +37,10 @@ import {
   deserializeChatMessage,
   serializeServerMessage,
   ServerMessageType,
-}                                                                                     from '../message';
-import {UserKeyRegistry}                                                              from '../user-key-registry';
-import {ConversationKeyRegistry}                                                      from '../conversation-key-registry';
-import {Observable, Subject}                                                          from 'rxjs';
+}                                from '../message';
+import {UserKeyRegistry}         from '../user-key-registry';
+import {ConversationKeyRegistry} from '../conversation-key-registry';
+import {Observable, Subject}     from 'rxjs';
 
 export class TitpClient extends CommonTitpClient {
   private _rsa: { priv: KeyObject, pub: KeyObject };
@@ -155,6 +166,7 @@ export class TitpClient extends CommonTitpClient {
   }
 
   public async negotiateKeyWith(username: string, ecdh: ECDH = this._ecdh) {
+    console.log(`client rsa of ${username}:`, this._rsa.pub.export({type: 'pkcs1', format: 'pem'}));
     const recipientRsaPublicKey = await this._keyRegistry.fetchRsa(username);
     const ecdhSig = createSign('RSA-SHA512')
       .update(ecdh.getPublicKey())
@@ -181,6 +193,7 @@ export class TitpClient extends CommonTitpClient {
     const decryptedContent = decryptRsa(encryptedContent, this._rsa.priv);
     const message = deserializeChatMessage(decryptedContent);
     const senderRsaPublicKey = await this._keyRegistry.fetchRsa(message.senderName);
+    console.log(`fetched rsa of ${message.senderName}:`, senderRsaPublicKey.export({format: 'pem', type: 'pkcs1'}));
     // const keys = decryptRsa(message.content, this._rsa.priv);
     if (message.content.length !== 609) {
       throw new Error('Data length mismatch!');
@@ -191,14 +204,19 @@ export class TitpClient extends CommonTitpClient {
     if (!signatureMatches) {
       throw new Error('Signature mismatch!');
     }
-    const conversationKey = this._ecdh.computeSecret(ecdhPub);
-    await this._keyRegistry.saveConversationKey(message.senderName, conversationKey);
+
     const savedEcdhKey = await this._keyRegistry.loadEcdhForHandshake(message.senderName);
-    if (savedEcdhKey === false) {
-      return;
+    let conversationKey: Buffer;
+    if (savedEcdhKey) {
+      //! initiator of handshake
+      conversationKey = savedEcdhKey.computeSecret(ecdhPub);
+      await this._keyRegistry.removeEcdhForHandshake(message.senderName);
+    } else {
+      //! recipient of handshake
+      await this.negotiateKeyWith(message.senderName, this._ecdh);
+      conversationKey = this._ecdh.computeSecret(ecdhPub);
     }
-    await this.negotiateKeyWith(message.senderName, savedEcdhKey);
-    await this._keyRegistry.removeEcdhForHandshake(message.senderName);
+    await this._keyRegistry.saveConversationKey(message.senderName, conversationKey);
   }
 
   /**
