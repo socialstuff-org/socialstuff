@@ -52,10 +52,16 @@ async function getAllInvitations(req: Request, res: Response) {
   const endIndex = startIndex + rpp;
   console.log('current page:  ', currentPage);
   console.log('');
-  const sql = 'SELECT * FROM invite_code LIMIT ?,?';
-  const response1 = await db.query(sql, [startIndex, endIndex]);
+  let response ;
+  if (headers.sortParam !== null) {
+    const sql = 'SELECT * FROM invite_code ORDER BY ?, id LIMIT ?,?';
+    response = await db.query(sql, [headers.sortParam, startIndex, endIndex]);
+  } else {
+    const sql = 'SELECT * FROM invite_code ORDER BY id LIMIT ?,?';
+    response = await db.query(sql, [headers.sortParam, startIndex, endIndex]);
+  }
 
-  return res.status(200).json({ret: response1[0]});
+  return res.status(200).json({ret: response[0]});
 }
 
 async function editInviteCode(req:Request, res: Response) {
@@ -78,6 +84,24 @@ async function editInviteCode(req:Request, res: Response) {
 }
 
 async function addInviteCode(req: Request, res: Response){
+  /*const request = require('request');
+  const options = {
+    method: 'GET',
+    url: 'http://127.0.0.1:3002/settings/security',
+    headers: {
+    }
+  };
+  let result:boolean = true;
+  await request(options, function (error:any, response:Response) {
+    if (error) throw new Error(error);
+    result = ('true' === response.get('inv_only.inv_only_by_admin') || ('1' === response.get('inv_only.inv_only_by_admin')));
+  });
+
+  if (result) {
+    //TODO check if user is admin
+  }
+*/
+
   const invCodeToAdd = req.body;
   console.log('Adding inv_code: ' + invCodeToAdd.code);
   try {

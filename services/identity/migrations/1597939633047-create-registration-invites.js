@@ -17,13 +17,21 @@ const { sharedConnection } = require('../lib/mysql');
 
 module.exports.up = async next => {
   const db = await sharedConnection();
-  await db.query(`CREATE TABLE IF NOT EXISTS registration_invites(
-    expires_at date not null,
-    secret binary(16) not null unique
-  );`);
+  await db.query(`create table socialstuff_identity.invite_code
+(
+    id              int auto_increment
+        primary key,
+    max_usage       int                  null,
+    times_used      int        default 0 not null,
+    expiration_date datetime             null,
+    active          tinyint(1) default 1 not null,
+    code            varchar(100)         not null,
+    constraint invite_code_code_uindex
+        unique (code)
+);`);
 };
 
 module.exports.down = async next => {
   const db = await sharedConnection();
-  await db.query('DROP TABLE IF EXISTS registration_invites CASCADE;');
+  await db.query('DROP TABLE IF EXISTS invite_code CASCADE;');
 };
