@@ -211,7 +211,7 @@ export class TitpClient extends CommonTitpClient {
         break;
 
       case ServerMessageType.initialHandshake:
-        this._parseInitialHandshake(data.slice(2));
+        await this._parseInitialHandshake(data.slice(2));
         break;
 
       default:
