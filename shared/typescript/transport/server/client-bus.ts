@@ -19,8 +19,12 @@ import {Observable, Subject}                         from 'rxjs';
 import {CommonTitpClient}                            from '../client/common';
 
 export class TitpClientBus {
+  get onForwardToOfflineUsers(): Observable<{ message: Buffer; recipient: string }[]> {
+    return this._onForwardToOfflineUsers;
+  }
   private _clients: { [username: string]: TitpClientConnection } = {};
   private _onDisconnect = new Subject<CommonTitpClient>();
+  private _onForwardToOfflineUsers = new Subject<{ message: Buffer; recipient: string }[]>();
 
   constructor(private _endpoint: string) {
   }
@@ -35,7 +39,6 @@ export class TitpClientBus {
    */
   public pushClient(client: TitpClientConnection) {
     this._registerNewClient(client);
-    // TODO send pending messages to client
   }
 
   /**
@@ -60,15 +63,22 @@ export class TitpClientBus {
         if (Object.keys(message.localRecipients).length === 0) {
           break;
         }
+        const offlineRecipients = [];
         for (const recipient in message.localRecipients) {
-          if (!this._clients[recipient]) {
-            console.log('skipping offline recipient:', recipient);
-          }
           const t = Buffer.alloc(2, 0);
           t.writeInt16BE(ServerMessageType.chatMessage);
           const signatureLength = Buffer.alloc(2, 0);
           signatureLength.writeInt16BE(message.localRecipients[recipient].length);
-          this._clients[recipient].write(Buffer.concat([t, signatureLength, message.localRecipients[recipient], message.content]));
+          const msg = Buffer.concat([t, signatureLength, message.localRecipients[recipient], message.content]);
+
+          if (this._clients[recipient]) {
+            this._clients[recipient].write(msg);
+          } else {
+            offlineRecipients.push({recipient, message: msg});
+          }
+        }
+        if (offlineRecipients.length) {
+          this._onForwardToOfflineUsers.next(offlineRecipients);
         }
         break;
     }
