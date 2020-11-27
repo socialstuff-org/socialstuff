@@ -59,6 +59,7 @@ export class TitpClientBus {
     const message = deserializeServerMessage(data);
     switch (message.type) {
       case ServerMessageType.chatMessage:
+      case ServerMessageType.initialHandshake:
         // TODO forward server message to other servers
         if (Object.keys(message.localRecipients).length === 0) {
           break;
@@ -66,7 +67,7 @@ export class TitpClientBus {
         const offlineRecipients = [];
         for (const recipient in message.localRecipients) {
           const t = Buffer.alloc(2, 0);
-          t.writeInt16BE(ServerMessageType.chatMessage);
+          t.writeInt16BE(message.type);
           const signatureLength = Buffer.alloc(2, 0);
           signatureLength.writeInt16BE(message.localRecipients[recipient].length);
           const msg = Buffer.concat([t, signatureLength, message.localRecipients[recipient], message.content]);
