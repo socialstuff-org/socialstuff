@@ -89,6 +89,7 @@ export function buildServerMessage(
   senderPrivateKey: KeyObject,
   key: Buffer,
   recipients: { name: string, publicKey: KeyObject }[],
+  messageType: ServerMessageType = ServerMessageType.chatMessage,
   encrypt: (data: Buffer, key: Buffer) => Buffer = encryptAes384,
 ): ServerMessage {
   // TODO encode participants
@@ -105,7 +106,7 @@ export function buildServerMessage(
     }
   }
   return {
-    type:       ServerMessageType.chatMessage,
+    type:       messageType,
     content:    encrypt(serializeChatMessage(message), key),
     recipients: remoteRecipients,
     localRecipients,
