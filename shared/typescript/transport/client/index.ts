@@ -160,16 +160,15 @@ export class TitpClient extends CommonTitpClient {
       .update(ecdh.getPublicKey())
       .sign(this._rsa.priv);
     const e = Buffer.concat([this._ecdh.getPublicKey(), ecdhSig]);
-    const messageContent = encryptRsa(e, recipientRsaPublicKey);
     const message: ChatMessage = {
       senderName:  username,
       sentAt:      new Date(),
       attachments: [],
       type:        ChatMessageType.handshake,
-      content:     messageContent,
+      content:     e,
     };
     const recipient = [{name: username, publicKey: recipientRsaPublicKey}];
-    const serverMessage = buildServerMessage(message, this._rsa.priv, Buffer.alloc(0), recipient, ServerMessageType.initialHandshake, x => x);
+    const serverMessage = buildServerMessage(message, this._rsa.priv, Buffer.alloc(0), recipient, ServerMessageType.initialHandshake, x => encryptRsa(x, recipientRsaPublicKey));
     await this._keyRegistry.saveEcdhForHandshake(username, ecdh);
     await this.write(serializeServerMessage(serverMessage));
   }
@@ -178,14 +177,16 @@ export class TitpClient extends CommonTitpClient {
     const signatureLength = data.readUInt16BE(0);
     const signature = data.slice(2, signatureLength + 2);
     // TODO verify signature
-    const message = deserializeChatMessage(data.slice(signatureLength + 2));
+    const encryptedContent = data.slice(signatureLength + 2);
+    const decryptedContent = decryptRsa(encryptedContent, this._rsa.priv);
+    const message = deserializeChatMessage(decryptedContent);
     const senderRsaPublicKey = await this._keyRegistry.fetchRsa(message.senderName);
-    const keys = decryptRsa(message.content, this._rsa.priv);
-    if (keys.length !== 609) {
+    // const keys = decryptRsa(message.content, this._rsa.priv);
+    if (message.content.length !== 609) {
       throw new Error('Data length mismatch!');
     }
-    const ecdhPub = keys.slice(0, 97);
-    const ecdhPubSig = keys.slice(97);
+    const ecdhPub = message.content.slice(0, 97);
+    const ecdhPubSig = message.content.slice(97);
     const signatureMatches = createVerify('RSA-SHA512').update(ecdhPub).verify(senderRsaPublicKey, ecdhPubSig);
     if (!signatureMatches) {
       throw new Error('Signature mismatch!');
