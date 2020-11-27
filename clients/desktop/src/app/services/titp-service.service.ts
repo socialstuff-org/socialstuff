@@ -3,9 +3,9 @@ import {Injectable} from '@angular/core';
 import {TitpClient}                                    from '@trale/transport/client';
 import {CURVE}                                         from '@trale/transport/constants/crypto-algorithms';
 import {KeyRegistryService}                            from './key-registry.service';
-import {generateRsaKeyPair}                            from '@socialstuff/utilities/security';
 import {createECDH, createPrivateKey, createPublicKey} from 'crypto';
 import {CryptoStorageService}                          from './crypto-storage.service';
+import {ApiService}                                    from './api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +20,7 @@ export class TitpServiceService {
   constructor(
     private keys: KeyRegistryService,
     private storage: CryptoStorageService,
+    private api: ApiService
   ) {
   }
 
@@ -30,7 +31,8 @@ export class TitpServiceService {
     const ecdh = createECDH(CURVE);
     ecdh.generateKeys();
     const client = new TitpClient(username, rsa, ecdh, this.keys);
-    await client.connect(createPublicKey(hostRsa), host, port);
+    await client.connect(hostRsa, host, port);
     this._client = client;
+    this.keys.serverAddress = this.api.hostname + ':' + this.api.port;
   }
 }
