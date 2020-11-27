@@ -89,7 +89,7 @@ export class TitpClient extends CommonTitpClient {
    * Terminates the server connection.
    */
   public end() {
-    return new Promise(res => {
+    return new Promise<void>(res => {
       this._socket.end(() => {
         this._socket.destroy();
         res();
@@ -175,7 +175,10 @@ export class TitpClient extends CommonTitpClient {
   }
 
   private async _parseInitialHandshake(data: Buffer) {
-    const message = deserializeChatMessage(data);
+    const signatureLength = data.readUInt16BE(0);
+    const signature = data.slice(2, signatureLength + 2);
+    // TODO verify signature
+    const message = deserializeChatMessage(data.slice(signatureLength + 2));
     const senderRsaPublicKey = await this._keyRegistry.fetchRsa(message.senderName);
     const keys = decryptRsa(message.content, this._rsa.priv);
     if (keys.length !== 609) {
