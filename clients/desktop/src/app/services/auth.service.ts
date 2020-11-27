@@ -19,6 +19,7 @@ export class AuthService {
         .subscribe(response => {
           res(response.data.token);
         }, (error: HttpErrorResponse) => {
+          console.log(error);
           if (error.status === 400) {
             rej('Invalid Credentials!')
           } else {
