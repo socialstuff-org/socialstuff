@@ -16,7 +16,7 @@
 import {createVerify}         from 'crypto';
 import {fromEvent}            from 'rxjs';
 import {SIGN}                 from '../../../constants/crypto-algorithms';
-import {decryptAes384}        from '../../../crypto';
+import {decrypt}              from '../../../crypto';
 import {TitpClientConnection} from '../../client-connection';
 import {Handshake}            from '../index';
 import {HandshakeState}       from '../state';
@@ -25,7 +25,7 @@ export class WaitForUsername implements HandshakeState {
   enter(handshake: Handshake) {
     const sub = fromEvent<Buffer>(handshake.socket, 'data').subscribe(async data => {
       sub.unsubscribe();
-      const usernameBytes = decryptAes384(data, handshake._syncKey);
+      const usernameBytes = decrypt(data, handshake._syncKey);
       const username = usernameBytes.toString('utf-8').trimEnd();
       const userRsa = await handshake._userKeyRegistry.fetchRsa(username.split('@')[0]);
       {

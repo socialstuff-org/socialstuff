@@ -33,7 +33,7 @@ export class Initial implements HandshakeState {
       handshake._ecdhPub = dataBuffer.slice(0, ECDH_END_INDEX);
       handshake._ecdhSig = dataBuffer.slice(ECDH_END_INDEX, ECDH_SIG_END_INDEX);
 
-      handshake._syncKey = handshake.ecdh.computeSecret(handshake._ecdhPub);
+      handshake._syncKey = handshake.ecdh.computeSecret(handshake._ecdhPub).slice(0, 32);
       const reply: Buffer[] = [handshake.ecdh.getPublicKey()];
       {
         const signer = createSign('RSA-SHA512');
