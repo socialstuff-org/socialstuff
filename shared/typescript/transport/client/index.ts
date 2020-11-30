@@ -26,7 +26,7 @@ import {
 import {CommonTitpClient}        from './common';
 import {Handshake}               from './handshake';
 import {
-  decryptAes384,
+  decrypt,
   decryptRsa,
   encryptRsa,
 }                                from '../crypto';
@@ -161,7 +161,7 @@ export class TitpClient extends CommonTitpClient {
       }
     }
     const messageBuffer = data.slice(signatureLength + 2);
-    const decryptedSerializedChatMessage = decryptAes384(messageBuffer, await this._keyRegistry.fetchConversationKey(senderName));
+    const decryptedSerializedChatMessage = decrypt(messageBuffer, await this._keyRegistry.fetchConversationKey(senderName));
     return deserializeChatMessage(decryptedSerializedChatMessage);
   }
 

@@ -14,7 +14,7 @@
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
 import {createSign, createVerify, KeyObject, sign} from 'crypto';
-import {decryptRsa, encryptAes384, encryptRsa}     from '../crypto';
+import {decryptRsa, encrypt, encryptRsa}           from '../crypto';
 
 export enum ChatMessageType {
   text,
@@ -90,7 +90,7 @@ export function buildServerMessage(
   key: Buffer,
   recipients: { name: string, publicKey: KeyObject }[],
   messageType: ServerMessageType = ServerMessageType.chatMessage,
-  encrypt: (data: Buffer, key: Buffer) => Buffer = encryptAes384,
+  _encrypt: (data: Buffer, key: Buffer) => Buffer = encrypt,
 ): ServerMessage {
   // TODO encode participants
   const senderServer = message.senderName.split('@')[1];
@@ -107,7 +107,7 @@ export function buildServerMessage(
   }
   return {
     type:       messageType,
-    content:    encrypt(serializeChatMessage(message), key),
+    content:    _encrypt(serializeChatMessage(message), key),
     recipients: remoteRecipients,
     localRecipients,
   };

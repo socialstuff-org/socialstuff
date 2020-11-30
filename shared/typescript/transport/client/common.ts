@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {BinaryLike}                   from 'crypto';
-import {Socket}                       from 'net';
-import {Observable, Subject}          from 'rxjs';
-import {decryptAes384, encryptAes384} from '../crypto';
-import {makeWriteP}                   from '../socket';
+import {BinaryLike}          from 'crypto';
+import {Socket}              from 'net';
+import {Observable, Subject} from 'rxjs';
+import {decrypt, encrypt}    from '../crypto';
+import {makeWriteP}          from '../socket';
 
 /**
  *
@@ -52,7 +52,7 @@ export abstract class CommonTitpClient {
    */
   protected _init(): void {
     this._socket.on('data', data => {
-      const decrypted = decryptAes384(data, this._key);
+      const decrypted = decrypt(data, this._key);
       this._onData.next(decrypted);
     });
   }
@@ -69,7 +69,7 @@ export abstract class CommonTitpClient {
    * @param data The data to be sent.
    */
   public write(data: BinaryLike): Promise<void> {
-    const enc = encryptAes384(data, this._key);
+    const enc = encrypt(data, this._key);
     return this._write(enc);
   }
 }
