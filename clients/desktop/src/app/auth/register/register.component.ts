@@ -58,6 +58,7 @@ export class RegisterComponent {
   }
 
   async foo() {
+    this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
       await this.http.post<ErrorResponse>(this.api.remoteEndpoint() + '/identity/register', {}).toPromise();
     } catch (e) {
