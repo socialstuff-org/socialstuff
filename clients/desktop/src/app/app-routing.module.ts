@@ -12,7 +12,7 @@ import {CallFunctionComponent} from './voice-communication/call-function/call-fu
 const routes: Routes = [
   {
     path:       '',
-    redirectTo: 'register',
+    redirectTo: 'login',
     pathMatch:  'full',
   },
   {path: 'login', component: LoginComponent},

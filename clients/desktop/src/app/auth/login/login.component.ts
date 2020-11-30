@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import {AuthService}         from '../../services/auth.service';
-import {ApiService}          from '../../services/api.service';
-import {AppConfigService}    from '../../services/app-config.service';
-import {Router} from "@angular/router";
-import sweetalert from 'sweetalert2';
+import { Component, OnInit }  from '@angular/core';
+import {AuthService}          from '../../services/auth.service';
+import {ApiService}           from '../../services/api.service';
+import {AppConfigService}     from '../../services/app-config.service';
+import {Router}               from '@angular/router';
+import sweetalert             from 'sweetalert2';
+import {createHash}           from 'crypto';
+import {CryptoStorageService} from '../../services/crypto-storage.service';
+import {DebugService}         from '../../services/debug.service';
 
 @Component({
   selector: 'app-login',
@@ -23,17 +26,30 @@ export class LoginComponent implements OnInit {
     private api: ApiService,
     private config: AppConfigService,
     private router: Router,
+    private storage: CryptoStorageService,
+    private debug: DebugService,
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    const session = await this.debug.loadSession();
+    if (session === false) {
+      return;
+    }
+    this.router.navigateByUrl('/landing');
   }
 
   public async login() {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
       const token = await this.auth.login(this.username, this.password);
-      console.log('token', token);
-      await this.router.navigateByUrl('/landing');
+      const userHandle = `${this.username}@${this.hostname}:${this.port}`;
+      const hash = createHash('sha256');
+      hash.update(this.password);
+      const key = hash.digest();
+      await this.storage.load(userHandle, key);
+      await this.storage.storage.persistFileContent(['session.token'], Buffer.from(token, 'utf8'));
+      await this.debug.persistSession(userHandle, key);
+      this.router.navigateByUrl('/landing');
     } catch (e) {
       if (typeof e === 'string') {
         await sweetalert.fire({
@@ -42,6 +58,7 @@ export class LoginComponent implements OnInit {
           showCloseButton: true,
         });
       } else {
+        console.error(e);
         // TODO print custom error messages
       }
     }

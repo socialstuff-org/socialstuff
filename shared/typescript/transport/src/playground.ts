@@ -13,25 +13,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {delay}                                                                  from '@socialstuff/utilities/common';
-import {generateRsaKeyPair}                                                                  from '@socialstuff/utilities/security';
-import {createECDH, createPrivateKey, createPublicKey, createVerify, KeyObject, randomBytes} from 'crypto';
-import fs                                                                                    from 'fs';
-import path                                                                     from 'path';
-import {TitpClient}                                                             from '../client';
-import {decryptAes384, decryptRsa}                                              from '../crypto';
+import {delay}                                                    from '@socialstuff/utilities/common';
+import {generateRsaKeyPair}                                       from '@socialstuff/utilities/security';
+import {createECDH, createPrivateKey, createPublicKey, KeyObject} from 'crypto';
+import fs                                                         from 'fs';
+import path                                                       from 'path';
+import {TitpClient}                                               from '../client';
 import {
-  buildServerMessage,
   ChatMessage,
   ChatMessageType,
-  deserializeChatMessage,
-  serializeServerMessage,
-  ServerMessageType,
-}                                from '../message';
-import {TitpServer}              from '../server';
-import {TitpClientBus}           from '../server/client-bus';
-import {UserKeyRegistry}         from '../user-key-registry';
-import {ConversationKeyRegistry} from '../conversation-key-registry';
+}                                                                 from '../message';
+import {TitpServer}                                               from '../server';
+import {TitpClientBus}                                            from '../server/client-bus';
+import {UserKeyRegistry}                                          from '../user-key-registry';
+import {ConversationKeyRegistry}                                  from '../conversation-key-registry';
 
 async function loadOrGenerateKeys(name: string, mod: number = 4096) {
   let exists;
@@ -62,6 +57,7 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
 
   const clientBus = new TitpClientBus('localhost:8086');
 
+  // @ts-ignore
   const userKeyRegistry: UserKeyRegistry & ConversationKeyRegistry = {
     async fetchRsa(username: string) {
       if (username.endsWith('@localhost:8086')) {
@@ -74,8 +70,8 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
         throw new Error('Username unknown!');
       }
     },
-    async fetchConversationKey(username: string) {
-      return Buffer.from('0f35b822fceea6b23bfa539770d34f7982c472fe8c6fdf8c8608470dd9698296f1b631dd831a7ae5de6f1948b926f3a5', 'hex');
+    async fetchConversationKey(_username: string) {
+      return Buffer.from('60742da6258b25275294fcef3229efa0769534c6dd98f31697a6d8c8f5ecb1d2', 'hex');
     },
   };
 
@@ -119,6 +115,9 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
           console.log(`this message is sent to the group '${message.groupId}'`);
         }
     }
+    alice.end();
+    bob.end();
+    server.close();
   });
 
   await alice.connect(server.rsaPublicKey(), '127.0.0.1', 8444);
@@ -126,12 +125,12 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
   await delay(1000);
 
   const message: ChatMessage = {
-    senderName: 'alice@localhost:8086',
-    sentAt: new Date(),
-    type: ChatMessageType.text,
-    content: Buffer.from('Hello, World! This is a chat message!'),
+    senderName:  'alice@localhost:8086',
+    sentAt:      new Date(),
+    type:        ChatMessageType.text,
+    content:     Buffer.from('Hello, World! This is a chat message!'),
     attachments: [],
-    groupId: 'someGroup'
+    groupId:     'someGroup',
   };
 
   alice.sendChatMessageTo(message, ['bob@localhost:8086']);

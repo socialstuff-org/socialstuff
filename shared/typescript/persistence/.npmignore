@@ -1,0 +1,7 @@
+**/*.ts
+!**/*.d.ts
+.gitignore
+tsconfig.json
+.idea/
+.vscode/
+src/playground.ts

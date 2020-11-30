@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {DebugService}        from '../services/debug.service';
 
 @Component({
   selector: 'app-landing',
@@ -7,9 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LandingComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private debug: DebugService
+  ) { }
 
   ngOnInit(): void {
+    this.debug.loadSession();
   }
 
 }
