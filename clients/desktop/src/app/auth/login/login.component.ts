@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
   public password = '';
   public hostname = '127.0.0.1';
   public port = 8086;
-
+  public loggingIn = false;
 
   constructor(
     private auth: AuthService,
@@ -39,6 +39,7 @@ export class LoginComponent implements OnInit {
   }
 
   public async login() {
+    this.loggingIn = true;
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
       const token = await this.auth.login(this.username, this.password);
@@ -49,8 +50,10 @@ export class LoginComponent implements OnInit {
       await this.storage.load(userHandle, key);
       await this.storage.storage.persistFileContent(['session.token'], Buffer.from(token, 'utf8'));
       await this.debug.persistSession(userHandle, key);
+      this.loggingIn = false;
       this.router.navigateByUrl('/landing');
     } catch (e) {
+      this.loggingIn = false;
       if (typeof e === 'string') {
         await sweetalert.fire({
           text: e,
