@@ -47,10 +47,18 @@ export class ContactService {
     });
   }
 
+  /**
+   * Unload/close the contact service session.
+   * This method has to be called between session of the same user, in order to avoid dangling (open) file descriptors.
+   */
   public async unLoad() {
     await this._contactStorage.close();
   }
 
+  /**
+   * Loads all contacts of the current user session into the service.
+   * @private
+   */
   private async _loadContacts() {
     const usernames = [];
     for await (const r of this._contactStorage.records()) {
@@ -74,6 +82,11 @@ export class ContactService {
     this._contacts = await Promise.all(contactPromises);
   }
 
+  /**
+   * Load all last (most recent) messages from the chat histories of the provided contacts.
+   * This method may be used to create an overview of the last interactions with the provided contacts.
+   * @param contacts
+   */
   public async loadLastMessages(contacts: Contact[]): Promise<ContactWithLastMessage[]> {
     const foo = contacts.map(async contact => {
       const records = await this.storage.storage.openTextRecordStorage([contact.usernameHash, 'chat.log']);
@@ -90,7 +103,13 @@ export class ContactService {
     return Promise.all(foo);
   }
 
-  public async exists(username: string) {
+  /**
+   * Check whether a contact with the given username exists.
+   * If the contact exists, their SHA512 username hash will be returned.
+   * If the contact does not exist, {false} will be returned.
+   * @param username
+   */
+  public async exists(username: string): Promise<string | false> {
     const usernameHash = createHash('sha512')
       .update(username)
       .digest()
@@ -103,26 +122,40 @@ export class ContactService {
     }
   }
 
-  public async load(username: string) {
+  /**
+   * Loads a contact from the local storage.
+   * If the contact cannot be found, {false} will be returned.
+   * @param username
+   */
+  public async load(username: string): Promise<Contact | false> {
     const usernameHash = await this.exists(username);
     if (usernameHash === false) {
       return false;
     }
     const propertiesStr = await this.storage.storage.loadFileContent(['chats', usernameHash, 'chat.properties']);
     const properties: ChatProperties = JSON.parse(propertiesStr.toString('utf-8'));
-    const c: Contact = {
+    return {
       username,
       usernameHash,
-      rsaPublicKey: createPublicKey(properties.rsaPublicKey),
+      rsaPublicKey:    createPublicKey(properties.rsaPublicKey),
       conversationKey: Buffer.from(properties.conversationKey, 'base64'),
     };
-    return c;
   }
 
+  /**
+   * Opens a {TextRecordStorage}, via which chat messages can be loaded.
+   * After opening the chat, it has to be closed by the component issuing access to the chat in the first place!
+   * @param contact
+   */
   public async openChat(contact: Contact) {
     return this.storage.storage.openTextRecordStorage(['chats', contact.usernameHash, 'chat.log']);
   }
 
+  /**
+   * Add a new contact for the current user session.
+   * The contact will not be saved, if it already has been added.
+   * @param contact
+   */
   public async addContact(contact: Contact) {
     console.log('adding contact:', contact);
     console.log('existing contact names: ', this._contacts.map(x => x.username));
@@ -151,7 +184,15 @@ export class ContactService {
     await this._contactStorage.addRecord(Buffer.from(contact.username, 'utf-8'));
   }
 
+  /**
+   * Update an existing contact of the current user.
+   * @param contact
+   */
   public async update(contact: Contact) {
+    const exists = await this.exists(contact.username);
+    if (exists === false) {
+      return;
+    }
     const properties: ChatProperties = {
       rsaPublicKey: contact.rsaPublicKey.export({ type: 'pkcs1', format: 'pem' }).toString(),
       customDisplayName: contact.displayName,
@@ -161,7 +202,11 @@ export class ContactService {
     await this.storage.storage.persistFileContent(['chats', contact.usernameHash, 'chat.properties'], serializedProperties);
   }
 
-  public readContacts(): Contact[] {
+  /**
+   * Returns an array of all contacts.
+   * This method shall only be called, after the crypto storage has been initialized!
+   */
+  public readContacts(): readonly Contact[] {
     return this._contacts;
   }
 
