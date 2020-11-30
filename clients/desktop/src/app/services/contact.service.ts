@@ -91,6 +91,7 @@ export class ContactService {
     const foo = contacts.map(async contact => {
       const records = await this.storage.storage.openTextRecordStorage([contact.usernameHash, 'chat.log']);
       const lastMessageString = await records.records().next();
+      await records.close();
 
       const lastMessage = lastMessageString.done
                           ? null
