@@ -19,6 +19,14 @@
     </ng-template>
   </div>
   <span class="example-spacer"></span>
+  <button
+    (click)="addNewContact()"
+    style="margin-right: 10px;"
+    mat-button
+    class="default-button"
+  >
+    <mat-icon>add</mat-icon>Add contact
+  </button>
   <button (click)="logout()" id="logout-btn">
     <mat-icon>exit_to_app</mat-icon>
   </button>
