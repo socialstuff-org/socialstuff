@@ -17,7 +17,7 @@ const { sharedConnection } = require('../lib/mysql');
 
 module.exports.up = async next => {
   const db = await sharedConnection();
-  await db.query(`create table socialstuff_identity.invite_code
+  await db.query(`create table invite_code
 (
     id              int auto_increment
         primary key,

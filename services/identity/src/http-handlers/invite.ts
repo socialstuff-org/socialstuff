@@ -1,6 +1,6 @@
 import {Request, Response, Router} from 'express';
 import {RequestWithDependencies} from '../request-with-dependencies';
-import {body, ValidationChain} from 'express-validator';
+import {body, header, ValidationChain} from 'express-validator';
 import {rejectOnValidationError} from '@socialstuff/utilities/express';
 import {sharedConnection} from '../mysql';
 import {RowDataPacket} from 'mysql2/promise';
@@ -61,6 +61,12 @@ if (result) {
     })
 ];
 
+export const headerMiddleware: ValidationChain[] = [
+  header('rows_per_page').notEmpty().isInt(),
+  header('current_page').notEmpty().isInt(),
+  header('sort_param').isString()
+];
+
 
 async function getAllInvitations(req: Request, res: Response) {
   const db = (req as RequestWithDependencies).dbHandle; //await sharedConnection();
@@ -83,25 +89,6 @@ async function getAllInvitations(req: Request, res: Response) {
   }
 
   return res.status(200).json({ret: response[0]});
-}
-
-async function editInviteCode(req:Request, res: Response) {
-  const newInvCode = req.body;
-  const codeId = newInvCode.id;
-  console.log('test');
-  try {
-    const db = (req as RequestWithDependencies).dbHandle;
-
-    const sql = 'UPDATE invite_code SET max_usage = ?, times_used = ?, expiration_date = ?, active = ?, code = ? WHERE id = ?;';
-
-    await db.query(sql, [newInvCode.max_usage, newInvCode.times_used, newInvCode.expiration_date, newInvCode.active, newInvCode.code, codeId]);
-    console.log('Put invite code called');
-    res.status(200);
-  } catch (e) {
-    console.log(e);
-    res.status(500);
-
-  }
 }
 
 async function addInviteCode(req: Request, res: Response){
@@ -140,8 +127,7 @@ async function deleteInviteCode(req: Request, res: Response) {
 const inviteManagementInterface = Router();
 inviteManagementInterface.use(injectDatabaseConnectionIntoRequest);
 
-inviteManagementInterface.get('/', getAllInvitations);
-inviteManagementInterface.put('/', editInviteCode);
+inviteManagementInterface.get('/', headerMiddleware, rejectOnValidationError, getAllInvitations);
 inviteManagementInterface.post('/', middleware, rejectOnValidationError, addInviteCode);
 inviteManagementInterface.delete('/', deleteInviteCode);
 

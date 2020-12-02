@@ -38,6 +38,6 @@ export function sharedConnection() {
 
 export async function rebuildDatabase() {
   const set = await promisify(migrate.load.bind(migrate))({stateStore: '.migrate'});
-  //await promisify(set.down.bind(set))();
+  await promisify(set.down.bind(set))();
   await promisify(set.up.bind(set))();
 }

@@ -3,6 +3,8 @@ import secSettings from '../res/security_settings.json';
 //import instantiate = WebAssembly.instantiate;
 import {ErrorResponse} from '@socialstuff/utilities/responses';
 import {body, check, validationResult} from 'express-validator';
+import {setSecuritySettings} from '../mysql/mysql';
+import {injectDatabaseConnectionIntoRequest} from '../mysql/utilities';
 
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -26,7 +28,7 @@ async function changeSecuritySettings(req: Request, res: Response) {
     console.log('Errors in the Json occurred!');
     return res.status(422).json({errors: errors.array()});
   }
-
+/*
   const body = req.body;// bodyParser.urlencoded(req.body);// req.body;
   await file.set('two_factor_auth.on', body.two_factor_auth.on);
   await file.set('two_factor_auth.phone', body.two_factor_auth.phone);
@@ -40,7 +42,8 @@ async function changeSecuritySettings(req: Request, res: Response) {
   await file.set('individual_pwd_req.reg_ex_string', body.individual_pwd_req.reg_ex_string);
   await file.set('inv_only.on', body.inv_only.on);
   await file.set('inv_only.inv_only_by_adm', body.inv_only.inv_only_by_adm);
-  await file.save()
+  await file.save()*/
+  await setSecuritySettings(req.body, req)
   res.json(editJsonFile(__dirname + '/../res/security_settings.json').data)
 }
 
@@ -61,8 +64,6 @@ let validationParameters = [
 
 const settingsInterface = Router();
 settingsInterface.get('/', getSecSettings);
-settingsInterface.put('/', validationParameters, changeSecuritySettings);
+settingsInterface.put('/',injectDatabaseConnectionIntoRequest, validationParameters, changeSecuritySettings);
 
 export default settingsInterface;
-
-
