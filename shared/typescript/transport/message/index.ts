@@ -19,7 +19,8 @@ import {decryptRsa, encrypt, encryptRsa}           from '../crypto';
 export enum ChatMessageType {
   text,
   voice,
-  handshake,
+  handshakeInitialization,
+  handshakeReply,
 }
 
 export interface MessageAttachment {
