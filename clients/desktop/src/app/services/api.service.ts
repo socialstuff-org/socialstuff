@@ -11,7 +11,7 @@ export class ApiService {
   constructor() { }
 
   /**
-   * The remove endpoint of the reverse proxy via which all services may be accessed.
+   * The HTTP remote endpoint of the reverse proxy, via which all services may be accessed.
    */
   public remoteEndpoint(): string {
     // return `http://${this.hostname}:${this.port}`;
