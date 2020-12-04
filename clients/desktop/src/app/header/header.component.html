@@ -4,13 +4,15 @@
   </span>
   <a routerLink="/landing" id="socialstuff">SocialStuff - logged in as {{titp.client?.username()}}</a>
   <span class="example-spacer"></span>
-  <div id="profile-picture" *ngIf="chatPartner">
+
+  <div id="profile-picture" (click)="openContactInfo()" *ngIf="chatPartner">
     <span *ngIf="chatPartner.realName; else noRealName">{{chatPartner.acronym}}</span>
     <ng-template #noRealName>
       <mat-icon style="margin-top: 7px;">person</mat-icon>
     </ng-template>
   </div>
-  <div id="username" (click)="openContactInfo()"  *ngIf="chatPartner">
+
+  <div id="username" (click)="openContactInfo()" *ngIf="chatPartner">
     <div *ngIf="chatPartner.realName; else onlyUsername">{{chatPartner.realName}}<br>
       @{{chatPartner.username}}
     </div>
@@ -18,6 +20,7 @@
       <span style="line-height: 40px;">@{{chatPartner.username}}</span>
     </ng-template>
   </div>
+
   <span class="example-spacer"></span>
   <button
     (click)="addNewContact()"
