@@ -45,6 +45,6 @@ const APP_HOST = process.env.APP_HOST || '::1';
     console.error(err);
     return;
   }
-  console.log(`Social Stuff Identity service running on ${APP_HOST}:${APP_PORT}.`);
+  console.log(`Social Stuff Reporting service running on ${APP_HOST}:${APP_PORT}.`);
 })();
 
