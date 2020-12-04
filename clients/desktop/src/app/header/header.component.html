@@ -2,7 +2,7 @@
   <span>
     <img src="https://cdn.code-lake.com/socialstuff/img/eye.svg" alt="img unavailable" id="logo">
   </span>
-  <a routerLink="/landing" id="socialstuff">SocialStuff</a>
+  <a routerLink="/landing" id="socialstuff">SocialStuff - logged in as {{titp.client?.username()}}</a>
   <span class="example-spacer"></span>
   <div id="profile-picture" *ngIf="chatPartner">
     <span *ngIf="chatPartner.realName; else noRealName">{{chatPartner.acronym}}</span>
@@ -19,6 +19,14 @@
     </ng-template>
   </div>
   <span class="example-spacer"></span>
+  <button
+    (click)="addNewContact()"
+    style="margin-right: 10px;"
+    mat-button
+    class="default-button"
+  >
+    <mat-icon>add</mat-icon>Add contact
+  </button>
   <button (click)="logout()" id="logout-btn">
     <mat-icon>exit_to_app</mat-icon>
   </button>

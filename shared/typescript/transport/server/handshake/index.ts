@@ -32,12 +32,12 @@ export class Handshake {
   private _state: HandshakeState = new Initial();
   constructor(public socket: Socket, public ecdh: ECDH, public rsa: { priv: KeyObject, pub: KeyObject }, public _userKeyRegistry: UserKeyRegistry) {
     this._write = makeWriteP(socket);
-    this._state.enter(this);
+    this._state.enter?.(this);
   }
 
   public _goToState(state: HandshakeState) {
-    this._state.exit(this);
+    this._state.exit?.(this);
     this._state = state;
-    this._state.enter(this);
+    this._state.enter?.(this);
   }
 }

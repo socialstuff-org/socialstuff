@@ -3,12 +3,13 @@
   "compilerOptions": {
     "outDir": "../out-tsc/app",
     "module": "es2015",
-    "baseUrl": "",
+    "baseUrl": ".",
     "types": []
   },
   "include": [
     "main.ts",
-    "polyfill.ts"
+    "polyfill.ts",
+    "../node_modules/@types/dom-mediacapture-record/index.d.ts"
   ],
   "exclude": [
     "**/*.spec.ts"

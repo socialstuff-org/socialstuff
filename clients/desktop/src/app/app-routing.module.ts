@@ -15,11 +15,13 @@ import {BlockedUsersComponent} from './admin/usersManagement/blocked-users/block
 import {LogoutComponent} from './auth/logout/logout.component';
 import {LandingComponent} from './landing/landing.component';
 import {DashboardViewComponent} from './admin/Dashboard/dashboard-view/dashboard-view.component';
+import {CallFunctionComponent}   from './voice-communication/call-function/call-function.component';
+import {MicrophoneTestComponent} from './microphone-test/microphone-test.component';
 
 export const routesChat: Routes = [
   {
     path:       '',
-    redirectTo: 'register',
+    redirectTo: 'login',
     pathMatch:  'full',
   },
   {path: 'login', component: LoginComponent},
@@ -28,7 +30,9 @@ export const routesChat: Routes = [
   {path: 'logout', component: LogoutComponent},
   {path: 'landing', component: LandingComponent},
   {path: 'chatview/:id', component: ChatViewComponent},
-  {path: 'chap-app', component: ChatAppComponent}
+  {path: 'chap-app', component: ChatAppComponent},
+  {path: 'call-function', component: CallFunctionComponent},
+  {path: 'microphone-test', component: MicrophoneTestComponent}
   // {
   //   path: '**',
   //   component: PageNotFoundComponent

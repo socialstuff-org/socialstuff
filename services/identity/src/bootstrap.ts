@@ -15,15 +15,15 @@
 
 /* istanbul ignore file */
 
-import crypto from 'crypto';
-import path                      from 'path';
+import crypto                                                from 'crypto';
+import path                                                  from 'path';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
 import {v1}                                                  from 'uuid';
 import fs                                                    from 'fs';
 import {createConnection, rebuildDatabase, sharedConnection} from './mysql';
 import {delay}                                               from '@socialstuff/utilities/common';
-import {hashHmac}                                from '@socialstuff/utilities/security';
+import {hashHmac}                                            from '@socialstuff/utilities/security';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env();
@@ -47,8 +47,8 @@ export default (async () => {
     }
   }
 
+  const keysPath = path.join(__dirname, '..', '..', 'priv.pem');
   {
-    const keysPath = path.join(__dirname, '..', 'priv.pem');
     if (!fs.existsSync(keysPath)) {
       const keys = crypto.generateKeyPairSync('rsa', {modulusLength: 4096});
       fs.writeFileSync(keysPath, keys.privateKey.export({format: 'pem', type: 'pkcs1'}));
@@ -56,12 +56,12 @@ export default (async () => {
     }
   }
 
-  /*
-   const serverPublicRsaString = fs.readFileSync(path.join(__dirname, '..', 'priv.pem')).toString('utf-8');
-  const serverRsaPublicKey = createPublicKey(serverPublicRsaString);
- */
+  // const serverPublicRsaString = fs.readFileSync(keysPath).toString('utf-8');
+  // const serverRsaPublicKey = createPublicKey(serverPublicRsaString);
 
-  const db = await sharedConnection();
+  // TODO add rsa keys to version control
+
+  const db = await createConnection({ multipleStatements: true });
 
   if (ENV !== 'dev') {
     return;
@@ -70,21 +70,20 @@ export default (async () => {
   const ecdh = crypto.createECDH('secp256k1');
   ecdh.generateKeys();
   process.env.ECDH_PRIVATE_KEY = ecdh.getPrivateKey().toString('base64');
-  // const publicKey = ecdh.getPrivateKey().toString('base64');
-  const password = crypto.randomBytes(16).toString('hex');
-  // eslint-disable-next-line no-unused-vars
-  //const username = 'root';
 
   console.log('Setting up database...');
   await rebuildDatabase();
   console.log('Database ready for use!');
   console.log('seeding some data...');
-  const id = v1().replace(/-/g, '');
-  const token = await hashHmac(id);
-  console.log('Token: ' + token);
-  await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
-  console.log('root password:           ', password);
-  console.log('sample invite code:      ', id);
-  //  const addUserSql = 'INSERT INTO users (id,username,password,public_key, can_login) VALUES (unhex(?),?,?,?,1);';
-
+  for (let i = 0; i < 5; ++i) {
+    const id = v1().replace(/-/g, '');
+    const token = await hashHmac(id);
+    await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
+    console.log('sample invite code:      ', id);
+  }
+  const dump = await fs.promises.readFile(path.join(__dirname, '..', 'identity-dump.sql'));
+  await db.query(dump.toString('utf8'));
+  await db.end();
+  await sharedConnection();
+  console.log('finished db initialization');
 })();

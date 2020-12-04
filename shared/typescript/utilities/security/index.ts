@@ -13,8 +13,22 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-import crypto, {KeyObject} from 'crypto';
-import argon               from 'argon2';
+import {
+  KeyObject,
+  createHash,
+  createHmac,
+  BinaryLike,
+  randomBytes,
+  createCipheriv,
+  createDecipheriv,
+  generateKeyPair,
+  createSign,
+  createPublicKey,
+  createPrivateKey,
+  createVerify, publicEncrypt, privateDecrypt,
+
+} from 'crypto';
+import * as argon from 'argon2';
 
 const ENCRYPTION_ALGORITHM = 'aes-256-cbc';
 
@@ -24,7 +38,7 @@ const LOWER_WORD_CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const UPPER_WORD_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const NUMBER_CHARS = '1234567890';
 const SPECIAL_CHARS = '!@#$%^&*()-_=+[]{};\'":,.<>/?`~€';
-export const REQUIRED_PASSWORD_LENGTH = {min: 10, max: 40};
+export const REQUIRED_PASSWORD_LENGTH = {min: 10, max: 50};
 
 export function passwordIssues(password: string) {
   let hasLower = false;
@@ -68,7 +82,7 @@ let _appSecretBytes: Buffer;
 
 export function appSecretBytes() {
   if (!_appSecretBytes) {
-    const h = crypto.createHash('sha256');
+    const h = createHash('sha256');
     if (!process.env.APP_SECRET) {
       throw new Error('Missing APP_SECRET environment variable!');
     }
@@ -78,8 +92,8 @@ export function appSecretBytes() {
   return _appSecretBytes;
 }
 
-export function hashHmac(data: crypto.BinaryLike, key: Buffer = appSecretBytes()) {
-  const hmac = crypto.createHmac('sha512', key);
+export function hashHmac(data: BinaryLike, key: Buffer = appSecretBytes()) {
+  const hmac = createHmac('sha512', key);
   return hmac.update(data).digest('hex');
 }
 
@@ -87,8 +101,8 @@ export function encrypt(data: Buffer | string, key: Buffer = appSecretBytes()) {
   if (!(data instanceof Buffer)) {
     data = Buffer.from(data, 'utf8');
   }
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, iv);
+  const iv = randomBytes(16);
+  const cipher = createCipheriv(ENCRYPTION_ALGORITHM, key, iv);
   const encrypted = cipher.update(data, undefined, 'base64') + cipher.final('base64');
   const cryptText = JSON.stringify({iv: iv.toString('base64'), value: encrypted});
   return base64encode(cryptText);
@@ -97,7 +111,7 @@ export function encrypt(data: Buffer | string, key: Buffer = appSecretBytes()) {
 export function decrypt(data: string, key: Buffer = appSecretBytes()) {
   const {iv, value} = JSON.parse(base64decode(data));
   const ivBuffer = Buffer.from(iv, 'base64');
-  const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, ivBuffer);
+  const decipher = createDecipheriv(ENCRYPTION_ALGORITHM, key, ivBuffer);
   const encrypted = Buffer.from(value, 'base64');
   return Buffer.concat([decipher.update(encrypted), decipher.final()]);
 }
@@ -119,7 +133,7 @@ export async function hashUnique(data: any, secret?: Buffer) {
   if (!secret) {
     secret = appSecretBytes();
   }
-  const salt = crypto.randomBytes(64);
+  const salt = randomBytes(64);
   const hash = await argon.hash(data, {secret, salt});
   const hashString = JSON.stringify({hash, salt});
   return base64encode(hashString);
@@ -135,7 +149,7 @@ export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: st
     privateKeyEncoding.passphrase = passphrase;
   }
   return new Promise((res, rej) => {
-    crypto.generateKeyPair('rsa', {
+    generateKeyPair('rsa', {
       modulusLength,
       publicKeyEncoding: {
         type:   'spki',
@@ -146,7 +160,7 @@ export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: st
       if (err) {
         rej(err);
       } else {
-        res({priv: crypto.createPrivateKey(privateKey), pub: crypto.createPublicKey(publicKey)});
+        res({priv: createPrivateKey(privateKey), pub: createPublicKey(publicKey)});
       }
     }));
   });
@@ -154,7 +168,7 @@ export function generateRsaKeyPair(modulusLength: number = 4096, passphrase?: st
 
 export function wrapEnvelop(senderName: string, senderEcdhPub: Buffer, senderRsaPriv: KeyObject, receiverRsaPub: KeyObject) {
   const ecdhStr = senderEcdhPub.toString('base64');
-  const signer = crypto.createSign('RSA-SHA512');
+  const signer = createSign('RSA-SHA512');
   signer.update(ecdhStr);
   const letter = {
     name:    senderName,
@@ -162,9 +176,9 @@ export function wrapEnvelop(senderName: string, senderEcdhPub: Buffer, senderRsa
     ecdh:    ecdhStr,
   };
   const letterBuffer = Buffer.from(JSON.stringify(letter), 'utf8');
-  const key = crypto.randomBytes(32);
+  const key = randomBytes(32);
   const letterEncrypted = encrypt(letterBuffer, key);
-  const encryptedKey = crypto.publicEncrypt(receiverRsaPub, key);
+  const encryptedKey = publicEncrypt(receiverRsaPub, key);
   const envelop = {letter: letterEncrypted, key: encryptedKey.toString('base64')};
   return JSON.stringify(envelop);
 }
@@ -172,10 +186,10 @@ export function wrapEnvelop(senderName: string, senderEcdhPub: Buffer, senderRsa
 export function openEnvelop(envelopStr: string, senderRsaPub: KeyObject, receiverRsaPriv: KeyObject) {
   const envelop = JSON.parse(envelopStr) as { letter: string, key: string };
   try {
-    const key = crypto.privateDecrypt(receiverRsaPriv, Buffer.from(envelop.key, 'base64'));
+    const key = privateDecrypt(receiverRsaPriv, Buffer.from(envelop.key, 'base64'));
     const letterStr = decrypt(envelop.letter, key).toString('utf-8');
     const letter = JSON.parse(letterStr) as { name: string, ecdhSig: string, ecdh: string };
-    const verifier = crypto.createVerify('RSA-SHA512');
+    const verifier = createVerify('RSA-SHA512');
     verifier.update(letter.ecdh);
     if (!verifier.verify(senderRsaPub, letter.ecdhSig, 'base64')) {
       throw new Error();

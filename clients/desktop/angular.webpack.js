@@ -23,6 +23,7 @@ module.exports = (config, options) => {
   const IGNORES = [
     'crypto',
     'fs',
+    'fs/promises',
     'net',
     'path',
   ];

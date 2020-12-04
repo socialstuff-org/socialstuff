@@ -38,6 +38,8 @@ import { LogoutComponent } from './auth/logout/logout.component';
 import { LandingComponent } from './landing/landing.component';
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import { MessageBoxComponent } from './message-box/message-box.component';
+import {CallFunctionComponent} from './voice-communication/call-function/call-function.component';
+import { MicrophoneTestComponent } from './microphone-test/microphone-test.component';
 
 import { SettingsViewComponent } from './admin/settings-view/settings-view.component';
 import { NavigationContainerComponent } from './admin/SideNav/navigation-container/navigation-container.component';
@@ -113,7 +115,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ReasonsForReportComponent,
     InformationTypeTileComponent,
     DashboardViewComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    CallFunctionComponent,
+    MicrophoneTestComponent
   ],
   imports: [
     BrowserModule,

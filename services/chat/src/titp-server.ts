@@ -13,34 +13,45 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Chat.  If not, see <https://www.gnu.org/licenses/>.
 
-import {TitpServer}                      from '@trale/transport/server';
-import {}                                from '@trale/transport/client';
-import {UserKeyRegistry}                 from '@trale/transport/user-key-registry';
-import {CURVE}                                      from '@trale/transport/constants/crypto-algorithms';
-import {createECDH, generateKeyPairSync, KeyObject} from 'crypto';
+import {TitpServer}                                               from '@trale/transport/server';
+import {UserKeyRegistry}                                          from '@trale/transport/user-key-registry';
+import {CURVE}                                                    from '@trale/transport/constants/crypto-algorithms';
+import {createECDH, createPrivateKey, createPublicKey, KeyObject} from 'crypto';
+import * as fs                                                    from 'fs';
+import axios                                                      from 'axios';
+import * as path                                                  from 'path';
+import {DataResponse}                                             from '@socialstuff/utilities/responses';
 
-const _rsa = generateKeyPairSync('rsa', {modulusLength: 1024});
-const rsa = {
-  pub:  _rsa.publicKey,
-  priv: _rsa.privateKey,
+let rsa: {
+  pub: KeyObject,
+  priv: KeyObject,
 };
 
-const rsaKeys: {[key: string]:KeyObject} = {
+const rsaPrivateKeyPath = path.join(__dirname, '..', '..', 'priv.pem');
 
-}
+const priv = fs.readFileSync(rsaPrivateKeyPath).toString('utf-8');
+rsa = {
+  priv: createPrivateKey(priv),
+  pub:  createPublicKey(priv),
+};
+
+const rsaKeys: { [key: string]: KeyObject } = {
+  root: rsa.pub,
+};
 
 const userKeyRegistry: UserKeyRegistry = {
   async fetchRsa(username: string) {
-    return rsaKeys[username];
-  }
+    if (rsaKeys[username]) {
+      return rsaKeys[username];
+    }
+    const response = await axios.get<DataResponse<{ public_key: string }>>(process.env.SOCIALSTUFF_IDENTITY_ENDPOINT + '/public-key-of/' + username);
+    const key = createPublicKey(response.data.data.public_key);
+    rsaKeys[username] = key;
+    return key;
+  },
 };
 
-export const server = new TitpServer(rsa, createECDH(CURVE), userKeyRegistry);
+const ecdh = createECDH(CURVE);
+ecdh.generateKeys();
 
-(async() => {
-  await server.listen({
-    host: '::',
-    port: 8088
-  });
-  console.log('TITP Server running.');
-})();
+export const server = new TitpServer(rsa, ecdh, userKeyRegistry);

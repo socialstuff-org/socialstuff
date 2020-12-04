@@ -1,3 +1,5 @@
+import {Contact} from './Contact';
+
 export interface ChatMenuItem {
   id: number;
   username: string;
@@ -11,3 +13,12 @@ export const createEmptyChatMenuItem = (): ChatMenuItem => ({
   realName: '',
   acronym: '',
 });
+
+export function fromContact(c: Contact): ChatMenuItem {
+  return {
+    id: 0,
+    username: c.username,
+    realName: c.displayName,
+    acronym: '',
+  };
+}
