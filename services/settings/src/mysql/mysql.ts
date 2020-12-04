@@ -17,6 +17,7 @@ import * as mysql  from 'mysql2/promise';
 import {Request, response, Response} from 'express';
 import {RequestWithDependencies} from './request-with-dependencies';
 import {sharedConnection} from './client';
+import {RowDataPacket} from 'mysql2/promise';
 const prisma = new PrismaClient();
 
 /**
@@ -123,8 +124,44 @@ export async function deleteInviteCodeFromSQL(invCodeId: number) {
   return 200;
 }
 
-export async function getSecuritySettings() {
-  prisma.security_settings.findFirst()
+export async function findSecuritySettings(req: Request) {
+  await sharedConnection();
+  const db = (req as RequestWithDependencies).dbHandle;
+  const sql = 'SELECT * FROM security_settings';
+  const [[{
+    two_factor_auth_on,
+    two_factor_auth_phone,
+    two_factor_auth_email,
+    confirmed_emails_only,
+    individual_pwd_req_upper_case,
+    individual_pwd_req_on,
+    individual_pwd_req_number,
+    individual_pwd_req_special_char,
+    individual_pwd_req_reg_ex,
+    individual_pwd_req_reg_ex_string,
+    inv_only_on, inv_only_inv_only_by_adm
+  }]] = (await db.query<RowDataPacket[]>(sql, []));
+  const returnJson = {
+    two_factor_auth: {
+      on: two_factor_auth_on,
+      phone: two_factor_auth_phone,
+      email: two_factor_auth_email
+    },
+    confirmed_emails_only: confirmed_emails_only,
+    individual_pwd_req: {
+      upper_case: individual_pwd_req_upper_case,
+      on: individual_pwd_req_on,
+      number: individual_pwd_req_number,
+      special_char: individual_pwd_req_special_char,
+      reg_ex: individual_pwd_req_reg_ex,
+      reg_ex_string: individual_pwd_req_reg_ex_string
+    },
+    inv_only: {
+      on: inv_only_on,
+      inv_only_by_adm: inv_only_inv_only_by_adm
+    }
+  }
+  return returnJson;
 }
 
 export function createConnection() {

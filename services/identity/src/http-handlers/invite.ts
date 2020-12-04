@@ -5,30 +5,42 @@ import {rejectOnValidationError} from '@socialstuff/utilities/express';
 import {sharedConnection} from '../mysql';
 import {RowDataPacket} from 'mysql2/promise';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
-
+import {} from 'axios';
 export const middleware: ValidationChain[] = [
-  /*header('user_token')
+  header('user_token')
     .isString()
     .custom(async token => {
-      const request = require('request');
-      const options = {
-        method: 'GET',
-        url: 'http://127.0.0.1:3002/settings/security',
-        headers: {},
+      var axios = require('axios');
+
+      var config = {
+        method: 'get',
+        url: 'http://::1:3002/settings/security',
+        headers: { }
       };
-      let result: boolean = true;
-      await request(options, function (error: any, response: Response) {
-        if (error) throw new Error(error);
-        result = ('true' === response.get('inv_only.inv_only_by_admin') || ('1' === response.get('inv_only.inv_only_by_admin')));
-      });
-
+      let result;
+      axios(config)
+        .then(function (response:any) {
+          result = response.data.inv_only.inv_only_by_admin || ('1' === response.data.inv_only.inv_only_by_admin);
+        })
+        .catch(function (error:any) {
+          console.log(error);
+        });
       if (result) {
-        //TODO check if user is admin
-        //TODO use axios
+
+        //TODO check if user is admin for now just throw error:
+
+        const db = await sharedConnection();
+        const sql = 'SELECT is_admin FROM users INNER JOIN tokens t WHERE t.token = ?';
+        const [[{is_admin}]] = await db.query<RowDataPacket[]>(sql, [token]);
+        if (is_admin) {
+          return;
+        } else {
+          throw new Error('Invite code not validated by admin!');
+        }
+      } else{
+        return;
       }
-
-
-    }),*/
+    }),
   body('max_usage')
     .isInt()
     .withMessage('Pick an Integer as max_usage!'),
@@ -65,7 +77,7 @@ export const middleware: ValidationChain[] = [
 export const headerMiddleware: ValidationChain[] = [
   header('rows_per_page').notEmpty().isInt(),
   header('current_page').notEmpty().isInt(),
-  header('sort_param').isString(),
+  header('sort_param').optional().isString(),
 ];
 
 
@@ -120,9 +132,9 @@ async function deleteInviteCode(req: Request, res: Response) {
     console.log('executing query with id: ', invId);
     await db.query(sql, [invId]);
     console.log('query executed');
-    res.status(200).json();
+    res.status(200).json({msg: 'code deleted successfully!'});
   } catch (e) {
-    res.status(500).json();
+    res.status(500).json({error: 'Internal server error has occurred!'});
   }
   //const responseCode = await deleteInviteCodeFromSQL(invId);
 }
