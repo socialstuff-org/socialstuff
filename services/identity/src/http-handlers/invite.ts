@@ -7,25 +7,25 @@ import {RowDataPacket} from 'mysql2/promise';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
 
 export const middleware: ValidationChain[] = [
-/*  header("user_token")
+  /*header('user_token')
     .isString()
     .custom(async token => {
       const request = require('request');
-const options = {
-  method: 'GET',
-  url: 'http://127.0.0.1:3002/settings/security',
-  headers: {
-  }
-};
-let result:boolean = true;
-await request(options, function (error:any, response:Response) {
-  if (error) throw new Error(error);
-  result = ('true' === response.get('inv_only.inv_only_by_admin') || ('1' === response.get('inv_only.inv_only_by_admin')));
-});
+      const options = {
+        method: 'GET',
+        url: 'http://127.0.0.1:3002/settings/security',
+        headers: {},
+      };
+      let result: boolean = true;
+      await request(options, function (error: any, response: Response) {
+        if (error) throw new Error(error);
+        result = ('true' === response.get('inv_only.inv_only_by_admin') || ('1' === response.get('inv_only.inv_only_by_admin')));
+      });
 
-if (result) {
-  //TODO check if user is admin
-}
+      if (result) {
+        //TODO check if user is admin
+        //TODO use axios
+      }
 
 
     }),*/
@@ -34,6 +34,7 @@ if (result) {
     .withMessage('Pick an Integer as max_usage!'),
   body('times_used')
     .isInt()
+    .optional()
     .withMessage('pick an Integer as times_used!'),
   //body('expiration_date')
   //  .isDate(),
@@ -55,16 +56,16 @@ if (result) {
       } else {
         console.log('Rejecting promise');
         throw new Error('Already exists');
-        //return Promise.reject('Username is already taken!');
+      //return Promise.reject('Username is already taken!');
       }
 
-    })
+    }),
 ];
 
 export const headerMiddleware: ValidationChain[] = [
   header('rows_per_page').notEmpty().isInt(),
   header('current_page').notEmpty().isInt(),
-  header('sort_param').isString()
+  header('sort_param').isString(),
 ];
 
 
@@ -79,7 +80,7 @@ async function getAllInvitations(req: Request, res: Response) {
 
   const startIndex = (rpp * (currentPage)) - rpp;
   const endIndex = startIndex + rpp;
-  let response ;
+  let response;
   if (headers.sortparam !== null) {
     const sql = 'SELECT * FROM invite_code ORDER BY ?, id LIMIT ?,?';
     response = await db.query(sql, [headers.sort_param, startIndex, endIndex]);
@@ -91,16 +92,16 @@ async function getAllInvitations(req: Request, res: Response) {
   return res.status(200).json({ret: response[0]});
 }
 
-async function addInviteCode(req: Request, res: Response){
+async function addInviteCode(req: Request, res: Response) {
 
   const invCodeToAdd = req.body;
   console.log('Adding inv_code: ' + invCodeToAdd.code);
   try {
     const db = (req as RequestWithDependencies).dbHandle;
     const sql = 'INSERT INTO invite_code (max_usage,  times_used, expiration_date, active, code) VALUES (?, ?, ?, ?, ?);';
-    const sqlLastId =  'SELECT LAST_INSERT_ID() as id;';
+    const sqlLastId = 'SELECT LAST_INSERT_ID() as id;';
     console.log('About to insert data');
-    await db.query(sql, [invCodeToAdd.max_usage, invCodeToAdd.times_used, invCodeToAdd.expiration_date, invCodeToAdd.active, invCodeToAdd.code]);
+    await db.query(sql, [invCodeToAdd.max_usage, 0, invCodeToAdd.expiration_date, invCodeToAdd.active, invCodeToAdd.code]);
     console.log('data inserted');
     const [retId] = await db.query(sqlLastId);
 
@@ -112,14 +113,16 @@ async function addInviteCode(req: Request, res: Response){
 
 async function deleteInviteCode(req: Request, res: Response) {
   console.log('delete invite was called');
-  const invId = req.body.id;
+  const invId = req.headers.id;
   try {
     const sql = 'DELETE FROM invite_code WHERE id = ?';
     const db = (req as RequestWithDependencies).dbHandle;
+    console.log('executing query with id: ', invId);
     await db.query(sql, [invId]);
-    res.status(200);
+    console.log('query executed');
+    res.status(200).json();
   } catch (e) {
-    res.status(500);
+    res.status(500).json();
   }
   //const responseCode = await deleteInviteCodeFromSQL(invId);
 }
