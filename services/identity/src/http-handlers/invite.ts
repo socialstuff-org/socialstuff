@@ -7,40 +7,6 @@ import {RowDataPacket} from 'mysql2/promise';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
 import {} from 'axios';
 export const middleware: ValidationChain[] = [
-  header('user_token')
-    .isString()
-    .custom(async token => {
-      var axios = require('axios');
-
-      var config = {
-        method: 'get',
-        url: 'http://::1:3002/settings/security',
-        headers: { }
-      };
-      let result;
-      axios(config)
-        .then(function (response:any) {
-          result = response.data.inv_only.inv_only_by_admin || ('1' === response.data.inv_only.inv_only_by_admin);
-        })
-        .catch(function (error:any) {
-          console.log(error);
-        });
-      if (result) {
-
-        //TODO check if user is admin for now just throw error:
-
-        const db = await sharedConnection();
-        const sql = 'SELECT is_admin FROM users INNER JOIN tokens t WHERE t.token = ?';
-        const [[{is_admin}]] = await db.query<RowDataPacket[]>(sql, [token]);
-        if (is_admin) {
-          return;
-        } else {
-          throw new Error('Invite code not validated by admin!');
-        }
-      } else{
-        return;
-      }
-    }),
   body('max_usage')
     .isInt()
     .withMessage('Pick an Integer as max_usage!'),
@@ -74,10 +40,48 @@ export const middleware: ValidationChain[] = [
     }),
 ];
 
+
 export const headerMiddleware: ValidationChain[] = [
   header('rows_per_page').notEmpty().isInt(),
   header('current_page').notEmpty().isInt(),
   header('sort_param').optional().isString(),
+  header('user_token')
+    .isString()
+    .custom(async token => {
+      var axios = require('axios');
+      console.log('validating request');
+      var config = {
+        method: 'get',
+        url: 'http://[::1]:3002/settings/security',
+        headers: { }
+      };
+      const secSettingsInvOnlyByAdmin = await axios(config)
+        .then(function (response:any) {
+          console.log('Invite only by admin active: ', response.data.inv_only.inv_only_by_adm);
+          return response.data.inv_only.inv_only_by_adm;
+        })
+        .catch(function (error:any) {
+          console.log(error);
+        });
+      console.log('is an admin active: ', secSettingsInvOnlyByAdmin);
+      if (secSettingsInvOnlyByAdmin) {
+
+        //TODO check if user is admin for now just throw error:
+
+        const db = await sharedConnection();
+        const sql = 'SELECT is_admin AS isAdmin FROM users INNER JOIN tokens t WHERE t.token = ?';
+        const [[{isAdmin}]] = await db.query<RowDataPacket[]>(sql, [token]);
+        console.log('User admin: ', isAdmin);
+        if (isAdmin) {
+          return;
+        } else {
+          throw new Error('Invite code not validated by admin!');
+        }
+      } else{
+        console.log('secSettingsInvOnlyByAdmin was false');
+        return;
+      }
+    })
 ];
 
 
@@ -138,6 +142,8 @@ async function deleteInviteCode(req: Request, res: Response) {
   }
   //const responseCode = await deleteInviteCodeFromSQL(invId);
 }
+
+
 
 const inviteManagementInterface = Router();
 inviteManagementInterface.use(injectDatabaseConnectionIntoRequest);
