@@ -1,7 +1,7 @@
 import DateTimeFormat = Intl.DateTimeFormat;
 
 export interface InviteCode {
-  id: string,
+  id: number,
   code: string,
   max_usage: number,
   times_used: number,
@@ -11,7 +11,7 @@ export interface InviteCode {
 }
 
 export const defaultInviteCode = (): InviteCode => ({
-  id: '',
+  id: 0,
   code: '',
   max_usage: 0,
   times_used: 0,

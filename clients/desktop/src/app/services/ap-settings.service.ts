@@ -1,8 +1,9 @@
 import {Injectable}                      from '@angular/core';
 import {ApiService}                      from './api.service';
-import {HttpClient}                      from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {HttpErrorResponse, HttpResponse} from '../types';
 import {SecuritySettings} from '../admin/interfaces/SecuritySettings';
+import {InviteCode} from '../admin/interfaces/InviteCode';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,24 @@ export class AdminSettings {
 
   public setSecuritySettings(currentSettings): Promise<SecuritySettings> {
     return this.http.put<any>((this.api.remoteEndpoint() + '/settings/security'), currentSettings).toPromise();
+  }
 
+  public getInviteCodes(): Promise<any> {
+
+    let headers = new HttpHeaders().set('rows_per_page', '100');
+    headers = headers.append('current_page', '1');
+
+    return this.http.get<any>(this.api.remoteEndpoint() + '/invitations', {headers: headers}).toPromise();
+  }
+
+  public addInviteCode(inviteCode: InviteCode): Promise<any> {
+    return this.http.post<any>((this.api.remoteEndpoint() + '/invitations'), inviteCode).toPromise();
+  }
+
+  public deleteInviteCode(id: number): Promise<any> {
+    const body = {
+      id: id
+    };
+    return this.http.delete<any>((this.api.remoteEndpoint() + '/invitations'), body).toPromise();
   }
 }

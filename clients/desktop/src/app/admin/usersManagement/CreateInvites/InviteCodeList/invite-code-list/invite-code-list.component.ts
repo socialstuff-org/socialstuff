@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {InviteCode, defaultInviteCode} from '../../../../interfaces/InviteCode';
-import utils from '../../../../utils/utils';
+import {AdminSettings} from '../../../../../services/ap-settings.service';
+import {ApiService} from '../../../../../services/api.service';
 
 @Component({
   selector: 'app-invite-code-list',
@@ -10,17 +11,39 @@ import utils from '../../../../utils/utils';
 export class InviteCodeListComponent implements OnInit {
 
   public inviteCodes: Array<InviteCode> = []
+  public hostname = '127.0.0.1';
+  public port = 3000;
 
-  constructor() { }
+  constructor(
+    private adminSettings: AdminSettings,
+    private api: ApiService,
+  ) {
+  }
 
   ngOnInit(): void {
-    for (let i = 0; i < 10; i++) {
-      const newInvite = defaultInviteCode();
-      newInvite.code = utils.generateRandomCode(7);
-      newInvite.id = utils.generateRandomCode(7);
-      newInvite.expiration_date = new Date().toDateString();
-      this.inviteCodes.push(newInvite);
-    }
+    // for (let i = 0; i < 10; i++) {
+    //   const newInvite = defaultInviteCode();
+    //   newInvite.code = utils.generateRandomCode(7);
+    //   newInvite.id = utils.generateRandomCode(7);
+    //   newInvite.expiration_date = new Date().toDateString();
+    //   this.inviteCodes.push(newInvite);
+    // }
+
+    this.getInviteCodes();
+    this.reload.subscribe(() => {
+      this.getInviteCodes();
+    });
+  }
+  @Input() reload: EventEmitter<any> = new EventEmitter<any>()
+
+  public getInviteCodes(): any {
+    this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
+    return this.adminSettings.getInviteCodes().then((inviteCodes) => {
+      this.inviteCodes = inviteCodes.ret;
+      console.log(inviteCodes.ret);
+    }).catch(error => {
+      console.log(error);
+    });
   }
 
 }

@@ -10,27 +10,23 @@ import {Route} from '@angular/router';
 
 export class NavigationContainerComponent implements OnInit {
 
-  navigationItems = [];
+  private navigationItems = [];
 
 
 
   private add(children: Array<Route>): Array<any> {
-    const items = [];
-    children.forEach(route => {
-      if (!route.data.ignore) {
-        const navigationItem = {
-          path: route.data.parent ? `${route.data.parent}/${route.path}` : route.path,
-          name: route.data.name,
-          icon: route.data.icon,
-          subRoutes: []
-        };
-        if (route.children) {
-          navigationItem.subRoutes = this.add(route.children);
-        }
-        items.push(navigationItem);
+    return children.filter(route => !route.data.ignore).map(route => {
+      const navigationItem = {
+        path: route.data.parent ? `${route.data.parent}/${route.path}` : route.path,
+        name: route.data.name,
+        icon: route.data.icon,
+        subRoutes: []
+      };
+      if (route.children) {
+        navigationItem.subRoutes = this.add(route.children);
       }
+      return navigationItem;
     });
-    return items;
   }
 
   constructor() { }

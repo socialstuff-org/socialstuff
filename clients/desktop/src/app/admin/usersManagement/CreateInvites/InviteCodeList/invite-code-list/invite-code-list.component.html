@@ -16,5 +16,5 @@
   </tr>
 </table>
 <table>
-  <app-invite-code-row *ngFor="let inviteCode of inviteCodes" [inviteCode]="inviteCode"></app-invite-code-row>
+  <app-invite-code-row [reload]="reload" *ngFor="let inviteCode of inviteCodes" [inviteCode]="inviteCode"></app-invite-code-row>
 </table>

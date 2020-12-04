@@ -12,6 +12,6 @@
     {{inviteCode.times_used}}
   </td>
   <td class="action-td">
-    <button [class.spinner]="loading" class="delete-btn">Delete</button>
+    <button [class.spinner]="loading" (click)="openDialog(inviteCode.id)" class="delete-btn">Delete</button>
   </td>
 </tr>

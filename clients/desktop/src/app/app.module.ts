@@ -44,7 +44,6 @@ import { NavigationContainerComponent } from './admin/SideNav/navigation-contain
 import { NavigationItemComponent } from './admin/SideNav/navigation-item/navigation-item.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { SecurityComponent } from './admin/security/security.component';
-import { DashboardComponent } from './admin/dashboard/dashboard.component';
 import { CreateInviteComponent } from './admin/usersManagement/CreateInvites/create-invite/create-invite.component';
 import { ReportSettingsComponent } from './admin/usersManagement/ReportSystem/ReportSettings/report-settings/report-settings.component';
 import { ReportedUsersComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/reported-users/reported-users.component';
@@ -68,6 +67,9 @@ import { ReportReasonEntryComponent } from './admin/usersManagement/ReportSystem
 import { ReportListComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/report-list/report-list.component';
 import { ReportRowComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/report-row/report-row.component';
 import { ReasonsForReportComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/reasons-for-report/reasons-for-report.component';
+import { InformationTypeTileComponent } from './admin/Dashboard/information-type-tile/information-type-tile.component';
+import { DashboardViewComponent } from './admin/Dashboard/dashboard-view/dashboard-view.component';
+import { ConfirmDialogComponent } from './admin/core/confirm-dialog/confirm-dialog.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -95,7 +97,6 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     NavigationContainerComponent,
     NavigationItemComponent,
     SecurityComponent,
-    DashboardComponent,
     CreateInviteComponent,
     ReportSettingsComponent,
     ReportedUsersComponent,
@@ -109,7 +110,10 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ReportReasonEntryComponent,
     ReportListComponent,
     ReportRowComponent,
-    ReasonsForReportComponent
+    ReasonsForReportComponent,
+    InformationTypeTileComponent,
+    DashboardViewComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     BrowserModule,
