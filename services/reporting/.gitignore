@@ -1,0 +1,9 @@
+node_modules/
+lib/
+.migrate
+coverage/
+loin_modules/
+.env
+*.d.ts
+*.d.ts.map
+src/**/*.js
