@@ -15,7 +15,6 @@
 
 /* istanbul ignore file */
 
-import {createConnection} from './mongodb';
 // @ts-ignore
 import customEnv          from 'custom-env';
 import {delay}            from '@socialstuff/utilities/common';
@@ -33,7 +32,6 @@ export default (async () => {
     let retryConnection = true;
     while (retryConnection) {
       try {
-        await createConnection();
         retryConnection = false;
       } catch (e) {
         console.error('retrying initial connection...', e);
