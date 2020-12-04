@@ -12,7 +12,7 @@ import {RegisterComponent} from './auth/register/register.component';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'chatview/1',
     pathMatch: 'full',
   },
   {path: 'login', component: LoginComponent},
