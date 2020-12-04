@@ -35,10 +35,10 @@ export class AdminSettings {
     return this.http.post<any>((this.api.remoteEndpoint() + '/invitations'), inviteCode).toPromise();
   }
 
-  public deleteInviteCode(id: number): Promise<any> {
-    const body = {
-      id: id
-    };
-    return this.http.delete<any>((this.api.remoteEndpoint() + '/invitations'), body).toPromise();
-  }
+  // public deleteInviteCode(id: number): Promise<any> {
+  //   // const body = {
+  //   //   id: id
+  //   // };
+  //   // return this.http.delete<any>((this.api.remoteEndpoint() + '/invitations'), body).toPromise();
+  // }
 }
