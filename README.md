@@ -24,6 +24,3 @@ for users who are registered at a certain SocialStuff deployment.
 * Backend Developers:
   * Tobias Jansen
   * Jörn Neumeyer
-
-## Design
-Please refer the [design documents](docs/design.md) for more details.

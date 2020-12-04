@@ -1,0 +1,7 @@
+*.ts
+!*.d.ts
+!*.d.ts.map
+.idea/
+.vscode/
+src/
+coverage/

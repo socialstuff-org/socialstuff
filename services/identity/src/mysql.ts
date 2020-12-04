@@ -13,18 +13,21 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
-import * as mysql  from 'mysql2/promise';
+import * as mysql          from 'mysql2/promise';
 // @ts-ignore
-import migrate     from 'migrate';
-import {promisify} from 'util';
+import migrate             from 'migrate';
+import {promisify}         from 'util';
+import {ConnectionOptions} from 'mysql2';
 
-export function createConnection() {
-  return mysql.createConnection({
+export function createConnection(config: ConnectionOptions = {}) {
+  config = {
+    ...config,
     host:     process.env.MYSQL_HOST,
     user:     process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
-  });
+  };
+  return mysql.createConnection(config);
 }
 
 let _sharedConnection: Promise<mysql.Connection> | undefined;

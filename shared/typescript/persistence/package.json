@@ -1,0 +1,39 @@
+{
+  "name": "@trale/persistence",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.1.4",
+  "description": "The Trale secure persistence module.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "prepublishOnly": "tsc"
+  },
+  "author": {
+    "name": "Jörn Neumeyer",
+    "email": "contact@joern-neumeyer.de"
+  },
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "@socialstuff/utilities": "^0.6.0",
+    "argon2": "^0.27.0",
+    "rxjs": "^6.6.3",
+    "uuid": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.14",
+    "@types/node": "^14.6.4",
+    "@types/uuid": "^8.3.0",
+    "jest": "^26.5.2",
+    "ts-jest": "^26.4.1",
+    "typescript": "^4.0.3"
+  },
+  "jest": {
+    "transform": {
+      ".ts": "ts-jest"
+    },
+    "testRegex": ".*\\w+\\.(test|spec)\\.ts$",
+    "collectCoverage": true
+  }
+}

@@ -13,30 +13,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Request, Response}          from 'express';
-import {body}                       from 'express-validator';
-import {RowDataPacket}              from 'mysql2/promise';
-import {v1}                         from 'uuid';
-import {rejectOnValidationError}    from '@socialstuff/utilities/express';
-import {RequestWithDependencies}    from '../request-with-dependencies';
-import {hashHmac, verifyHashUnique} from '@socialstuff/utilities/security';
-import {DataResponse}               from '@socialstuff/utilities/responses';
-import { injectDatabaseConnectionIntoRequest } from '../utilities';
+import {Request, Response}                   from 'express';
+import {body}                                from 'express-validator';
+import {RowDataPacket}                       from 'mysql2/promise';
+import {v1}                                  from 'uuid';
+import {rejectOnValidationError}             from '@socialstuff/utilities/express';
+import {RequestWithDependencies}             from '../request-with-dependencies';
+import {hashHmac, verifyHashUnique}          from '@socialstuff/utilities/security';
+import {DataResponse}                        from '@socialstuff/utilities/responses';
+import {injectDatabaseConnectionIntoRequest} from '../utilities';
 
 const middleware = [
-  body('username').isString().custom(async (username: string) => {
-    if (!username) {
-      throw new Error();
-    }
-    if (username.length >= 5 && username.length <= 20 || username === 'root') {
-
-    } else {
-      throw new Error();
-    }
-  }).withMessage('This is not a valid username.'),
-  body('password').isString().isLength({min: 10, max: 40}).withMessage('This is not a valid password.'),
+  body('username').isString().isLength({min: 5, max: 20}).withMessage('This is not a valid username.'),
+  body('password').isString().isLength({min: 10, max: 50}).withMessage('This is not a valid password.'),
   rejectOnValidationError,
-  injectDatabaseConnectionIntoRequest
+  injectDatabaseConnectionIntoRequest,
 ];
 
 async function login(req: Request, res: Response) {

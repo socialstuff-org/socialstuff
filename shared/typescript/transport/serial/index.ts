@@ -29,7 +29,9 @@ export interface Serializable {
 
 export function serialize(foo: Serializable | SerializableField[]): Buffer {
   if (foo instanceof Array) {
-    return Buffer.concat(foo.map(x => serialize(x as any)));
+    const serializedElements = foo.map(x => serialize(x as any));
+    serializedElements.push(uInt32ToBuffer(serializedElements.length));
+    return Buffer.concat(serializedElements);
   } else {
     const result: Buffer[] = [];
     for (const name in foo) {
@@ -99,7 +101,6 @@ export function deserialize<T = any>(schema: DeserializationSchema, data: Buffer
       offset += elementLength;
       let value;
       if (schema[name].isArray) {
-        console.log('result', result);
         value = deserialize(schema[name].type as any, elementBuffer, true);
       } else {
         value = parseFieldBytes(schema[name].type, elementBuffer);

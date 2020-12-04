@@ -1,12 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import {createEmptyMessage, Message} from "../models/Message";
-import {ChatPartner, createEmptyChatPartner} from "../models/ChatPartner";
-import {UtilService} from "../services/util.service";
+import {Component, OnInit}                   from '@angular/core';
+import {Message}                             from '../models/Message';
+import {ChatPartner, createEmptyChatPartner} from '../models/ChatPartner';
+import {UtilService}                         from '../services/util.service';
+import {DebugService}                        from '../services/debug.service';
+import {ContactService}                      from '../services/contact.service';
+import {take}                                from '../../lib/functional';
 
 @Component({
-  selector: 'app-chat-view',
+  selector:    'app-chat-view',
   templateUrl: './chat-view.component.html',
-  styleUrls: ['./chat-view.component.scss']
+  styleUrls:   ['./chat-view.component.scss'],
 })
 export class ChatViewComponent implements OnInit {
 
@@ -15,6 +18,8 @@ export class ChatViewComponent implements OnInit {
 
   constructor(
     private utils: UtilService,
+    private debug: DebugService,
+    private contacts: ContactService,
   ) {
     this.messages = [];
     this.chatPartner = createEmptyChatPartner();
@@ -22,57 +27,12 @@ export class ChatViewComponent implements OnInit {
     this.chatPartner.username = 'maxmustermann99';
     this.chatPartner.imageUrl = 'https://cdn.code-lake.com/mergery/users/vanderzee.jpg';
     this.chatPartner.acronym = this.utils.generateAcronym(this.chatPartner.realName);
-
-    // sample data for UI testing
-    const message = createEmptyMessage();
-    message.message = 'lorem ipsum';
-    message.time = '20:01';
-    message.isSender = true;
-    message.sent = true;
-    this.messages.push(message);
-
-    const secondMessage = createEmptyMessage();
-    secondMessage.message = 'test text for some GUI testing';
-    secondMessage.time = '20:04';
-    secondMessage.isSender = true;
-    secondMessage.delivered = true;
-    this.messages.push(secondMessage);
-
-    const thirdMessage = createEmptyMessage();
-    thirdMessage.message = 'lorem asdkasdnmas das dnas f asdasda asdasdas as.';
-    thirdMessage.time = '20:12';
-    thirdMessage.isSender = false;
-    thirdMessage.seen = true;
-    this.messages.push(thirdMessage);
-
-    const fourthMessage = createEmptyMessage();
-    fourthMessage.message = 'pin k 1n2 31 lkf as asdsa.';
-    fourthMessage.time = '20:30';
-    fourthMessage.isSender = true;
-    fourthMessage.seen = true;
-    this.messages.push(fourthMessage);
-
-    const fifthMessage = createEmptyMessage();
-    fifthMessage.message = 'This is some longer chat message so we can test proper sizing on the chat bubbles.';
-    fifthMessage.time = '20:41';
-    fifthMessage.isSender = false;
-    fifthMessage.delivered = true;
-    this.messages.push(fifthMessage);
-
-    for (let  i = 0; i < 30; i++) {
-      let message = createEmptyMessage();
-      message.message = 'This is some longer chat message so we can test proper sizing on the chat bubbles.';
-      message.time = '20:41';
-      message.isSender = Math.random() >= 0.5;
-      message.delivered = true;
-      this.messages.push(message);
-    }
-
-    // later on the messages will be retrieved by the server in the correct order
-    this.messages = this.messages.slice().reverse();
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    const chat = await this.contacts.openChat(undefined);
+    const messages = take(chat.records());
+    const a = messages(3);
   }
 
 }

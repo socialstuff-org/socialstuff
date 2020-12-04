@@ -66,6 +66,14 @@ html, body {
   }
 }
 
+.default-button {
+  background-color: $coralRed;
+  color: $plainWhite;
+  border: none;
+  border-radius: 3px;
+  height: 40px;
+}
+
 // MAT INPUT STYLES
 mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-field-wrapper > div.mat-form-field-flex > div.mat-form-field-infix  { padding: 0.4em 0px }
 mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-field-wrapper > div.mat-form-field-flex > div.mat-form-field-infix > span.mat-form-field-label-wrapper { top: -1.5em; }
