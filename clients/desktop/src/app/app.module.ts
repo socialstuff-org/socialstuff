@@ -39,6 +39,7 @@ import { LandingComponent } from './landing/landing.component';
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import { MessageBoxComponent } from './message-box/message-box.component';
 import {CallFunctionComponent} from './voice-communication/call-function/call-function.component';
+import { MicrophoneTestComponent } from './microphone-test/microphone-test.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -46,7 +47,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent, ContactInfoComponent, LogoutComponent, LandingComponent, MessageBoxComponent, CallFunctionComponent],
+  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent, ContactInfoComponent, LogoutComponent, LandingComponent, MessageBoxComponent, CallFunctionComponent, MicrophoneTestComponent],
   imports: [
     BrowserModule,
     FormsModule,

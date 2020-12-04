@@ -22,7 +22,8 @@ const routes: Routes = [
   {path: 'landing', component: LandingComponent},
   {path: 'chatview/:id', component: ChatViewComponent},
   {path: 'chap-app', component: ChatAppComponent},
-  {path: 'call-function', component: CallFunctionComponent}
+  {path: 'call-function', component: CallFunctionComponent},
+  {path: 'microphone-test', component: MicrophoneTestComponent}
   // {
   //   path: '**',
   //   component: PageNotFoundComponent
