@@ -22,7 +22,7 @@ async function getAllReportReasons(req: Request, res: Response) {
 async function editReportReason(req: Request, res: Response) {
   const max_report_violations = req.body.max_report_violations;
   const reason = req.body.reason;
-  const sql = 'UPDATE report_reaon SET reason = ?, max_report_violations = ? WHERE id = ?;';
+  const sql = 'UPDATE report_reason SET reason = ?, max_report_violations = ? WHERE id = ?;';
   const db = (req as RequestWithDependencies).dbHandle;
   try {
     await db.query(sql, [reason, max_report_violations, req.body.id]);
@@ -31,8 +31,8 @@ async function editReportReason(req: Request, res: Response) {
     throw new Error('Something went wrong!');
   }
 
-  const retSQL = 'SELECT * FROM report_reason;';
-  res.status(200).json(await db.query(retSQL));
+  const retSQL = 'SELECT * FROM report_reason WHERE id = ?;';
+  res.status(200).json((await db.query(retSQL, [req.body.id]))[0]);
 
 }
 
