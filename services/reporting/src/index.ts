@@ -36,7 +36,7 @@ const APP_HOST = process.env.APP_HOST || '::1';
     next();
   });
 
-  app.use('/', router);
+  app.use('/reporting', router);
 
   try {
     const appListen: (port: number, host: string) => Promise<void> = util.promisify(app.listen.bind(app));
@@ -45,6 +45,6 @@ const APP_HOST = process.env.APP_HOST || '::1';
     console.error(err);
     return;
   }
-  console.log(`Social Stuff Identity service running on ${APP_HOST}:${APP_PORT}.`);
+  console.log(`Social Stuff Reporting service running on ${APP_HOST}:${APP_PORT}.`);
 })();
 

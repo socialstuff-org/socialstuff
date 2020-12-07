@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit} from '@angular/core';
 import utils from '../../../../../utils/utils';
 import { ReportReason, createReportReason } from '../../../../../interfaces/ReportReason';
 import {AdminSettings} from '../../../../../../services/ap-settings.service';
@@ -12,8 +12,10 @@ import {ApiService} from '../../../../../../services/api.service';
 export class ReportReasonsComponent implements OnInit {
 
   public reportReasons: Array<ReportReason> = [];
-  public hostname = '127.0.0.1';
-  public port = 3000;
+  public hostname = '[::1]';
+  public port = 3003;
+
+  public reload: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(
     private adminSettings: AdminSettings,
@@ -22,16 +24,14 @@ export class ReportReasonsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    for (let i = 0; i < 10; i++) {
-      const reason = utils.generateRandomCode(7);
-      const maxViolations = Math.round(Math.random() * 10);
-      const newReason = createReportReason(reason, reason, maxViolations);
-      this.reportReasons.push(newReason);
-    }
-    console.log(this.reportReasons);
+    this.getReportReasons();
+
+    this.reload.subscribe(() => {
+      this.getReportReasons();
+    });
   }
 
-  public getInviteCodes(): any {
+  public getReportReasons(): any {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     return this.adminSettings.getReportReasons().then((reportReasons) => {
       this.reportReasons = reportReasons;

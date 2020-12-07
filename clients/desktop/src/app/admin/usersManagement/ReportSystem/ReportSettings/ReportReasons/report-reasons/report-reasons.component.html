@@ -1,6 +1,6 @@
 <div class="reasons-container">
   <app-report-reason-entry *ngFor="let reportReason of reportReasons" [reportReason]="reportReason"></app-report-reason-entry>
   <div>
-    <app-report-reason-entry [newEntry]="true"></app-report-reason-entry>
+    <app-report-reason-entry [reload]="reload" [newEntry]="true"></app-report-reason-entry>
   </div>
 </div>

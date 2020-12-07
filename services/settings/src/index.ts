@@ -6,7 +6,7 @@ customEnv.env();
 import router from './router';
 
 const APP_PORT = parseInt(process.env.APP_PORT || '3002');
-const APP_HOST = process.env.APP_HOST || '0.0.0.0';
+const APP_HOST = process.env.APP_HOST || '::1';
 
 const cors = require('cors');
 const app = express();

@@ -1,17 +1,18 @@
 import {Request, Response, Router} from 'express';
 import {RequestWithDependencies} from '../request-with-dependencies';
-import {body, ValidationChain} from 'express-validator';
+import {body, header, ValidationChain} from 'express-validator';
 import {rejectOnValidationError} from '@socialstuff/utilities/express';
 import {sharedConnection} from '../mysql';
 import {RowDataPacket} from 'mysql2/promise';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
-
+import {} from 'axios';
 export const middleware: ValidationChain[] = [
   body('max_usage')
     .isInt()
     .withMessage('Pick an Integer as max_usage!'),
   body('times_used')
     .isInt()
+    .optional()
     .withMessage('pick an Integer as times_used!'),
   //body('expiration_date')
   //  .isDate(),
@@ -19,6 +20,9 @@ export const middleware: ValidationChain[] = [
     .isBoolean(),
   body('code')
     .isString().custom(async code => {
+      if (code === '') {
+        throw new Error('Code was empty');
+      }
       console.log('checking code: ' + code);
       const db = await sharedConnection();
       const sql = 'SELECT COUNT(*) AS numcodes FROM invite_code WHERE code = ?;';
@@ -30,9 +34,51 @@ export const middleware: ValidationChain[] = [
       } else {
         console.log('Rejecting promise');
         throw new Error('Already exists');
-        //return Promise.reject('Username is already taken!');
+      //return Promise.reject('Username is already taken!');
       }
 
+    }),
+];
+
+
+export const headerMiddleware: ValidationChain[] = [
+  header('rows_per_page').notEmpty().isInt(),
+  header('current_page').notEmpty().isInt(),
+  header('sort_param').optional().isString(),
+  header('user_token')
+    .isString()
+    .custom(async token => {
+      var axios = require('axios');
+      console.log('validating request');
+      var config = {
+        method: 'get',
+        url: 'http://[::1]:3002/settings/security',
+        headers: { }
+      };
+      let secSettingsInvOnlyByAdmin = null;
+      try {
+        secSettingsInvOnlyByAdmin = await axios(config);
+      } catch (e) {
+        throw new Error('Admin settings could not be fetched!');
+      }
+      console.log('is an admin active: ', secSettingsInvOnlyByAdmin);
+      if (secSettingsInvOnlyByAdmin) {
+
+        //TODO check if user is admin for now just throw error:
+
+        const db = await sharedConnection();
+        const sql = 'SELECT is_admin AS isAdmin FROM users INNER JOIN tokens t WHERE t.token = ?';
+        const [[{isAdmin}]] = await db.query<RowDataPacket[]>(sql, [token]);
+        console.log('User admin: ', isAdmin);
+        if (isAdmin) {
+          return;
+        } else {
+          throw new Error('Invite code not validated by admin, please provide a valid invite code!');
+        }
+      } else{
+        console.log('secSettingsInvOnlyByAdmin was false');
+        return;
+      }
     })
 ];
 
@@ -40,79 +86,81 @@ export const middleware: ValidationChain[] = [
 async function getAllInvitations(req: Request, res: Response) {
   const db = (req as RequestWithDependencies).dbHandle; //await sharedConnection();
   const headers = req.headers;
-  //const db = (req as RequestWithDependencies).dbHandle;
 
   console.log('getting all invitations');
-  //console.log(headers);
   const rpp = Number(headers.rows_per_page);
   console.log('rows per page: ', rpp);
   const currentPage = Number(headers.current_page);
 
   const startIndex = (rpp * (currentPage)) - rpp;
   const endIndex = startIndex + rpp;
-  console.log('current page:  ', currentPage);
-  console.log('');
-  const sql = 'SELECT * FROM invite_code LIMIT ?,?';
-  const response1 = await db.query(sql, [startIndex, endIndex]);
+  let response;
+  if (headers.sortparam !== null) {
+    const sql = 'SELECT * FROM invite_code ORDER BY ?, id LIMIT ?,?';
+    try {
 
-  return res.status(200).json({ret: response1[0]});
-}
-
-async function editInviteCode(req:Request, res: Response) {
-  const newInvCode = req.body;
-  const codeId = newInvCode.id;
-  console.log('test');
-  try {
-    const db = (req as RequestWithDependencies).dbHandle;
-
-    const sql = 'UPDATE invite_code SET max_usage = ?, times_used = ?, expiration_date = ?, active = ?, code = ? WHERE id = ?;';
-
-    await db.query(sql, [newInvCode.max_usage, newInvCode.times_used, newInvCode.expiration_date, newInvCode.active, newInvCode.code, codeId]);
-    console.log('Put invite code called');
-    res.status(200);
-  } catch (e) {
-    console.log(e);
-    res.status(500);
-
+      response = await db.query(sql, [headers.sort_param, startIndex, endIndex]);
+    } catch (e) {
+      console.log(e);
+      throw new Error('Invalid sort parameter!');
+    }
+  } else {
+    const sql = 'SELECT * FROM invite_code ORDER BY id LIMIT ?,?';
+    response = await db.query(sql, [startIndex, endIndex]);
   }
+
+  return res.status(200).json({ret: response[0]});
 }
 
-async function addInviteCode(req: Request, res: Response){
+async function addInviteCode(req: Request, res: Response) {
+
   const invCodeToAdd = req.body;
   console.log('Adding inv_code: ' + invCodeToAdd.code);
   try {
     const db = (req as RequestWithDependencies).dbHandle;
-    const sql = 'INSERT INTO invite_code (max_usage,  times_used, expiration_date, active, code) VALUES (?, ?, ?, ?, ?);';
-    const sqlLastId =  'SELECT LAST_INSERT_ID() as id;';
-    console.log('About to insert data');
-    await db.query(sql, [invCodeToAdd.max_usage, invCodeToAdd.times_used, invCodeToAdd.expiration_date, invCodeToAdd.active, invCodeToAdd.code]);
-    console.log('data inserted');
-    const [retId] = await db.query(sqlLastId);
+    await db.beginTransaction();
+    let retId;
+    try {
 
+      const sql = 'INSERT INTO invite_code (max_usage,  times_used, expiration_date, active, code) VALUES (?, ?, ?, ?, ?);';
+      const sqlLastId = 'SELECT LAST_INSERT_ID() as id;';
+      console.log('About to insert data');
+      await db.query(sql, [invCodeToAdd.max_usage, 0, invCodeToAdd.expiration_date, invCodeToAdd.active, invCodeToAdd.code]);
+      console.log('data inserted');
+      [retId] = await db.query(sqlLastId);
+      await db.commit();
+    } catch (e) {
+      console.log(e);
+      throw new Error('Transaction failed');
+    }
     res.status(200).json(retId);
   } catch (e) {
-    res.status(500);
+    res.status(500).end();
   }
 }
 
 async function deleteInviteCode(req: Request, res: Response) {
-  const invId = req.body.id;
+  console.log('delete invite was called');
+  const invId = req.headers.id;
   try {
     const sql = 'DELETE FROM invite_code WHERE id = ?';
     const db = (req as RequestWithDependencies).dbHandle;
+    console.log('executing query with id: ', invId);
     await db.query(sql, [invId]);
-    res.status(200);
+    console.log('query executed');
+    res.status(200).json({msg: 'code deleted successfully!'});
   } catch (e) {
-    res.status(500);
+    res.status(500).json({error: 'Internal server error has occurred!'});
   }
   //const responseCode = await deleteInviteCodeFromSQL(invId);
 }
 
+
+
 const inviteManagementInterface = Router();
 inviteManagementInterface.use(injectDatabaseConnectionIntoRequest);
 
-inviteManagementInterface.get('/', getAllInvitations);
-inviteManagementInterface.put('/', editInviteCode);
+inviteManagementInterface.get('/', headerMiddleware, rejectOnValidationError, getAllInvitations);
 inviteManagementInterface.post('/', middleware, rejectOnValidationError, addInviteCode);
 inviteManagementInterface.delete('/', deleteInviteCode);
 

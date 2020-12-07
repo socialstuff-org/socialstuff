@@ -14,12 +14,10 @@
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 import {PrismaClient} from "@prisma/client"
 import * as mysql  from 'mysql2/promise';
-// @ts-ignore
-import migrate     from 'migrate';
-import {log, promisify} from 'util';
 import {Request, response, Response} from 'express';
-import DateTimeFormat = Intl.DateTimeFormat;
-
+import {RequestWithDependencies} from './request-with-dependencies';
+import {sharedConnection} from './client';
+import {RowDataPacket} from 'mysql2/promise';
 const prisma = new PrismaClient();
 
 /**
@@ -41,7 +39,7 @@ export async function getReportReasons() {
  * @return 201 if insertion was successfull, 409 if report reason has already been detected in the database
  */
 //TODO use different signature
-export async function addReportReason(req: Request, res:Response) {
+export async function insertReportReason(req: Request, res:Response) {
   const body = req.body;
   console.log(req.body);
   //let existingReasons = [{a: "a"}];
@@ -56,12 +54,7 @@ export async function addReportReason(req: Request, res:Response) {
       max_report_violations: 5,
       report: {create: {}}
     }
-  }).catch(e => {
-    //throw e
-    return 409;
-  }).finally(async () => {
-      await prisma.$disconnect();
-    });
+  });
   return 201;
 }
 
@@ -91,13 +84,6 @@ export async function getAllInviteCodesFromSQL(rowsPerPage:number, currentPage:n
     }
   }
 }
-let invite_code = {
-  active: true,
-  expiration_date: "",
-  max_usage: 5,
-  times_used: 0,
-  code: "abcdef"
-};
 
 export async function updateInviteCodeInSQL(id: number, data: any) {
   await prisma.invite_code.update({where: {
@@ -108,12 +94,7 @@ export async function updateInviteCodeInSQL(id: number, data: any) {
                                expiration_date: new Date(data.expiration_date),
                                max_usage: data.max_usage,
                                code: data.code
-                             }})
-    .catch(e => {
-      throw e
-    }).finally(async () => {
-      await prisma.$disconnect();
-    });
+                             }});
   return 201;
 }
 //Todo the request keeps looping here. Cant figure out why. Insertion is successful but nothing is returned
@@ -127,25 +108,92 @@ export async function addInviteCodeToSQL(invCodeToAdd: any) {
         expiration_date: new Date(invCodeToAdd.expiration_date),
         active: invCodeToAdd.active
       }
-    })
-  .catch(e => {
-    console.log("Insert not successful");
-    //return 409;
-    throw e
-  }).finally(async () => {
-    await prisma.$disconnect();
-  });
+    });
   return 201;
 }
 
 export async function deleteInviteCodeFromSQL(invCodeId: number) {
-  prisma.invite_code.delete({where: {id: invCodeId}})
-    .catch(e => {
-      throw e
-    }).finally(async () => {
-      await prisma.$disconnect();
-  })
+  prisma.invite_code.delete({where: {id: invCodeId}});
   return 200;
+}
+
+
+export async function findSecuritySettings(db: mysql.Connection) {
+  await sharedConnection();
+  const sql = 'SELECT * FROM security_settings';
+  const [[{
+    two_factor_auth_on,
+    two_factor_auth_phone,
+    two_factor_auth_email,
+    confirmed_emails_only,
+    individual_pwd_req_upper_case,
+    individual_pwd_req_on,
+    individual_pwd_req_number,
+    individual_pwd_req_special_char,
+    individual_pwd_req_reg_ex,
+    individual_pwd_req_reg_ex_string,
+    inv_only_on, inv_only_inv_only_by_adm
+  }]] = (await db.query<RowDataPacket[]>(sql, []));
+  const returnJson = {
+    two_factor_auth: {
+      on: two_factor_auth_on,
+      phone: two_factor_auth_phone,
+      email: two_factor_auth_email
+    },
+    confirmed_emails_only: confirmed_emails_only,
+    individual_pwd_req: {
+      upper_case: individual_pwd_req_upper_case,
+      on: individual_pwd_req_on,
+      number: individual_pwd_req_number,
+      special_char: individual_pwd_req_special_char,
+      reg_ex: individual_pwd_req_reg_ex,
+      reg_ex_string: individual_pwd_req_reg_ex_string
+    },
+    inv_only: {
+      on: inv_only_on,
+      inv_only_by_adm: inv_only_inv_only_by_adm
+    }
+  }
+  return returnJson;
+}
+
+export function createConnection() {
+  return mysql.createConnection({
+    host:     process.env.MYSQL_HOST,
+    user:     process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
+  });
+}
+
+export async function setSecuritySettings(settings:any, db: mysql.Connection) {
+  await sharedConnection();
+  const sql = 'UPDATE security_settings SET two_factor_auth_on = ?, two_factor_auth_email = ?, two_factor_auth_phone = ?, confirmed_emails_only = ?, individual_pwd_req_upper_case = ?, individual_pwd_req_on = ?, individual_pwd_req_number = ?, individual_pwd_req_special_char = ?, individual_pwd_req_reg_ex = ?, individual_pwd_req_reg_ex_string = ?, inv_only_on = ?, inv_only_inv_only_by_adm = ?;';
+  console.log(
+    "settings.two_factor_auth.email", settings.two_factor_auth.email,
+    "settings.two_factor_auth.phone", settings.two_factor_auth.phone,
+    "settings.confirmed_emails_only", settings.confirmed_emails_only,
+    "settings.individual_pwd_req.upper_case", settings.individual_pwd_req.upper_case,
+    "settings.individual_pwd_req.on", settings.individual_pwd_req.on,
+    "settings.individual_pwd_req.number", settings.individual_pwd_req.number,
+    "settings.individual_pwd_req.special_char", settings.individual_pwd_req.special_char,
+    "settings.individual_pwd_req.reg_ex", settings.individual_pwd_req.reg_ex,
+    "settings.individual_pwd_req.reg_ex_string", settings.individual_pwd_req.reg_ex_string,
+    "settings.inv_only.on", settings.inv_only.on,
+    "settings.inv_only.inv_only_by_adm", settings.inv_only.inv_only_by_adm)
+
+  return await db.query(sql, [settings.two_factor_auth.on,
+    settings.two_factor_auth.email,
+    settings.two_factor_auth.phone,
+    settings.confirmed_emails_only,
+    settings.individual_pwd_req.upper_case,
+    settings.individual_pwd_req.on,
+    settings.individual_pwd_req.number,
+    settings.individual_pwd_req.special_char,
+    settings.individual_pwd_req.reg_ex,
+    settings.individual_pwd_req.reg_ex_string,
+    settings.inv_only.on,
+    settings.inv_only.inv_only_by_adm]);
 }
 //tReports().catch(e => {
 //    throw e

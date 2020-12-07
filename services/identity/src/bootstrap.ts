@@ -23,7 +23,6 @@ import {v1}                                                  from 'uuid';
 import fs                                                    from 'fs';
 import {createConnection, rebuildDatabase, sharedConnection} from './mysql';
 import {delay}                                               from '@socialstuff/utilities/common';
-import {hashHmac}                                            from '@socialstuff/utilities/security';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env();
@@ -77,12 +76,10 @@ export default (async () => {
   console.log('seeding some data...');
   for (let i = 0; i < 5; ++i) {
     const id = v1().replace(/-/g, '');
-    const token = await hashHmac(id);
-    await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
+    //const token = await hashHmac(id);
+    //await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
     console.log('sample invite code:      ', id);
   }
-  const dump = await fs.promises.readFile(path.join(__dirname, '..', 'identity-dump.sql'));
-  await db.query(dump.toString('utf8'));
   await db.end();
   await sharedConnection();
   console.log('finished db initialization');
