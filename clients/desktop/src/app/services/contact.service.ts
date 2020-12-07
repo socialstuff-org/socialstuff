@@ -2,7 +2,6 @@ import {Injectable}                              from '@angular/core';
 import {Message}                                 from '../models/Message';
 import {CryptoStorageService}                    from './crypto-storage.service';
 import {Contact, ContactWithLastMessage}         from '../models/Contact';
-import {TextRecordStorage}                       from '@trale/persistence/crypto-storage';
 import {createHash, createHmac, createPublicKey} from 'crypto';
 import {ChatProperties}                          from '../models/ChatProperties';
 import * as fs                                   from 'fs';
@@ -17,7 +16,6 @@ export class ContactService {
     return this._isLoaded;
   }
 
-  private _contactStorage: TextRecordStorage;
   private _contacts: Contact[] = [];
   private _isLoaded = new Subject<void>();
 
@@ -25,24 +23,7 @@ export class ContactService {
     private storage: CryptoStorageService,
   ) {
     storage.isLoaded.subscribe(async () => {
-      if (this._contactStorage) {
-        await this._contactStorage.close();
-      }
-      const contactsPath = path.join(storage.path, 'contacts.txt');
-      let contactsExist = true;
-      try {
-        const stat = await fs.promises.stat(contactsPath);
-        if (stat.size < 2) {
-          contactsExist = false;
-        }
-      } catch {
-        await fs.promises.writeFile(contactsPath, '');
-        contactsExist = false;
-      }
-      this._contactStorage = await this.storage.storage.openTextRecordStorage(['contacts.txt']);
-      if (contactsExist) {
-        await this._loadContacts();
-      }
+      await this._loadContacts();
       this._isLoaded.next();
     });
   }
@@ -52,7 +33,7 @@ export class ContactService {
    * This method has to be called between session of the same user, in order to avoid dangling (open) file descriptors.
    */
   public async unLoad() {
-    await this._contactStorage.close();
+
   }
 
   /**
@@ -60,26 +41,21 @@ export class ContactService {
    * @private
    */
   private async _loadContacts() {
-    const usernames = [];
-    for await (const r of this._contactStorage.records()) {
-      usernames.push(r.toString('utf-8'));
+    const contactBaseDirectory = path.join(this.storage.storage.storageDirectory, 'chats');
+    const contactHashes = await fs.promises.readdir(contactBaseDirectory);
+    if (contactHashes.length === 0) {
+      return;
     }
-    const contactPromises = usernames.map(async username => {
-      const hash = createHmac('sha512', this.storage.masterKey);
-      hash.update(username);
-      const usernameHash = hash.digest('hex');
-      const propertiesContent = await this.storage.storage.loadFileContent(['chats', usernameHash, 'chat.properties']);
-      const properties = JSON.parse(propertiesContent.toString('utf-8')) as ChatProperties;
-      const contact: Contact = {
-        username,
-        displayName:     properties.customDisplayName,
-        conversationKey: Buffer.from(properties.conversationKey, 'base64'),
-        rsaPublicKey:    createPublicKey(properties.rsaPublicKey),
-        usernameHash,
-      };
-      return contact;
-    });
-    this._contacts = await Promise.all(contactPromises);
+    const contactPropertiesBuffers = await Promise.all<Buffer>(contactHashes.map(name => this.storage.storage.loadFileContent(['chats', name, 'chat.properties'])));
+    const contactProperties = contactPropertiesBuffers.map<ChatProperties>(props => JSON.parse(props.toString('utf8')));
+    const contacts = contactProperties.map<Contact>((props, i) => ({
+      username:        props.username,
+      displayName:     props.customDisplayName,
+      conversationKey: Buffer.from(props.conversationKey, 'base64'),
+      usernameHash:    contactHashes[i],
+      rsaPublicKey:    createPublicKey(props.rsaPublicKey),
+    }));
+    this._contacts = contacts;
   }
 
   /**
@@ -179,10 +155,10 @@ export class ContactService {
       rsaPublicKey:      contact.rsaPublicKey.export({format: 'pem', type: 'pkcs1'}).toString('utf8'),
       conversationKey:   contact.conversationKey.toString('base64'),
       customDisplayName: contact.displayName,
+      username:          contact.username,
     };
     const serializedProperties = Buffer.from(JSON.stringify(properties), 'utf8');
     await this.storage.storage.persistFileContent(['chats', usernameHash, 'chat.properties'], serializedProperties);
-    await this._contactStorage.addRecord(Buffer.from(contact.username, 'utf-8'));
   }
 
   /**
@@ -195,10 +171,11 @@ export class ContactService {
       return;
     }
     const properties: ChatProperties = {
-      rsaPublicKey: contact.rsaPublicKey.export({ type: 'pkcs1', format: 'pem' }).toString(),
+      rsaPublicKey:      contact.rsaPublicKey.export({type: 'pkcs1', format: 'pem'}).toString(),
       customDisplayName: contact.displayName,
-      conversationKey: contact.conversationKey.toString('base64'),
-    }
+      conversationKey:   contact.conversationKey.toString('base64'),
+      username:          contact.username,
+    };
     const serializedProperties = Buffer.from(JSON.stringify(properties), 'utf8');
     await this.storage.storage.persistFileContent(['chats', contact.usernameHash, 'chat.properties'], serializedProperties);
   }

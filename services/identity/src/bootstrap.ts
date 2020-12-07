@@ -67,7 +67,7 @@ export default (async () => {
     return;
   }
 
-  const ecdh = crypto.createECDH('secp256k1');
+  const ecdh = crypto.createECDH('secp384r1');
   ecdh.generateKeys();
   process.env.ECDH_PRIVATE_KEY = ecdh.getPrivateKey().toString('base64');
 
