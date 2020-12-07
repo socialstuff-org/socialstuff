@@ -32,4 +32,5 @@ async function editReportReason(req: Request, res: Response) {
 reportReasonHandler.use(injectProcessEnvironmentIntoRequest);
 reportReasonHandler.get('/', getAllReportReasons);
 reportReasonHandler.put('/', middleware, editReportReason);
+
 export default reportReasonHandler;
