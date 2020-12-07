@@ -23,12 +23,13 @@ async function editReportReason(req: Request, res: Response) {
   const max_report_violations = req.body.max_report_violations;
   const reason = req.body.reason;
   const sql = 'UPDATE report_reason SET reason = ?, max_report_violations = ? WHERE id = ?;';
+  console.log(sql);
   const db = (req as RequestWithDependencies).dbHandle;
   try {
     await db.query(sql, [reason, max_report_violations, req.body.id]);
   } catch (e) {
     console.log(e);
-    throw new Error('Something went wrong!');
+    res.status(500).end();
   }
 
   const retSQL = 'SELECT * FROM report_reason WHERE id = ?;';
