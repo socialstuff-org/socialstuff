@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {delay}             from '@socialstuff/utilities/common';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {delay}                                    from '@socialstuff/utilities/common';
 
 @Component({
   selector:    'app-microphone-test',
@@ -8,7 +8,10 @@ import {delay}             from '@socialstuff/utilities/common';
 })
 export class MicrophoneTestComponent implements OnInit {
 
-  private recordingBuffer: any[] = [];
+  private recordingFinishedEvent: BlobEvent;
+
+  @ViewChild('audioPlayer')
+  private audioPlayer: ElementRef<HTMLAudioElement>;
 
   constructor() {
   }
@@ -20,7 +23,7 @@ export class MicrophoneTestComponent implements OnInit {
     const microphone = await navigator.mediaDevices.getUserMedia({audio: true});
     this.recorder = new MediaRecorder(microphone);
     this.recorder.addEventListener('dataavailable', data => {
-      this.recordingBuffer.push(data);
+      this.recordingFinishedEvent = data;
     });
   }
 
@@ -29,12 +32,11 @@ export class MicrophoneTestComponent implements OnInit {
       this.recorder.start();
       this.recordOption = 'Stop';
     } else {
-      this.recorder.requestData();
       this.recorder.stop();
       this.recordOption = 'Start';
       await delay(0);
-      console.log(this.recordingBuffer);
-      this.recordingBuffer = [];
+      this.audioPlayer.nativeElement.src = URL.createObjectURL(this.recordingFinishedEvent.data);
+      this.recordingFinishedEvent = undefined;
     }
   }
 
