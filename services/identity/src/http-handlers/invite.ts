@@ -48,9 +48,9 @@ export const headerMiddleware: ValidationChain[] = [
   header('user_token')
     .isString()
     .custom(async token => {
-      var axios = require('axios');
+      const axios = require('axios');
       console.log('validating request');
-      var config = {
+      const config = {
         method: 'get',
         url: 'http://[::1]:3002/settings/security',
         headers: { }
