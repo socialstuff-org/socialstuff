@@ -4,6 +4,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {HttpErrorResponse, HttpResponse} from '../types';
 import {SecuritySettings} from '../admin/interfaces/SecuritySettings';
 import {InviteCode} from '../admin/interfaces/InviteCode';
+import {ReportReason} from '../admin/interfaces/ReportReason';
 
 @Injectable({
   providedIn: 'root',
@@ -36,9 +37,27 @@ export class AdminSettings {
   }
 
   // public deleteInviteCode(id: number): Promise<any> {
-  //   // const body = {
-  //   //   id: id
-  //   // };
-  //   // return this.http.delete<any>((this.api.remoteEndpoint() + '/invitations'), body).toPromise();
+  //   const body = {
+  //     id: id
+  //   };
+  //   return this.http.delete<any>((this.api.remoteEndpoint() + '/invitations')).toPromise();
   // }
+
+  public getReportReasons(): Promise<Array<ReportReason>> {
+
+    let headers = new HttpHeaders().set('rows_per_page', '100');
+    headers = headers.append('current_page', '1');
+
+    return this.http.get<any>(this.api.remoteEndpoint() + '/reporting/report-reasons', {headers: headers}).toPromise();
+  }
+
+  public createReportReason(reportReason): Promise<ReportReason> {
+    return this.http.post<any>((this.api.remoteEndpoint() + '/reporting/report-reasons'), reportReason).toPromise();
+  }
+
+  public editReportReason(reportReason): Promise<ReportReason> {
+    return this.http.put<any>((this.api.remoteEndpoint() + '/reporting/report-reasons'), reportReason).toPromise();
+  }
+
+
 }

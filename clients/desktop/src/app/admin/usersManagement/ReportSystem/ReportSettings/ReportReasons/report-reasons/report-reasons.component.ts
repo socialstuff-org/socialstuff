@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import utils from '../../../../../utils/utils';
 import { ReportReason, createReportReason } from '../../../../../interfaces/ReportReason';
+import {AdminSettings} from '../../../../../../services/ap-settings.service';
+import {ApiService} from '../../../../../../services/api.service';
 
 @Component({
   selector: 'app-report-reasons',
@@ -10,8 +12,14 @@ import { ReportReason, createReportReason } from '../../../../../interfaces/Repo
 export class ReportReasonsComponent implements OnInit {
 
   public reportReasons: Array<ReportReason> = [];
+  public hostname = '127.0.0.1';
+  public port = 3000;
 
-  constructor() { }
+  constructor(
+    private adminSettings: AdminSettings,
+    private api: ApiService,
+  ) {
+  }
 
   ngOnInit(): void {
     for (let i = 0; i < 10; i++) {
@@ -21,6 +29,16 @@ export class ReportReasonsComponent implements OnInit {
       this.reportReasons.push(newReason);
     }
     console.log(this.reportReasons);
+  }
+
+  public getInviteCodes(): any {
+    this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
+    return this.adminSettings.getReportReasons().then((reportReasons) => {
+      this.reportReasons = reportReasons;
+      console.log(reportReasons);
+    }).catch(error => {
+      console.log(error);
+    });
   }
 
 }
