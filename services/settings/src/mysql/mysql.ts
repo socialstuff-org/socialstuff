@@ -84,13 +84,6 @@ export async function getAllInviteCodesFromSQL(rowsPerPage:number, currentPage:n
     }
   }
 }
-let invite_code = {
-  active: true,
-  expiration_date: "",
-  max_usage: 5,
-  times_used: 0,
-  code: "abcdef"
-};
 
 export async function updateInviteCodeInSQL(id: number, data: any) {
   await prisma.invite_code.update({where: {
@@ -124,9 +117,9 @@ export async function deleteInviteCodeFromSQL(invCodeId: number) {
   return 200;
 }
 
-export async function findSecuritySettings(req: Request) {
+
+export async function findSecuritySettings(db: mysql.Connection) {
   await sharedConnection();
-  const db = (req as RequestWithDependencies).dbHandle;
   const sql = 'SELECT * FROM security_settings';
   const [[{
     two_factor_auth_on,
@@ -173,9 +166,8 @@ export function createConnection() {
   });
 }
 
-export async function setSecuritySettings(settings:any ,req: Request) {
+export async function setSecuritySettings(settings:any, db: mysql.Connection) {
   await sharedConnection();
-  const db = (req as RequestWithDependencies).dbHandle;
   const sql = 'UPDATE security_settings SET two_factor_auth_on = ?, two_factor_auth_email = ?, two_factor_auth_phone = ?, confirmed_emails_only = ?, individual_pwd_req_upper_case = ?, individual_pwd_req_on = ?, individual_pwd_req_number = ?, individual_pwd_req_special_char = ?, individual_pwd_req_reg_ex = ?, individual_pwd_req_reg_ex_string = ?, inv_only_on = ?, inv_only_inv_only_by_adm = ?;';
   console.log(
     "settings.two_factor_auth.email", settings.two_factor_auth.email,

@@ -55,14 +55,12 @@ export const headerMiddleware: ValidationChain[] = [
         url: 'http://[::1]:3002/settings/security',
         headers: { }
       };
-      const secSettingsInvOnlyByAdmin = await axios(config)
-        .then(function (response:any) {
-          console.log('Invite only by admin active: ', response.data.inv_only.inv_only_by_adm);
-          return response.data.inv_only.inv_only_by_adm;
-        })
-        .catch(function (error:any) {
-          console.log(error);
-        });
+      let secSettingsInvOnlyByAdmin = null;
+      try {
+        secSettingsInvOnlyByAdmin = await axios(config);
+      } catch (e) {
+        throw new Error('Admin settings could not be fetched!');
+      }
       console.log('is an admin active: ', secSettingsInvOnlyByAdmin);
       if (secSettingsInvOnlyByAdmin) {
 
@@ -75,7 +73,7 @@ export const headerMiddleware: ValidationChain[] = [
         if (isAdmin) {
           return;
         } else {
-          throw new Error('Invite code not validated by admin!');
+          throw new Error('Invite code not validated by admin, please provide a valid invite code!');
         }
       } else{
         console.log('secSettingsInvOnlyByAdmin was false');
@@ -99,7 +97,13 @@ async function getAllInvitations(req: Request, res: Response) {
   let response;
   if (headers.sortparam !== null) {
     const sql = 'SELECT * FROM invite_code ORDER BY ?, id LIMIT ?,?';
-    response = await db.query(sql, [headers.sort_param, startIndex, endIndex]);
+    try {
+
+      response = await db.query(sql, [headers.sort_param, startIndex, endIndex]);
+    } catch (e) {
+      console.log(e);
+      throw new Error('Invalid sort parameter!');
+    }
   } else {
     const sql = 'SELECT * FROM invite_code ORDER BY id LIMIT ?,?';
     response = await db.query(sql, [startIndex, endIndex]);
@@ -114,16 +118,24 @@ async function addInviteCode(req: Request, res: Response) {
   console.log('Adding inv_code: ' + invCodeToAdd.code);
   try {
     const db = (req as RequestWithDependencies).dbHandle;
-    const sql = 'INSERT INTO invite_code (max_usage,  times_used, expiration_date, active, code) VALUES (?, ?, ?, ?, ?);';
-    const sqlLastId = 'SELECT LAST_INSERT_ID() as id;';
-    console.log('About to insert data');
-    await db.query(sql, [invCodeToAdd.max_usage, 0, invCodeToAdd.expiration_date, invCodeToAdd.active, invCodeToAdd.code]);
-    console.log('data inserted');
-    const [retId] = await db.query(sqlLastId);
+    await db.beginTransaction();
+    let retId;
+    try {
 
+      const sql = 'INSERT INTO invite_code (max_usage,  times_used, expiration_date, active, code) VALUES (?, ?, ?, ?, ?);';
+      const sqlLastId = 'SELECT LAST_INSERT_ID() as id;';
+      console.log('About to insert data');
+      await db.query(sql, [invCodeToAdd.max_usage, 0, invCodeToAdd.expiration_date, invCodeToAdd.active, invCodeToAdd.code]);
+      console.log('data inserted');
+      [retId] = await db.query(sqlLastId);
+      await db.commit();
+    } catch (e) {
+      console.log(e);
+      throw new Error('Transaction failed');
+    }
     res.status(200).json(retId);
   } catch (e) {
-    res.status(500);
+    res.status(500).end();
   }
 }
 

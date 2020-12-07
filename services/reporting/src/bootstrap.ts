@@ -40,6 +40,7 @@ export default (async () => {
       }
     }
   }
+
   {
     let retryConnection = true;
     while (retryConnection) {

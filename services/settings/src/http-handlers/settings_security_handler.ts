@@ -5,6 +5,7 @@ import {ErrorResponse} from '@socialstuff/utilities/responses';
 import {body, check, validationResult} from 'express-validator';
 import {findSecuritySettings, setSecuritySettings} from '../mysql/mysql';
 import {injectDatabaseConnectionIntoRequest} from '../mysql/utilities';
+import {RequestWithDependencies} from '../mysql/request-with-dependencies';
 
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -16,13 +17,10 @@ async function getSecSettings(req: Request, res: Response) {
   //if (!verifyAdmin(req)) {
   //  return;
   //}
-  const secSetings = await findSecuritySettings(req);
+  const secSetings = await findSecuritySettings((req as RequestWithDependencies).dbHandle);
   console.log(secSetings);
   res.status(200).json(secSetings).end();
 }
-
-const editJsonFile = require('edit-json-file');
-let file = editJsonFile(__dirname + '/../res/security_settings.json');
 
 async function changeSecuritySettings(req: Request, res: Response) {
   const errors = validationResult(req);
@@ -31,8 +29,8 @@ async function changeSecuritySettings(req: Request, res: Response) {
     return res.status(422).json({errors: errors.array()});
   }
   try {
-    await setSecuritySettings(req.body, req);
-    res.status(200).json(findSecuritySettings(req));
+    await setSecuritySettings(req.body, (req as RequestWithDependencies).dbHandle);
+    res.status(200).json(findSecuritySettings((req as RequestWithDependencies).dbHandle));
   } catch (e) {
     res.status(500).json({error: 'An internal error occurred!'})
   }
