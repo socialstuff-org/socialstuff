@@ -5,6 +5,7 @@ import {UtilService}                         from '../services/util.service';
 import {DebugService}                        from '../services/debug.service';
 import {ContactService}                      from '../services/contact.service';
 import {take}                                from '../../lib/functional';
+import {delay}             from '@socialstuff/utilities/common';
 
 @Component({
   selector:    'app-chat-view',
@@ -12,6 +13,8 @@ import {take}                                from '../../lib/functional';
   styleUrls:   ['./chat-view.component.scss'],
 })
 export class ChatViewComponent implements OnInit {
+
+  private recordingBuffer: any[] = [];
 
   public messages: Message[];
   public chatPartner: ChatPartner;
@@ -28,11 +31,34 @@ export class ChatViewComponent implements OnInit {
     this.chatPartner.imageUrl = 'https://cdn.code-lake.com/mergery/users/vanderzee.jpg';
     this.chatPartner.acronym = this.utils.generateAcronym(this.chatPartner.realName);
   }
+  //Set MediaRecorder for Microphone
+  public recordOption: 'Start' | 'Stop' = 'Start';
+  private recorder: MediaRecorder;
 
   async ngOnInit() {
-    const chat = await this.contacts.openChat(undefined);
-    const messages = take(chat.records());
-    const a = messages(3);
-  }
 
+    //Set variables for Microphone
+    //navigator.permissions.query({name: 'microphone'});
+    //await navigator.permissions.query().
+    const microphone = await navigator.mediaDevices.getUserMedia({audio: true});
+    this.recorder = new MediaRecorder(microphone);
+    this.recorder.addEventListener('dataavailable', data => {
+      this.recordingBuffer.push(data);
+    });
+    console.log('recorder is finished');
+  }
+  async toggleRecording() {
+    console.log('microphone', this.recorder);
+    if (this.recordOption === 'Start') {
+      this.recorder.start();
+      this.recordOption = 'Stop';
+    } else {
+      this.recorder.requestData();
+      this.recorder.stop();
+      this.recordOption = 'Start';
+      await delay(0);
+      console.log(this.recordingBuffer);
+      this.recordingBuffer = [];
+    }
+  }
 }

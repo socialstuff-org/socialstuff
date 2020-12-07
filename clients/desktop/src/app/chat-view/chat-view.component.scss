@@ -31,3 +31,18 @@
   margin: 10px auto 0;
   z-index: 100;
 }
+
+#record-button {
+  height: 58px;
+  width: 45px;
+  color: $plainWhite;
+  background-color: #ed3330;
+  position: relative;
+  bottom: 58px;
+  border: none;
+  z-index: 100;
+}
+
+#record-button:hover {
+  cursor: pointer;
+}

@@ -13,7 +13,7 @@ import {MicrophoneTestComponent} from './microphone-test/microphone-test.compone
 const routes: Routes = [
   {
     path:       '',
-    redirectTo: 'login',
+    redirectTo: 'chatview/1',
     pathMatch:  'full',
   },
   {path: 'login', component: LoginComponent},
