@@ -13,23 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {Socket}                  from 'net';
-import {promisify}               from 'util';
-import {
-  createPrivateKey,
-  createPublicKey,
-  createSign,
-  createVerify,
-  ECDH,
-  KeyObject,
-}                                from 'crypto';
-import {CommonTitpClient}        from './common';
-import {Handshake}               from './handshake';
-import {
-  decrypt,
-  decryptRsa,
-  encryptRsa,
-}                                from '../crypto';
+import {Socket}                                                                       from 'net';
+import {promisify}                                                                    from 'util';
+import {createPrivateKey, createPublicKey, createSign, createVerify, ECDH, KeyObject} from 'crypto';
+import {CommonTitpClient}                                                             from './common';
+import {Handshake}                                                                    from './handshake';
+import {decrypt, decryptRsa, encryptRsa}                                              from '../crypto';
 import {
   buildServerMessage,
   ChatMessage,
@@ -37,10 +26,10 @@ import {
   deserializeChatMessage,
   serializeServerMessage,
   ServerMessageType,
-}                                from '../message';
-import {UserKeyRegistry}         from '../user-key-registry';
-import {ConversationKeyRegistry} from '../conversation-key-registry';
-import {Observable, Subject}     from 'rxjs';
+}                                                                                     from '../message';
+import {UserKeyRegistry}                                                              from '../user-key-registry';
+import {ConversationKeyRegistry}                                                      from '../conversation-key-registry';
+import {Observable, Subject}                                                          from 'rxjs';
 
 export class TitpClient extends CommonTitpClient {
   private _rsa: { priv: KeyObject, pub: KeyObject };
@@ -165,24 +154,25 @@ export class TitpClient extends CommonTitpClient {
     return deserializeChatMessage(decryptedSerializedChatMessage);
   }
 
-  public async negotiateKeyWith(username: string, ecdh: ECDH = this._ecdh) {
+  public async negotiateKeyWith(username: string, type: ChatMessageType = ChatMessageType.handshakeInitialization) {
     console.log(`client rsa of ${username}:`, this._rsa.pub.export({type: 'pkcs1', format: 'pem'}));
     const recipientRsaPublicKey = await this._keyRegistry.fetchRsa(username);
     const ecdhSig = createSign('RSA-SHA512')
-      .update(ecdh.getPublicKey())
+      .update(this._ecdh.getPublicKey())
       .sign(this._rsa.priv);
     const e = Buffer.concat([this._ecdh.getPublicKey(), ecdhSig]);
     const message: ChatMessage = {
       senderName:  this._username,
       sentAt:      new Date(),
       attachments: [],
-      type:        ChatMessageType.handshake,
+      type:        type,
       content:     e,
     };
     const recipient = [{name: username, publicKey: recipientRsaPublicKey}];
     const serverMessage = buildServerMessage(message, this._rsa.priv, Buffer.alloc(0), recipient, ServerMessageType.initialHandshake, x => encryptRsa(x, recipientRsaPublicKey));
-    await this._keyRegistry.saveEcdhForHandshake(username, ecdh);
+    await this._keyRegistry.saveEcdhForHandshake(username, this._ecdh);
     await this.write(serializeServerMessage(serverMessage));
+    return message;
   }
 
   private async _parseInitialHandshake(data: Buffer) {
@@ -213,10 +203,11 @@ export class TitpClient extends CommonTitpClient {
       await this._keyRegistry.removeEcdhForHandshake(message.senderName);
     } else {
       //! recipient of handshake
-      await this.negotiateKeyWith(message.senderName, this._ecdh);
+      await this.negotiateKeyWith(message.senderName, ChatMessageType.handshakeReply);
       conversationKey = this._ecdh.computeSecret(ecdhPub);
     }
     await this._keyRegistry.saveConversationKey(message.senderName, conversationKey);
+    return message;
   }
 
   /**
@@ -227,13 +218,16 @@ export class TitpClient extends CommonTitpClient {
   private async _interpretIncomingData(data: Buffer) {
     const messageType: ServerMessageType = data.readInt16BE(0);
     switch (messageType) {
-      case ServerMessageType.chatMessage:
+      case ServerMessageType.chatMessage: {
         const message = await this._parseChatMessage(data.slice(2));
         this._onIncomingMessage.next(message);
+      }
         break;
 
-      case ServerMessageType.initialHandshake:
-        await this._parseInitialHandshake(data.slice(2));
+      case ServerMessageType.initialHandshake: {
+        const message = await this._parseInitialHandshake(data.slice(2));
+        this._onIncomingMessage.next(message);
+      }
         break;
 
       default:
