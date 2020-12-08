@@ -1,2 +1,9 @@
 {
+  "admin": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "security": "Security",
+      "users": "Users"
+    }
+  }
 }

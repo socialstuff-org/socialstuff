@@ -1,0 +1,19 @@
+type Report @db(name: "report") @relationTable {
+  id: Int! @id
+  reason: ReportReason @db(name: "reason_id")
+  user: SocialstuffUser @db(name: "user_id")
+}
+
+type ReportReason @db(name: "report_reason") {
+  id: Int! @id
+  maxReportViolations: Int @db(name: "max_report_violations")
+  reason: String
+  report: [Report]
+}
+
+type SocialstuffUser @db(name: "socialstuff_user") {
+  id: Int! @id
+  banned: Boolean
+  report: [Report]
+  usernameHash: String @db(name: "username_hash")
+}

@@ -16,7 +16,7 @@
 import crypto                                                 from 'crypto';
 import {body, ValidationChain}                                from 'express-validator';
 import {v1 as v1uuid}                                         from 'uuid';
-import {Request, Response}                                    from 'express';
+import {Request, Response} from 'express';
 import {RowDataPacket}                                        from 'mysql2/promise';
 import {registrationChallengeMode, registrationChallenges}    from '../constants';
 import speakeasy                                                       from 'speakeasy';
@@ -74,7 +74,7 @@ export const middleware: ValidationChain[] = [
 
 const addUserSql = 'INSERT INTO users (id, username, password, public_key, mfa_seed) VALUES (unhex(?), ?, ?, ?, ?);';
 const saveRegistrationConfirmationTokenSql = 'INSERT INTO registration_confirmations (expires_at, secret_hash, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY), ?, unhex(?));';
-const removeUsedInviteCodeSql = 'DELETE FROM registration_invites WHERE secret = unhex(?);';
+const removeUsedInviteCodeSql = 'DELETE FROM invite_code WHERE secret = unhex(?);';
 
 export async function register(req: Request, res: Response) {
   const r = req as RequestWithDependencies;
@@ -128,12 +128,14 @@ if (hasChallenge(registrationChallenges.invite)) {
         throw new Error('Registrations are only allowed using invites!');
       }
       const db = await sharedConnection();
-      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM registration_invites WHERE expires_at > NOW();';
+      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM invite_code WHERE expiration_date > NOW() AND active = true AND times_used < max_usage AND code = ?;';
       try {
-        const [[{validInvite}]] = await db.query<RowDataPacket[]>(checkInviteCodeSql);
+        const [[{validInvite}]] = await db.query<RowDataPacket[]>(checkInviteCodeSql, [inviteCode]);
         if (validInvite === 0) {
           throw new Error();
         }
+        const increaseTimesUsedSQL = 'UPDATE invite_code SET max_usage = (max_usage + 1) WHERE code = ?';
+        await db.query(increaseTimesUsedSQL, inviteCode);
       } catch (e) {
         throw new Error('Please provide a valid invite code!');
       }
