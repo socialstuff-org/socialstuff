@@ -1,0 +1,32 @@
+@import "../../../styles/colors";
+
+.navigation-item {
+  width: 100%;
+}
+
+.profile-picture {
+  width: 40px;
+  height: 40px;
+  border: 2px solid $frenchRasperry;
+  border-radius: 40px;
+  text-align: center;
+  line-height: 40px;
+  float: left;
+  background-color: $elderberry;
+}
+
+.username {
+  line-height: 20px;
+  width: 100%;
+  margin-left: 65px;
+}
+
+.sidenav-link {
+  text-decoration: none;
+  margin-left: 10px;
+  color: $plainWhite;
+}
+
+.active-link-item {
+  color: red;
+}
