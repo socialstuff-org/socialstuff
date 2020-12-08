@@ -15,15 +15,16 @@
 }
 
 .message-row {
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   display: grid;
   grid-template-columns: 100%;
 }
 
 .example-viewport {
+  margin-top: 20px;
   height: calc(100vh - 300px);
   width: 70%;
-  // border: 1px solid $coralRed; // DEBUG ONLY
+  z-index: 100;
 }
 
 #message-box-wrapper {
