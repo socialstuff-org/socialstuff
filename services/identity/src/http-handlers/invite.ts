@@ -10,10 +10,6 @@ export const middleware: ValidationChain[] = [
   body('max_usage')
     .isInt()
     .withMessage('Pick an Integer as max_usage!'),
-  body('times_used')
-    .isInt()
-    .optional()
-    .withMessage('pick an Integer as times_used!'),
   //body('expiration_date')
   //  .isDate(),
   body('active')
