@@ -1,13 +1,14 @@
-import {Routes, RouterModule} from '@angular/router';
-import {CallFunctionComponent} from './voice-communication/call-function/call-function.component';
-import {ChatAppComponent} from './chat-app/chat-app.component';
-import {ChatViewComponent} from './chat-view/chat-view.component';
+import {Routes, RouterModule}    from '@angular/router';
+import {CallFunctionComponent}   from './voice-communication/call-function/call-function.component';
+import {ChatAppComponent}        from './chat-app/chat-app.component';
+import {ChatViewComponent}       from './chat-view/chat-view.component';
 import {ForgotPasswordComponent} from './auth/forgot-password/forgot-password.component';
-import {LandingComponent} from './landing/landing.component';
-import {LoginComponent} from './auth/login/login.component';
-import {LogoutComponent} from './auth/logout/logout.component';
-import {NgModule} from '@angular/core';
-import {RegisterComponent} from './auth/register/register.component';
+import {LandingComponent}        from './landing/landing.component';
+import {LoginComponent}          from './auth/login/login.component';
+import {LogoutComponent}         from './auth/logout/logout.component';
+import {NgModule}                from '@angular/core';
+import {RegisterComponent}       from './auth/register/register.component';
+import {MicrophoneTestComponent} from './microphone-test/microphone-test.component';
 
 const routes: Routes = [
   {
