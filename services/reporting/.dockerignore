@@ -1,0 +1,14 @@
+node_modules/
+docker/
+lib/
+.idea/
+.vscode/
+coverage/
+nbproject/
+.env*
+.eslintrc
+.migrate
+Makefile
+rsa-example.public
+rsa-example.private
+todo.md

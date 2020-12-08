@@ -1,0 +1,18 @@
+<div *ngFor="let navItem of navigationItems">
+  <mat-list-item routerLinkActive="active-list-item" class="contactListItem">
+    <mat-divider class="contact-list-divider"></mat-divider>
+      <a class="sidenav-link" [routerLinkActiveOptions]="{ exact: !navItem.subRoutes.length > 0 }" [routerLink]="[navItem.path]" routerLinkActive="active-link-item">
+        <div class="navigation-item">
+          <div class="profile-picture">
+            <mat-icon style="margin-top: 7px;">{{navItem.icon}}</mat-icon>
+          </div>
+          <div class="username">
+            <br>
+            <span style="line-height: 40px;">{{navItem.name}}</span>
+          </div>
+        </div>
+      </a>
+    <mat-divider class="contact-list-divider"></mat-divider>
+  </mat-list-item>
+  <app-navigation-item *ngIf="navItem.subRoutes.length > 0 && currentRoute === navItem.path" [navigationItems]="navItem.subRoutes" ></app-navigation-item>
+</div>

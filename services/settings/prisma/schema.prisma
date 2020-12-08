@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:root@localhost:3306/socialstuff_admin_panel"
+}
+
+model report {
+  id               Int               @id @default(autoincrement())
+  user_id          Int?
+  reason_id        Int?
+  report_reason    report_reason?    @relation(fields: [reason_id], references: [id])
+  socialstuff_user socialstuff_user? @relation(fields: [user_id], references: [id])
+
+  @@index([reason_id], name: "fk_reason_id")
+  @@index([user_id], name: "fk_user_id")
+}
+
+model report_reason {
+  id                    Int      @id @default(autoincrement())
+  reason                String?
+  max_report_violations Int?
+  report                report[]
+}
+
+model socialstuff_user {
+  id            Int      @id @default(autoincrement())
+  username_hash String?
+  banned        Boolean?
+  report        report[]
+}
+
+model invite_code {
+  id              Int       @id @default(autoincrement())
+  max_usage       Int?
+  times_used      Int       @default(0)
+  expiration_date DateTime?
+  active          Boolean   @default(true)
+  code            String    @unique
+}
+
+model users {
+  // This type is currently not supported.
+  // id      binary(16) @id
+  username   String     @unique
+  password   String
+  public_key String
+  mfa_seed   String?
+  can_login  Boolean    @default(false)
+}
+
+model security_settings {
+  id                               Int      @id
+  two_factor_auth_on               Boolean? @default(false)
+  two_factor_auth_phone            Boolean? @default(false)
+  two_factor_auth_email            Boolean? @default(false)
+  confirmed_emails_only            Boolean? @default(false)
+  individual_pwd_req_upper_case    Boolean? @default(false)
+  individual_pwd_req_on            Boolean? @default(false)
+  individual_pwd_req_number        Boolean? @default(false)
+  individual_pwd_req_special_char  Boolean? @default(false)
+  individual_pwd_req_reg_ex        Boolean? @default(false)
+  individual_pwd_req_reg_ex_string String?  @default("[]")
+  inv_only_on                      Boolean? @default(false)
+  inv_only_inv_only_by_adm         Boolean? @default(false)
+}
+
+// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+// model password_resets {
+  // expires_at DateTime
+  // This type is currently not supported.
+  // secret     binary(16)
+  // This type is currently not supported.
+  // id_user    binary(16)
+// }
+
+// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+// model registration_confirmations {
+  // expires_at  DateTime
+  // secret_hash String
+  // This type is currently not supported.
+  // id_user     binary(16)
+// }
+
+// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+// model registration_invites {
+  // expires_at DateTime
+  // This type is currently not supported.
+  // secret     binary(16) @unique
+// }
+
+// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+// model tokens {
+  // This type is currently not supported.
+  // token      binary(16) @unique
+  // expires_at DateTime?
+  // This type is currently not supported.
+  // id_user    binary(16)
+// }
