@@ -1,10 +1,11 @@
-import {Component, OnInit}                   from '@angular/core';
-import {Message}                             from '../models/Message';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ChatPartner, createEmptyChatPartner} from '../models/ChatPartner';
 import {UtilService}                         from '../services/util.service';
 import {DebugService}                        from '../services/debug.service';
 import {ContactService}                      from '../services/contact.service';
 import {take}                                from '../../lib/functional';
+import {ChatMessage} from '@trale/transport/message';
+import {CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
 
 @Component({
   selector:    'app-chat-view',
@@ -13,7 +14,9 @@ import {take}                                from '../../lib/functional';
 })
 export class ChatViewComponent implements OnInit {
 
-  public messages: Message[];
+  @ViewChild(CdkVirtualScrollViewport, { static: false }) virtualScrollViewport: CdkVirtualScrollViewport;
+
+  public messages: ChatMessage[];
   public chatPartner: ChatPartner;
 
   constructor(
@@ -30,9 +33,23 @@ export class ChatViewComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const chat = await this.contacts.openChat(undefined);
+    // load messages from storage
+/*    const chat = await this.contacts.openChat(undefined);
     const messages = take(chat.records());
-    const a = messages(3);
+    const a = messages(3);*/
+  }
+
+  messageSentHandler(message: ChatMessage): void {
+    console.log('message', message);
+    this.messages.push(message);
+    this.messages = [...this.messages];
+    // this.messages.unshift(message);
+    console.log('array', this.messages);
+    this.virtualScrollViewport.scrollToIndex(this.messages.length - 1);
+    setTimeout(() => {
+      const items = document.getElementsByClassName('list-item');
+      items[items.length - 1].scrollIntoView();
+    }, 10);
   }
 
 }
