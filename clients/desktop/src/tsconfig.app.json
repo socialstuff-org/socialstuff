@@ -8,7 +8,8 @@
   },
   "include": [
     "main.ts",
-    "polyfill.ts"
+    "polyfill.ts",
+    "../node_modules/@types/dom-mediacapture-record/index.d.ts"
   ],
   "exclude": [
     "**/*.spec.ts"
