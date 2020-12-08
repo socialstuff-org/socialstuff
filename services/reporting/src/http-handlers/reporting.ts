@@ -11,7 +11,7 @@ async function reportUser(req: Request, res: Response) {
   if (alreadyReported) {
     res.status(422).json({msg: 'You already reported this user in the last 15 minutes!'}).end();
   } else {
-    res.status(200).end();
+    res.status(200).end(); //Some comment
   }
 }
 
