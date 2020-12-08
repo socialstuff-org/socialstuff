@@ -1,31 +1,31 @@
-import {Injectable}                              from '@angular/core';
-import {Message}                                 from '../models/Message';
-import {CryptoStorageService}                    from './crypto-storage.service';
-import {Contact, ContactWithLastMessage}         from '../models/Contact';
-import {createHash, createHmac, createPublicKey} from 'crypto';
-import {ChatProperties}                          from '../models/ChatProperties';
-import * as fs                                   from 'fs';
-import * as path                                 from 'path';
-import {Subject}                                 from 'rxjs';
+import {Injectable}                      from '@angular/core';
+import {Message}                         from '../models/Message';
+import {CryptoStorageService}            from './crypto-storage.service';
+import {Contact, ContactWithLastMessage} from '../models/Contact';
+import {createHash, createPublicKey}     from 'crypto';
+import {ChatProperties}                  from '../models/ChatProperties';
+import * as fs                           from 'fs';
+import * as path                         from 'path';
+import {Observable, Subject}             from 'rxjs';
+import {hashUsernameHmac}                from '../../lib/helpers';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContactService {
-  get isLoaded(): Subject<void> {
-    return this._isLoaded;
-  }
-
   private _contacts: Contact[] = [];
-  private _isLoaded = new Subject<void>();
+  private _onContactListUpdated = new Subject<Contact[]>();
 
   constructor(
     private storage: CryptoStorageService,
   ) {
     storage.isLoaded.subscribe(async () => {
       await this._loadContacts();
-      this._isLoaded.next();
     });
+  }
+
+  public onContactListUpdated(): Observable<Contact[]> {
+    return this._onContactListUpdated;
   }
 
   /**
@@ -33,7 +33,7 @@ export class ContactService {
    * This method has to be called between session of the same user, in order to avoid dangling (open) file descriptors.
    */
   public async unLoad() {
-
+    this._contacts = [];
   }
 
   /**
@@ -56,6 +56,7 @@ export class ContactService {
       rsaPublicKey:    createPublicKey(props.rsaPublicKey),
     }));
     this._contacts = contacts;
+    this._onContactListUpdated.next(contacts);
   }
 
   /**
@@ -69,9 +70,10 @@ export class ContactService {
       const lastMessageString = await records.records().next();
       await records.close();
 
-      const lastMessage = lastMessageString.done
-                          ? null
-                          : JSON.parse((lastMessageString.value as Buffer).toString('utf-8')) as Message;
+      const lastMessage =
+              lastMessageString.done
+              ? null
+              : JSON.parse((lastMessageString.value as Buffer).toString('utf-8')) as Message;
       return {
         ...contact,
         lastMessage,
@@ -139,9 +141,7 @@ export class ContactService {
     if (this._contacts.some(x => x.username === contact.username)) {
       return;
     }
-    const hmac = createHmac('sha512', this.storage.masterKey);
-    hmac.update(contact.username);
-    const usernameHash = hmac.digest().toString('hex');
+    const usernameHash = hashUsernameHmac(contact.username, this.storage.masterKey);
     const contactDirectory = path.join(this.storage.path, 'chats', usernameHash);
     {
       try {
@@ -159,6 +159,7 @@ export class ContactService {
     };
     const serializedProperties = Buffer.from(JSON.stringify(properties), 'utf8');
     await this.storage.storage.persistFileContent(['chats', usernameHash, 'chat.properties'], serializedProperties);
+    this._onContactListUpdated.next(this._contacts);
   }
 
   /**
@@ -178,6 +179,9 @@ export class ContactService {
     };
     const serializedProperties = Buffer.from(JSON.stringify(properties), 'utf8');
     await this.storage.storage.persistFileContent(['chats', contact.usernameHash, 'chat.properties'], serializedProperties);
+    const userIndex = this._contacts.map(x => x.username).indexOf(contact.username);
+    this._contacts[userIndex] = contact;
+    this._onContactListUpdated.next(this._contacts);
   }
 
   /**
