@@ -1,7 +1,7 @@
 // IMPORTS
 // TODO fix imports
 // @import url(app/styles/colors.scss);
-// @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 // END OF IMPORTS
 
@@ -86,4 +86,24 @@ mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-f
 
 textarea:focus, input:focus{
   outline: none;
+}
+
+// MAT MENU
+.mat-menu-content {
+  background-color: #21142D !important;
+  border: 1px solid #ed3330 !important;
+}
+
+.mat-menu-item {
+  color: #ffffff !important;
+}
+
+.mat-menu-item:hover {
+  color: #ed3330 !important;
+}
+
+// LANGUAGE MENU
+.lang-icon {
+  width: 25px;
+  vertical-align: middle;
 }
