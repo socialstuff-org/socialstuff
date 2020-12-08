@@ -25,5 +25,10 @@
       "security": "Security",
       "users": "Users"
     }
+  },
+  "language": {
+    "german": "German",
+    "dutch": "Dutch",
+    "english": "English"
   }
 }

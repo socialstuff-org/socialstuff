@@ -25,5 +25,10 @@
       "security": "",
       "users": ""
     }
+  },
+  "language": {
+    "german": "Deutsch",
+    "dutch": "Niederländisch",
+    "english": "Englisch"
   }
 }

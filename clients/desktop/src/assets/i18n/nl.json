@@ -24,5 +24,10 @@
       "dashboard": "",
       "security": ""
     }
+  },
+  "language": {
+    "german": "Duits",
+    "dutch": "Nederlands",
+    "english": "Engels"
   }
 }
