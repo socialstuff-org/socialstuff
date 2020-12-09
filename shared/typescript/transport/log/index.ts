@@ -13,7 +13,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-export let ENABLE_DEBUG_LOGGING = false;
+let ENABLE_DEBUG_LOGGING = false;
+
+export function enableLogging() {
+  ENABLE_DEBUG_LOGGING = true;
+}
+
+export function disableLogging() {
+  ENABLE_DEBUG_LOGGING = true;
+}
 
 export function log(...items: any[]) {
   if (!ENABLE_DEBUG_LOGGING) {

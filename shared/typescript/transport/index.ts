@@ -15,6 +15,7 @@
 
 import * as client               from './client';
 import * as crypto               from './crypto';
+import * as log                  from './log';
 import * as message              from './message';
 import * as serial               from './serial';
 import * as server               from './server';
@@ -30,6 +31,7 @@ export {
 export default {
   client,
   crypto,
+  log,
   message,
   serial,
   server,
