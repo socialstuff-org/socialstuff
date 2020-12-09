@@ -37,7 +37,7 @@ export const middleware: ValidationChain[] = [
 
 export const deleteMiddleware: ValidationChain[] = [
   header('id').notEmpty().isInt()
-]
+];
 
 export const headerMiddleware: ValidationChain[] = [
   header('rows_per_page').notEmpty().isInt(),
