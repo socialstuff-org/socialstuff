@@ -1,17 +1,17 @@
-import { Component, OnInit }  from '@angular/core';
-import {AuthService}          from '../../services/auth.service';
-import {ApiService}           from '../../services/api.service';
-import {AppConfigService}     from '../../services/app-config.service';
-import {Router}               from '@angular/router';
-import sweetalert             from 'sweetalert2';
-import {createHash}           from 'crypto';
-import {CryptoStorageService} from '../../services/crypto-storage.service';
-import {DebugService}         from '../../services/debug.service';
+import {Component, OnInit}                                           from '@angular/core';
+import {AuthService}                                                 from '../../services/auth.service';
+import {ApiService}                                                  from '../../services/api.service';
+import {AppConfigService}                                            from '../../services/app-config.service';
+import {Router}                                                      from '@angular/router';
+import sweetalert                                                    from 'sweetalert2';
+import {createHash, createPrivateKey, privateDecrypt, publicEncrypt} from 'crypto';
+import {CryptoStorageService}                                        from '../../services/crypto-storage.service';
+import {DebugService}                                                from '../../services/debug.service';
 
 @Component({
-  selector: 'app-login',
+  selector:    'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls:   ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
 
@@ -28,7 +28,8 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private storage: CryptoStorageService,
     private debug: DebugService,
-  ) { }
+  ) {
+  }
 
   async ngOnInit() {
     this.port = this.api.port;
@@ -58,8 +59,8 @@ export class LoginComponent implements OnInit {
       this.loggingIn = false;
       if (typeof e === 'string') {
         await sweetalert.fire({
-          text: e,
-          title: 'Something\'s wrong, I can feel it!',
+          text:            e,
+          title:           'Something\'s wrong, I can feel it!',
           showCloseButton: true,
         });
       } else {
