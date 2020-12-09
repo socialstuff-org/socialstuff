@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
 
   public username = '';
   public password = '';
-  public hostname = '127.0.0.1';
+  public hostname = '';
   public port = 8086;
   public loggingIn = false;
 
@@ -31,6 +31,8 @@ export class LoginComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    this.port = this.api.port;
+    this.hostname = this.api.hostname;
     const session = await this.debug.loadSession();
     if (session === false) {
       return;

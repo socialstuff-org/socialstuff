@@ -1,4 +1,4 @@
-import {Component}                   from '@angular/core';
+import {Component, OnInit}           from '@angular/core';
 import {
   createHash,
   createPrivateKey,
@@ -40,12 +40,12 @@ function newKeyPair(mod) {
   templateUrl: './register.component.html',
   styleUrls:   ['./register.component.scss'],
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
 
   public username = '';
   public password = '';
   public password_confirm = '';
-  public hostname = '127.0.0.1';
+  public hostname = '';
   public port = 8086;
   public inviteCodeRequired = false;
   public inviteCode = '';
@@ -55,6 +55,11 @@ export class RegisterComponent {
     private api: ApiService,
     private storage: CryptoStorageService,
   ) {
+  }
+
+  ngOnInit(): void {
+    this.hostname = this.api.hostname;
+    this.port = this.api.port;
   }
 
   async foo() {
