@@ -128,14 +128,14 @@ if (hasChallenge(registrationChallenges.invite)) {
         throw new Error('Registrations are only allowed using invites!');
       }
       const db = await sharedConnection();
-      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM invite_code WHERE expiration_date > NOW() AND active = true AND times_used < max_usage AND code = ?;';
+      const checkInviteCodeSql = 'SELECT COUNT(*) AS validInvite FROM invite_code WHERE code = ? AND expiration_date > NOW() AND active = true AND times_used < max_usage;';
       try {
         const [[{validInvite}]] = await db.query<RowDataPacket[]>(checkInviteCodeSql, [inviteCode]);
         if (validInvite === 0) {
           throw new Error();
         }
-        const increaseTimesUsedSQL = 'UPDATE invite_code SET max_usage = (max_usage + 1) WHERE code = ?';
-        await db.query(increaseTimesUsedSQL, inviteCode);
+        const increaseTimesUsedSQL = 'UPDATE invite_code SET times_used = (times_used + 1) WHERE code = ?';
+        await db.query(increaseTimesUsedSQL, [inviteCode]);
       } catch (e) {
         throw new Error('Please provide a valid invite code!');
       }
