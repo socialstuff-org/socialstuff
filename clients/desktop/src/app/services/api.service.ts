@@ -16,9 +16,9 @@ export class ApiService {
   get hostname(): string {
     return this._hostname;
   }
-  private endpoint = 'http://trale.org:8086';
-  private _hostname: string = 'trale.org';
+  private _hostname: string = 'joern-neumeyer.de';
   private _port: number = 8086;
+  private endpoint = `http://${this._hostname}:${this._port}`;
   private _tralePort: number = 8087;
 
   constructor() { }
