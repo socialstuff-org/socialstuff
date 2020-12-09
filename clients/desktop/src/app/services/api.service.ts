@@ -4,16 +4,22 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ApiService {
+  set tralePort(value: number) {
+    this._tralePort = value;
+  }
+  get tralePort(): number {
+    return this._tralePort;
+  }
   get port(): number {
     return this._port;
   }
   get hostname(): string {
     return this._hostname;
   }
-  private endpoint = 'http://127.0.0.1:8086';
-  private _hostname: string = '';
+  private endpoint = 'http://trale.org:8086';
+  private _hostname: string = 'trale.org';
   private _port: number = 8086;
-  private tralePort: number = 8087;
+  private _tralePort: number = 8087;
 
   constructor() { }
 
