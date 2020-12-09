@@ -62,6 +62,12 @@ export default (async () => {
 
   const db = await createConnection({multipleStatements: true});
 
+  if (ENV === 'dev') {
+    console.log('Setting up database...');
+    await rebuildDatabase();
+    console.log('Database ready for use!');
+  }
+
   const [[{rootRegistered}]] = await db.query<RowDataPacket[]>('SELECT COUNT(*) rootRegistered FROM users WHERE username = \'root\';');
   if (!rootRegistered) {
     const insertRootUserSql = 'INSERT INTO users (id, username, password, public_key, is_admin, mfa_seed, can_login) VALUES (?, ?, ?, ?, false, ?, false);';
@@ -80,9 +86,6 @@ export default (async () => {
   ecdh.generateKeys();
   process.env.ECDH_PRIVATE_KEY = ecdh.getPrivateKey().toString('base64');
 
-  console.log('Setting up database...');
-  await rebuildDatabase();
-  console.log('Database ready for use!');
   console.log('seeding some data...');
 
   {
