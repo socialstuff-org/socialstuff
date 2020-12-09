@@ -13,25 +13,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
-import crypto                                                 from 'crypto';
-import {body, ValidationChain}                                from 'express-validator';
-import {v1 as v1uuid}                                         from 'uuid';
-import {Request, Response} from 'express';
-import {RowDataPacket}                                        from 'mysql2/promise';
-import {registrationChallengeMode, registrationChallenges}    from '../constants';
+import crypto                                                          from 'crypto';
+import {body, ValidationChain}                                         from 'express-validator';
+import {v1 as v1uuid}                                                  from 'uuid';
+import {Request, Response}                                             from 'express';
+import {RowDataPacket}                                                 from 'mysql2/promise';
+import {registrationChallengeMode, registrationChallenges}             from '../constants';
 import speakeasy                                                       from 'speakeasy';
 import {encrypt, hashHmac, hashUnique, passwordIssues, USERNAME_REGEX} from '@socialstuff/utilities/security';
 import {sharedConnection}                                              from '../mysql';
-import {RequestWithDependencies}                              from '../request-with-dependencies';
-import {DataResponse}                                         from '@socialstuff/utilities/responses';
-import {hasChallenge}                                         from '../registration-confirmation-challenge';
-import {rejectOnValidationError}                              from '@socialstuff/utilities/express';
-import {injectDatabaseConnectionIntoRequest}                  from '../utilities';
+import {RequestWithDependencies}                                       from '../request-with-dependencies';
+import {DataResponse}                                                  from '@socialstuff/utilities/responses';
+import {hasChallenge}                                                  from '../registration-confirmation-challenge';
+import {rejectOnValidationError}                                       from '@socialstuff/utilities/express';
+import {injectDatabaseConnectionIntoRequest}                           from '../utilities';
 
 export const middleware: ValidationChain[] = [
   body('username')
     .isString()
-    .isLength({ min: 5, max: 20 })
+    .isLength({min: 5, max: 20})
     .matches(USERNAME_REGEX)
     .withMessage('Please pick a username containing regular characters (a-zA-Z), numbers, and \'_\' and \'.\', with a length between 5 and 20 characters!'),
   body('username').custom(async username => {
@@ -74,7 +74,8 @@ export const middleware: ValidationChain[] = [
 
 const addUserSql = 'INSERT INTO users (id, username, password, public_key, mfa_seed) VALUES (unhex(?), ?, ?, ?, ?);';
 const saveRegistrationConfirmationTokenSql = 'INSERT INTO registration_confirmations (expires_at, secret_hash, id_user) VALUES (DATE_ADD(NOW(), INTERVAL 1 DAY), ?, unhex(?));';
-const removeUsedInviteCodeSql = 'DELETE FROM invite_code WHERE secret = unhex(?);';
+// const removeUsedInviteCodeSql = 'DELETE FROM invite_code WHERE secret = unhex(?);';
+const increaseTimesUsedSQL = 'UPDATE invite_code SET times_used = (times_used + 1) WHERE code = ?';
 
 export async function register(req: Request, res: Response) {
   const r = req as RequestWithDependencies;
@@ -105,13 +106,14 @@ export async function register(req: Request, res: Response) {
       response.data.token = encryptedToken;
     }
     if (hasChallenge(registrationChallenges.invite)) {
-      await db.query(removeUsedInviteCodeSql, [req.body.invite]);
+      await db.query(increaseTimesUsedSQL, [req.body.invite]);
     }
     await db.query(saveRegistrationConfirmationTokenSql, [hashHmac(challengeToken), id]);
     await db.commit();
     res.status(201).json(response);
   } catch (e) {
     await db.rollback();
+    console.error(e);
     res.status(500).end();
   }
 }
@@ -134,8 +136,6 @@ if (hasChallenge(registrationChallenges.invite)) {
         if (validInvite === 0) {
           throw new Error();
         }
-        const increaseTimesUsedSQL = 'UPDATE invite_code SET max_usage = (max_usage + 1) WHERE code = ?';
-        await db.query(increaseTimesUsedSQL, inviteCode);
       } catch (e) {
         throw new Error('Please provide a valid invite code!');
       }
