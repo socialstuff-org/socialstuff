@@ -35,6 +35,9 @@ export const middleware: ValidationChain[] = [
     }),
 ];
 
+export const deleteMiddleware: ValidationChain[] = [
+  header('id').notEmpty().isInt()
+]
 
 export const headerMiddleware: ValidationChain[] = [
   header('rows_per_page').notEmpty().isInt(),
@@ -156,7 +159,7 @@ inviteManagementInterface.use(injectDatabaseConnectionIntoRequest);
 
 inviteManagementInterface.get('/', headerMiddleware, rejectOnValidationError, getAllInvitations);
 inviteManagementInterface.post('/', middleware, rejectOnValidationError, addInviteCode);
-inviteManagementInterface.delete('/', deleteInviteCode);
+inviteManagementInterface.delete('/', deleteMiddleware, deleteInviteCode);
 
 //const final: any[] = [];
 //final.push(middleware, rejectOnValidationError, injectDatabaseConnectionIntoRequest, addInviteCode);
