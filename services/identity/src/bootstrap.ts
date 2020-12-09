@@ -23,6 +23,7 @@ import {v1}                                                  from 'uuid';
 import fs                                                    from 'fs';
 import {createConnection, rebuildDatabase, sharedConnection} from './mysql';
 import {delay}                                               from '@socialstuff/utilities/common';
+import {RowDataPacket}                                       from 'mysql2/promise';
 
 const ENV = process.env.NODE_ENV || 'dev';
 customEnv.env();
@@ -55,14 +56,22 @@ export default (async () => {
     }
   }
 
-  // const serverPublicRsaString = fs.readFileSync(keysPath).toString('utf-8');
+  const serverPublicRsaString = fs.readFileSync(keysPath).toString('utf-8');
   // const serverRsaPublicKey = createPublicKey(serverPublicRsaString);
+
+  const db = await createConnection({multipleStatements: true});
+
+  const [[{rootRegistered}]] = await db.query<RowDataPacket[]>('SELECT COUNT(*) rootRegistered FROM users WHERE username = \'root\';');
+  if (!rootRegistered) {
+    const insertRootUserSql = 'INSERT INTO users (id, username, password, public_key, is_admin, mfa_seed, can_login) VALUES (?, ?, ?, ?, false, ?, false);';
+    const idBuffer = Buffer.from(v1().replace(/-/, ''), 'hex');
+    await db.query(insertRootUserSql, [idBuffer, 'root', '', serverPublicRsaString, '']);
+  }
 
   // TODO add rsa keys to version control
 
-  const db = await createConnection({ multipleStatements: true });
-
   if (ENV !== 'dev') {
+    await db.end();
     return;
   }
 
@@ -74,6 +83,7 @@ export default (async () => {
   await rebuildDatabase();
   console.log('Database ready for use!');
   console.log('seeding some data...');
+
   {
     const id = v1().replace(/-/g, '');
     const token = id;//await hashHmac(id);
