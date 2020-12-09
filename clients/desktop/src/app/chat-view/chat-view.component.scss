@@ -38,11 +38,18 @@
   color: $plainWhite;
   background-color: #ed3330;
   position: relative;
-  bottom: 58px;
+  bottom: 86px;
   border: none;
   z-index: 100;
 }
 
 #record-button:hover {
+  cursor: pointer;
+}
+#audioButton {
+  border: none;
+  z-index: 100;
+}
+#audioButton:hover {
   cursor: pointer;
 }

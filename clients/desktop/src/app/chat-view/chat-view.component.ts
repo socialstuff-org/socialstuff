@@ -1,4 +1,4 @@
-import {Component, OnInit}                   from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Message}                             from '../models/Message';
 import {ChatPartner, createEmptyChatPartner} from '../models/ChatPartner';
 import {UtilService}                         from '../services/util.service';
@@ -15,6 +15,10 @@ import {delay}             from '@socialstuff/utilities/common';
 export class ChatViewComponent implements OnInit {
 
   private recordingBuffer: any[] = [];
+  //Playback Variables
+  private recordingFinishedEvent : BlobEvent;
+  @ViewChild('audioPlayer')
+  private audioPlayer: ElementRef<HTMLAudioElement>;
 
   public messages: Message[];
   public chatPartner: ChatPartner;
@@ -43,11 +47,12 @@ export class ChatViewComponent implements OnInit {
     const microphone = await navigator.mediaDevices.getUserMedia({audio: true});
     this.recorder = new MediaRecorder(microphone);
     this.recorder.addEventListener('dataavailable', data => {
-      this.recordingBuffer.push(data);
+      // this.recordingBuffer.push(data);
+      this.recordingFinishedEvent = data;
     });
     console.log('recorder is finished');
   }
-  async toggleRecording() {
+  /*async toggleRecording() {
     console.log('microphone', this.recorder);
     if (this.recordOption === 'Start') {
       this.recorder.start();
@@ -59,6 +64,18 @@ export class ChatViewComponent implements OnInit {
       await delay(0);
       console.log(this.recordingBuffer);
       this.recordingBuffer = [];
+    }
+  }*/
+  async toggleRecording() {
+    if (this.recordOption === 'Start') {
+      this.recorder.start();
+      this.recordOption = 'Stop';
+    } else {
+      this.recorder.stop();
+      this.recordOption = 'Start';
+      await delay(0);
+      this.audioPlayer.nativeElement.src = URL.createObjectURL(this.recordingFinishedEvent.data);
+      this.recordingFinishedEvent = undefined;
     }
   }
 }
