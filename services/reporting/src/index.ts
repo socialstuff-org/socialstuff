@@ -33,6 +33,8 @@ const APP_HOST = process.env.APP_HOST || '::1';
   app.use((_, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE');
+
     next();
   });
 
