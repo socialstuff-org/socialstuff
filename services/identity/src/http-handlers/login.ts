@@ -33,7 +33,7 @@ const middleware = [
 async function login(req: Request, res: Response) {
   const db = (req as RequestWithDependencies).dbHandle;
 
-  const sql = 'SELECT id,password FROM users WHERE username LIKE ? AND can_login=1;';
+  const sql = 'SELECT id,password, is_admin as isAdmin FROM users WHERE username LIKE ? AND can_login=1;';
 
   const [userRow] = await db.query<RowDataPacket[]>(sql, [req.body.username]);
 
@@ -41,7 +41,7 @@ async function login(req: Request, res: Response) {
     res.status(400).json({errors: [{message: 'Invalid credentials!'}]}).end();
     return;
   }
-  const [{id, password}] = userRow;
+  const [{id, password, isAdmin}] = userRow;
 
   const passwordsMatch = await verifyHashUnique(password, req.body.password);
   if (!passwordsMatch) {
@@ -53,8 +53,8 @@ async function login(req: Request, res: Response) {
   const addTokenSql = 'INSERT INTO tokens (token, id_user, expires_at) VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 DAY));';
   try {
     await db.query(addTokenSql, [hashHmac(token), id]);
-    const response: DataResponse<{ token: string }> = {data: {token}};
-    res.status(201).json(response).end();
+    const response: DataResponse<{ token: string, isAdmin: boolean }> = {data: {token, isAdmin: isAdmin}};
+    res.status(201).json(response);
   } catch (e) {
     res.status(500).json({errors: [{message: 'Internal login error!'}]}).end();
   }

@@ -6,16 +6,11 @@ import {sharedConnection} from '../mysql';
 import {RowDataPacket} from 'mysql2/promise';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
 import {} from 'axios';
+
 export const middleware: ValidationChain[] = [
   body('max_usage')
     .isInt()
     .withMessage('Pick an Integer as max_usage!'),
-  body('times_used')
-    .isInt()
-    .optional()
-    .withMessage('pick an Integer as times_used!'),
-  //body('expiration_date')
-  //  .isDate(),
   body('active')
     .isBoolean(),
   body('code')
@@ -98,7 +93,6 @@ async function getAllInvitations(req: Request, res: Response) {
   if (headers.sortparam !== null) {
     const sql = 'SELECT * FROM invite_code ORDER BY ?, id LIMIT ?,?';
     try {
-
       response = await db.query(sql, [headers.sort_param, startIndex, endIndex]);
     } catch (e) {
       console.log(e);
