@@ -1,0 +1,33 @@
+{
+  "auth": {
+    "login": "Login",
+    "enter_credentials": "",
+    "domain": "",
+    "port": "",
+    "username": "",
+    "forgot_password": "",
+    "no_account": "",
+    "enter_details": "",
+    "confirm_password": "",
+    "invite_code": "",
+    "register": "",
+    "already_account": "",
+    "logout_successful": "",
+    "logout_redirect": "",
+    "enter_username_email": "",
+    "email": "",
+    "reset_password": "",
+    "back_to_login": ""
+  },
+  "admin": {
+    "navigation": {
+      "dashboard": "",
+      "security": ""
+    }
+  },
+  "language": {
+    "german": "Duits",
+    "dutch": "Nederlands",
+    "english": "Engels"
+  }
+}

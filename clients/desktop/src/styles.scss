@@ -1,7 +1,7 @@
 // IMPORTS
 // TODO fix imports
 // @import url(app/styles/colors.scss);
-// @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import 'assets/styles/trale-theme';
 
 // END OF IMPORTS
 
@@ -21,8 +21,28 @@ html, body {
 
   height: 100%;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+#body {
   background-color: $elderberry;
   color: $plainWhite;
+}
+
+.mat-toolbar {
+  color: inherit;
+}
+
+.mat-drawer {
+  color: inherit;
+}
+
+.mat-drawer-container {
+  color: inherit;
+  background-color: inherit;
+}
+
+.mat-dialog-container {
+  color: inherit;
 }
 
 /* CAN (MUST) BE REMOVED ! Sample Global style */
@@ -74,6 +94,28 @@ html, body {
   height: 40px;
 }
 
+.custom-button {
+  border-radius: 100px;
+  border: none;
+  background-color: $coralRed;
+  color: $plainWhite;
+  font-size: 1em;
+  height: 36px;
+  width: 300px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.custom-button:hover {
+  cursor: pointer;
+}
+
+.custom-button:disabled {
+  background-color: #535353;
+  color: #8f8f8f;
+  cursor: default;
+}
+
 // MAT INPUT STYLES
 mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-field-wrapper > div.mat-form-field-flex > div.mat-form-field-infix  { padding: 0.4em 0px }
 mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-field-wrapper > div.mat-form-field-flex > div.mat-form-field-infix > span.mat-form-field-label-wrapper { top: -1.5em; }
@@ -86,4 +128,24 @@ mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-f
 
 textarea:focus, input:focus{
   outline: none;
+}
+
+// MAT MENU
+.mat-menu-content {
+  background-color: #21142D !important;
+  border: 1px solid #ed3330 !important;
+}
+
+.mat-menu-item {
+  color: #ffffff !important;
+}
+
+.mat-menu-item:hover {
+  color: #ed3330 !important;
+}
+
+// LANGUAGE MENU
+.lang-icon {
+  width: 25px;
+  vertical-align: middle;
 }
