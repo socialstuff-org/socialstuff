@@ -22,7 +22,7 @@ async function addAReportReason(req: Request, res: Response) {
 
 async function updateReportReason(req: Request, res: Response) {
   const responseBody = await updateReasonRequest(req.body);
-  res.status(200),json(responseBody);
+  res.status(200).json(responseBody);
 }
 
 reportCreationInterface.post("/", addAReportReason);
