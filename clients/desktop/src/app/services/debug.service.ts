@@ -27,28 +27,8 @@ export class DebugService {
   ) {
   }
 
-  public async loadSession() {
-    if (AppConfig.environment === 'PROD') {
-      return false;
-    }
-    const sessionPath = path.join(this.basePath, '.debug_session');
-    try {
-      await fs.promises.stat(sessionPath);
-    } catch {
-      return false;
-    }
-    const sessionString = (await fs.promises.readFile(sessionPath)).toString('utf8');
-    const session = JSON.parse(sessionString);
-    const result = {username: session.username, key: Buffer.from(session.key.data)};
-    await this.storage.load(result.username, result.key);
-    session.hostname && (this.api.hostname = session.hostname);
-    session.port && (this.api.port = session.port);
-    session.tralePort && (this.api.tralePort = session.tralePort);
-
-    console.log('connecting to chat service...');
-    await this.titp.connect(session.username, this.api.hostname, this.api.tralePort);
-    console.log('did connect!');
-    this.titp.client.onDisconnect().subscribe(async hadError => {
+  private connectWithAnimation(session: any) {
+    return new Promise(async (res) => {
       Swal.fire({
         title: 'Disconnected!',
         html: 'Please wait until we can connect you...' +
@@ -71,17 +51,51 @@ export class DebugService {
         showCloseButton: false,
         showConfirmButton: false,
       });
-      const intervalSub = interval(5000).subscribe(async () => {
+      const attempt = async () => {
         try {
-          console.log('trying..');
           await this.titp.connect(session.username, this.api.hostname, this.api.tralePort);
+          return true;
         } catch {
-          console.log('failed');
-          return;
+          return false;
         }
+      }
+      const worked = await attempt();
+      if (worked) {
+        Swal.close();
+        res();
+        return;
+      }
+      const intervalSub = interval(5000).subscribe(async () => {
+        await attempt();
         intervalSub.unsubscribe();
         Swal.close();
+        res();
       });
+    })
+  }
+
+  public async loadSession() {
+    if (AppConfig.environment === 'PROD') {
+      return false;
+    }
+    const sessionPath = path.join(this.basePath, '.debug_session');
+    try {
+      await fs.promises.stat(sessionPath);
+    } catch {
+      return false;
+    }
+    const sessionString = (await fs.promises.readFile(sessionPath)).toString('utf8');
+    const session = JSON.parse(sessionString);
+    const result = {username: session.username, key: Buffer.from(session.key.data)};
+    await this.storage.load(result.username, result.key);
+    session.hostname && (this.api.hostname = session.hostname);
+    session.port && (this.api.port = session.port);
+    session.tralePort && (this.api.tralePort = session.tralePort);
+    console.log('connecting to chat service...');
+    await this.connectWithAnimation(session);
+    console.log('did connect!');
+    this.titp.client.onDisconnect().subscribe(async hadError => {
+      this.connectWithAnimation(session);
     });
 
     return result;
