@@ -36,9 +36,9 @@ export class DebugService {
     const session = JSON.parse(sessionString);
     const result = {username: session.username, key: Buffer.from(session.key.data)};
     await this.storage.load(result.username, result.key);
-    this.api.hostname = session.hostname;
-    this.api.port = session.port;
-    this.api.tralePort = session.tralePort;
+    session.hostname && (this.api.hostname = session.hostname);
+    session.port && (this.api.port = session.port);
+    session.tralePort && (this.api.tralePort = session.tralePort);
 
     console.log('connecting to chat service...');
     await this.titp.connect(session.username, this.api.hostname, this.api.tralePort);
