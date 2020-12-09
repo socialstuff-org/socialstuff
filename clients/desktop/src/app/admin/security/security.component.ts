@@ -14,7 +14,7 @@ export class SecurityComponent implements OnInit {
   public settingsBackup = defaultSettings();
   public settings = defaultSettings();
   public loading = false;
-  public hostname = '127.0.0.1';
+  public hostname = '[::1]';
   public port = 3002;
 
   constructor(
