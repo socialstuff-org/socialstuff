@@ -13,7 +13,7 @@ import * as _ from 'lodash';
 })
 export class CreateNewInviteComponent implements OnInit {
 
-  public hostname = '127.0.0.1';
+  public hostname = '[::1]';
   public port = 3000;
 
   constructor(
@@ -36,6 +36,7 @@ export class CreateNewInviteComponent implements OnInit {
   @Input() reload: EventEmitter<any> = new EventEmitter<any>();
 
   public addInviteCode(): void {
+    console.log(this.hostname);
     this.loading = true;
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     this.adminSettings.addInviteCode(this.inviteCode).then(response => {

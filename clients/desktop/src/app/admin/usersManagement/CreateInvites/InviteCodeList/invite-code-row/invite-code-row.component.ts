@@ -14,7 +14,7 @@ export class InviteCodeRowComponent implements OnInit {
 
   public loading = false;
 
-  public hostname = '127.0.0.1';
+  public hostname = '[::1]';
   public port = 3000;
 
   constructor(
@@ -32,12 +32,13 @@ export class InviteCodeRowComponent implements OnInit {
   @Input() reload: EventEmitter<any> = new EventEmitter<any>();
 
   public deleteInviteCode(): void {
-    // this.loading = true;
-    // this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
-    // this.adminSettings.deleteInviteCode(id).then(response => {
-    //   this.loading = false;
-    //   this.reload.emit(null);
-    // });
+    this.loading = true;
+    this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
+    this.adminSettings.deleteInviteCode(this.inviteCode.id).then(response => {
+      console.log(response)
+      this.loading = false;
+      this.reload.emit(null);
+    });
     console.log('Deleted ' + this.inviteCode.id);
   }
 

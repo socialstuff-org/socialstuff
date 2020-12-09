@@ -11,7 +11,7 @@ import {ApiService} from '../../../../../services/api.service';
 export class InviteCodeListComponent implements OnInit {
 
   public inviteCodes: Array<InviteCode> = []
-  public hostname = '127.0.0.1';
+  public hostname = '[::1]';
   public port = 3000;
 
   constructor(
