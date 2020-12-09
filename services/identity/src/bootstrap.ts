@@ -74,10 +74,10 @@ export default (async () => {
   await rebuildDatabase();
   console.log('Database ready for use!');
   console.log('seeding some data...');
-  for (let i = 0; i < 5; ++i) {
+  {
     const id = v1().replace(/-/g, '');
-    //const token = await hashHmac(id);
-    //await db.query('INSERT INTO registration_invites (secret, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY));', [token]);
+    const token = id;//await hashHmac(id);
+    await db.query('INSERT INTO invite_code (code, expiration_date, active, max_usage) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 DAY), 1, 5);', [token]);
     console.log('sample invite code:      ', id);
   }
   await db.end();
