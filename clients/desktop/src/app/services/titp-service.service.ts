@@ -6,14 +6,24 @@ import {KeyRegistryService}                            from './key-registry.serv
 import {createECDH, createPrivateKey, createPublicKey} from 'crypto';
 import {CryptoStorageService}                          from './crypto-storage.service';
 import {ApiService}                                    from './api.service';
+import {Subject}                                       from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TitpServiceService {
+  get connected(): boolean {
+    return this._connected;
+  }
+  get onConnectionStateChanged(): Subject<boolean> {
+    return this._onConnectionStateChanged;
+  }
   get client(): TitpClient {
     return this._client;
   }
+
+  private _onConnectionStateChanged = new Subject<boolean>();
+  private _connected = false;
 
   private _client: TitpClient;
 
@@ -34,5 +44,11 @@ export class TitpServiceService {
     await client.connect(hostRsa, host, port);
     this._client = client;
     this.keys.serverAddress = this.api.hostname + ':' + this.api.port;
+    client.onDisconnect().subscribe(() => {
+      this._onConnectionStateChanged.next(false);
+      this._connected = false;
+    });
+    this._onConnectionStateChanged.next(true);
+    this._connected = true;
   }
 }
