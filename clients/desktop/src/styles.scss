@@ -87,3 +87,8 @@ mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-f
 textarea:focus, input:focus{
   outline: none;
 }
+
+.swal2-shown {
+  background-color: #21142D !important;
+  color: #ffffff !important;
+}
