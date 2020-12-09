@@ -34,12 +34,13 @@
 
 #record-button {
   height: 58px;
-  width: 45px;
+  width: 55px;
   color: $plainWhite;
   background-color: #ed3330;
   position: relative;
-  bottom: 86px;
+  bottom: 111px;
   border: none;
+  border-radius: 50%;
   z-index: 100;
 }
 
@@ -48,6 +49,7 @@
 }
 #audioButton {
   border: none;
+  bottom: 806px;
   z-index: 100;
 }
 #audioButton:hover {

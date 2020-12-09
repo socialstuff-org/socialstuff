@@ -3,7 +3,9 @@
 
 <div id="chat-view-container">
   <div class="chat-message-list">
-
+    <audio id="audioButton" controls #audioPlayer type="audio/webm;codecs=opus" >
+      type="audio/webm;codecs=opus"
+    </audio>
     <app-message-box style="z-index: 100;"></app-message-box>
 
     <cdk-virtual-scroll-viewport [itemSize]="100" class="example-viewport" style="z-index: 100">
@@ -16,11 +18,11 @@
 
   </div>
 <div>
-  <button (click)="toggleRecording()"id="record-button">{{recordOption}} Recording </button>
-  <audio id="audioButton" controls #audioPlayer type="audio/webm;codecs=opus"></audio>
+  <button (click)="toggleRecording()" id="record-button">{{recordOption}} Audio </button>
+</div>
+<div>
 
 </div>
-
 </div>
 
 
