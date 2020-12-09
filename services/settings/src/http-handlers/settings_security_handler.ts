@@ -30,7 +30,7 @@ async function changeSecuritySettings(req: Request, res: Response) {
   }
   try {
     await setSecuritySettings(req.body, (req as RequestWithDependencies).dbHandle);
-    res.status(200).json(findSecuritySettings((req as RequestWithDependencies).dbHandle));
+    res.status(200).json(await findSecuritySettings((req as RequestWithDependencies).dbHandle));
   } catch (e) {
     res.status(500).json({error: 'An internal error occurred!'})
   }
