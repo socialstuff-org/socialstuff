@@ -15,8 +15,8 @@
 
 /* istanbul ignore file */
 
-import crypto                                                from 'crypto';
-import path                                                  from 'path';
+import crypto, {createPublicKey} from 'crypto';
+import path                      from 'path';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
 import {v1}                                                  from 'uuid';
@@ -56,8 +56,9 @@ export default (async () => {
     }
   }
 
-  const serverPublicRsaString = fs.readFileSync(keysPath).toString('utf-8');
-  // const serverRsaPublicKey = createPublicKey(serverPublicRsaString);
+  const serverPrivateRsaString = fs.readFileSync(keysPath).toString('utf-8');
+  const serverRsaPublicKey = createPublicKey(serverPrivateRsaString);
+  const serverPublicRsaString = serverRsaPublicKey.export({ type: 'pkcs1', format: 'pem' });
 
   const db = await createConnection({multipleStatements: true});
 
