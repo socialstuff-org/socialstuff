@@ -15,8 +15,8 @@
 
 /* istanbul ignore file */
 
-import crypto, {createPublicKey} from 'crypto';
-import path                      from 'path';
+import crypto, {createPublicKey, publicEncrypt} from 'crypto';
+import path                                     from 'path';
 // @ts-ignore
 import customEnv                                             from 'custom-env';
 import {v1}                                                  from 'uuid';
@@ -66,6 +66,8 @@ export default (async () => {
     console.log('Setting up database...');
     await rebuildDatabase();
     console.log('Database ready for use!');
+    const sampleCryptData = 'foobar';
+    console.log(`server rsa encrypt: '${sampleCryptData}' => ${publicEncrypt(serverRsaPublicKey, Buffer.from(sampleCryptData)).toString('base64')}`);
   }
 
   const [[{rootRegistered}]] = await db.query<RowDataPacket[]>('SELECT COUNT(*) rootRegistered FROM users WHERE username = \'root\';');
