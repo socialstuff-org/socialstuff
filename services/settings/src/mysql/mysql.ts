@@ -13,20 +13,44 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 import {PrismaClient} from "@prisma/client"
-import * as mysql  from 'mysql2/promise';
+import * as mysql from 'mysql2/promise';
 import {Request, response, Response} from 'express';
 import {RequestWithDependencies} from './request-with-dependencies';
 import {sharedConnection} from './client';
 import {RowDataPacket} from 'mysql2/promise';
 const prisma = new PrismaClient();
 
+
+export async function updateReasonRequest(newReason:any) {
+  const axios = require('axios');
+  const config = {
+    method : 'put',
+    url: 'http://[::]:3003/reporting/report-reasons',
+    headers:{
+    }
+  }
+
+  const updatedReason = await axios(config);
+  console.log(updatedReason.data);
+  return updatedReason.data;
+}
+
 /**
  * returns all Report reasons on the server
  */
 export async function getReportReasons() {
-  const reportReasons = await prisma.report_reason.findMany();
-  console.log(reportReasons);
-  return reportReasons;
+  const axios = require('axios');
+
+  const config = {
+    method: 'get',
+    url: 'http://[::]:3003/reporting/report-reasons',
+    headers: {
+    }
+  };
+
+  const reportReasons = await axios(config);
+  console.log(reportReasons.data);
+  return reportReasons.data;
 }
 
 /**
@@ -39,23 +63,20 @@ export async function getReportReasons() {
  * @return 201 if insertion was successfull, 409 if report reason has already been detected in the database
  */
 //TODO use different signature
-export async function insertReportReason(req: Request, res:Response) {
-  const body = req.body;
-  console.log(req.body);
-  //let existingReasons = [{a: "a"}];
-  const existingReasons = await prisma.report_reason.findMany({ where: {reason: body.reason} });
-  //existingReasons.forEach()
-  for (let i = 0; i < existingReasons.length; i++) {
-    return 409;
-  }
-  await prisma.report_reason.create({
-    data: {
-      reason: "some",
-      max_report_violations: 5,
-      report: {create: {}}
-    }
-  });
-  return 201;
+export async function insertReportReason(data: any) {
+  const axios = require('axios');
+
+  var config = {
+    method: 'post',
+    url: 'http://::1:3003/reporting/report-reasons',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+
+  return await axios(config).data;
+
 }
 
 
