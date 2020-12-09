@@ -3,19 +3,39 @@ import {RequestWithDependencies} from '../request-with-dependencies';
 import {body, ValidationChain} from 'express-validator';
 import {injectProcessEnvironmentIntoRequest} from '@socialstuff/utilities/express';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
+import {rejectOnValidationError} from '@socialstuff/utilities/express';
+
 import {RowDataPacket} from 'mysql2/promise';
+import {sharedConnection} from '../mysql';
 
 const reportReasonHandler = Router();
 
 export const middleware:ValidationChain[] = [
   body('max_report_violations').isInt(),
-  body('reason').isString()
+  body('reason').isString().custom(async reason => {
+    console.log('Checking if reason already exists: ');
+    const db = await sharedConnection();
+    const sql = 'SELECT count(*) >= 1 AS present FROM report_reason WHERE reason LIKE UPPER(?);';
+
+    const [[{present}]] = await db.query<RowDataPacket[]>(sql, [reason]);
+
+    console.log('Reason already exists?' , present);
+    if (present){
+      console.log('reason already exists, throwing error!');
+      await Promise.reject('Reason already exists!');
+    } else {
+      console.log('reason not present yet');
+      return;
+    }
+
+  })
 ];
 
 async function getAllReportReasons(req: Request, res: Response) {
   const sql = 'SELECT * FROM report_reason;';
   const db = (req as RequestWithDependencies).dbHandle;
   const reports = await db.query(sql);
+  console.log(reports[0]);
   return res.status(200).json(reports[0]);
 }
 
@@ -58,7 +78,7 @@ async function addReportReason(req: Request, res: Response) {
 
 reportReasonHandler.use(injectProcessEnvironmentIntoRequest , injectDatabaseConnectionIntoRequest);
 reportReasonHandler.get('/', getAllReportReasons);
-reportReasonHandler.post('/', middleware, addReportReason);
-reportReasonHandler.put('/', middleware, editReportReason);
+reportReasonHandler.post('/', middleware, rejectOnValidationError, addReportReason);
+reportReasonHandler.put('/', middleware, rejectOnValidationError, editReportReason);
 
 export default reportReasonHandler;
