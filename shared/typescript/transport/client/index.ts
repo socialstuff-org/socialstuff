@@ -77,7 +77,7 @@ export class TitpClient extends CommonTitpClient {
    * @param host
    * @param port
    */
-  public async connect(hostRsaPub: KeyObject, host: string, port: number = 8086) {
+  public async connect(hostRsaPub: KeyObject, host: string, port: number = 8087) {
     await (promisify<number, string>(this._socket.connect.bind(this._socket)) as any)(port, host);
     const handshake = new Handshake(this._username, this._socket, this._ecdh, this._rsa, hostRsaPub);
     await handshake._handshakeResult.toPromise();
