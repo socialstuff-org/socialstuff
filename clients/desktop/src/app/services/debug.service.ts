@@ -61,15 +61,24 @@ export class DebugService {
       }
       const worked = await attempt();
       if (worked) {
+        console.log('worked');
         Swal.close();
         res();
         return;
       }
+      console.log('after worked');
+      let attempts = 1;
       const intervalSub = interval(5000).subscribe(async () => {
-        await attempt();
-        intervalSub.unsubscribe();
-        Swal.close();
-        res();
+        const connected = await attempt();
+        console.log('connected', connected);
+
+        if (connected) {
+          intervalSub.unsubscribe();
+          Swal.close();
+          res();
+        } else {
+          console.info('failed trale connect attempt #', (++attempts));
+        }
       });
     })
   }
@@ -92,11 +101,15 @@ export class DebugService {
     session.port && (this.api.port = session.port);
     session.tralePort && (this.api.tralePort = session.tralePort);
     console.log('connecting to chat service...');
-    await this.connectWithAnimation(session);
-    console.log('did connect!');
-    this.titp.client.onDisconnect().subscribe(async hadError => {
-      this.connectWithAnimation(session);
-    });
+    this.connectWithAnimation(session);
+    this.titp.onConnectionStateChanged.subscribe(isConnected => {
+      if (isConnected) {
+        console.log('did connect!');
+        this.titp.client.onDisconnect().subscribe(async hadError => {
+          this.connectWithAnimation(session);
+        });
+      }
+    })
 
     return result;
   }
