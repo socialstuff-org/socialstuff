@@ -7,6 +7,10 @@ import {CryptoStorageService} from './crypto-storage.service';
 import {TitpServiceService}   from './titp-service.service';
 import {ContactService}       from './contact.service';
 import {ApiService}           from './api.service';
+import {Router}               from '@angular/router';
+import Swal                   from 'sweetalert2';
+import {delay}                from '@socialstuff/utilities/common';
+import {interval}             from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +23,7 @@ export class DebugService {
     private titp: TitpServiceService,
     private contacts: ContactService,
     private api: ApiService,
+    private router: Router,
   ) {
   }
 
@@ -43,6 +48,26 @@ export class DebugService {
     console.log('connecting to chat service...');
     await this.titp.connect(session.username, this.api.hostname, this.api.tralePort);
     console.log('did connect!');
+    this.titp.client.onDisconnect().subscribe(async hadError => {
+      Swal.fire({
+        title: 'Disconnected!',
+        text: 'Please wait until we can reconnect you.',
+        allowOutsideClick: false,
+        showCloseButton: false,
+        showConfirmButton: false,
+      });
+      const intervalSub = interval(5000).subscribe(async () => {
+        try {
+          console.log('trying..');
+          await this.titp.connect(session.username, this.api.hostname, this.api.tralePort);
+        } catch {
+          console.log('failed');
+          return;
+        }
+        intervalSub.unsubscribe();
+        Swal.close();
+      });
+    });
 
     return result;
   }
