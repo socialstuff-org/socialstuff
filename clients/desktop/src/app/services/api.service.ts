@@ -4,6 +4,12 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ApiService {
+  set port(value: number) {
+    this._port = value;
+  }
+  set hostname(value: string) {
+    this._hostname = value;
+  }
   set tralePort(value: number) {
     this._tralePort = value;
   }
