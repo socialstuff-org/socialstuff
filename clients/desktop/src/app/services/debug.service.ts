@@ -7,6 +7,7 @@ import {CryptoStorageService} from './crypto-storage.service';
 import {TitpServiceService}   from './titp-service.service';
 import {ChatMessageType}      from '@trale/transport/message';
 import {ContactService}       from './contact.service';
+import {ApiService}           from './api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class DebugService {
     private storage: CryptoStorageService,
     private titp: TitpServiceService,
     private contacts: ContactService,
+    private api: ApiService
   ) { }
 
   public async loadSession() {
@@ -36,7 +38,7 @@ export class DebugService {
     await this.storage.load(result.username, result.key);
 
     console.log('connecting to chat service...');
-    await this.titp.connect(session.username, '127.0.0.1', 3002);
+    await this.titp.connect(session.username, this.api.hostname, this.api.tralePort);
     // TODO - still throws due to missing conversation key
     // this.titp
     //   .client.sendChatMessageTo({
