@@ -22,7 +22,7 @@ export class ApiService {
   get hostname(): string {
     return this._hostname;
   }
-  private _hostname: string = 'joern-neumeyer.de';
+  private _hostname: string = 'trale.org';
   private _port: number = 8086;
   private endpoint = `http://${this._hostname}:${this._port}`;
   private _tralePort: number = 8087;
