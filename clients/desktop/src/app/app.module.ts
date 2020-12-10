@@ -29,17 +29,19 @@ import {MatInputModule}          from '@angular/material/input';
 import {ChatBubbleComponent}     from './utils/chat-bubble/chat-bubble.component';
 import {ChatViewComponent}       from './chat-view/chat-view.component';
 import {ChatAppComponent}        from './chat-app/chat-app.component';
-import {SidenavComponent}        from './sidenav/sidenav.component';
-import {ForgotPasswordComponent} from './auth/forgot-password/forgot-password.component';
-import {ContactInfoComponent}    from './contact-info/contact-info.component';
-import {MatDialogModule}         from '@angular/material/dialog';
-import {MatCheckboxModule}       from '@angular/material/checkbox';
-import {LogoutComponent}         from './auth/logout/logout.component';
-import {LandingComponent}        from './landing/landing.component';
-import {ScrollingModule}         from '@angular/cdk/scrolling';
-import {MessageBoxComponent}     from './message-box/message-box.component';
-import {CallFunctionComponent}   from './voice-communication/call-function/call-function.component';
-import {MicrophoneTestComponent} from './microphone-test/microphone-test.component';
+import { SidenavComponent }        from './sidenav/sidenav.component';
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { ContactInfoComponent }    from './contact-info/contact-info.component';
+import {MatDialogModule}           from "@angular/material/dialog";
+import {MatCheckboxModule}         from "@angular/material/checkbox";
+import { LogoutComponent }         from './auth/logout/logout.component';
+import { LandingComponent }        from './landing/landing.component';
+import {ScrollingModule}           from "@angular/cdk/scrolling";
+import { MessageBoxComponent }     from './message-box/message-box.component';
+import {CallFunctionComponent}     from './voice-communication/call-function/call-function.component';
+import { MicrophoneTestComponent } from './microphone-test/microphone-test.component';
+import {MatMenuModule}             from "@angular/material/menu";
+import { LanguageselectComponent } from './utils/languageselect/languageselect.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -65,6 +67,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MessageBoxComponent,
     CallFunctionComponent,
     MicrophoneTestComponent,
+    LanguageselectComponent,
   ],
   imports:      [
     BrowserModule,
@@ -89,6 +92,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MatDialogModule,
     MatCheckboxModule,
     ScrollingModule,
+    MatMenuModule,
   ],
   providers:    [],
   bootstrap:    [AppComponent],
