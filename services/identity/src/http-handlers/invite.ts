@@ -5,7 +5,6 @@ import {rejectOnValidationError} from '@socialstuff/utilities/express';
 import {sharedConnection} from '../mysql';
 import {RowDataPacket} from 'mysql2/promise';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
-import {} from 'axios';
 
 export const middleware: ValidationChain[] = [
   body('max_usage')
