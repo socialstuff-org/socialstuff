@@ -81,7 +81,6 @@ export class TextRecordStorage {
       let chunkBuffer = Buffer.alloc(this._chunkSize);
       await this._handle.read(chunkBuffer, 0, this._chunkSize, Math.max(0, i));
       if (i < 0) {
-        console.log('i', i);
         chunkBuffer = chunkBuffer.slice(0, this._chunkSize + i);
         buf = [...buf, ...chunkBuffer.toString('ascii').split('').reverse()];
         break;
@@ -109,7 +108,11 @@ export class TextRecordStorage {
         }
       }
     }
-    const record = Buffer.from(buf.reverse().join(''), 'base64');
+    const bufStr = buf.reverse().filter(x => x !== '\x00').join();
+    if (bufStr.length === 0) {
+      return;
+    }
+    const record = Buffer.from(bufStr, 'base64');
     let decrypted = this._crypt.decrypt(record);
     if (decrypted instanceof Promise) {
       decrypted = await decrypted;
