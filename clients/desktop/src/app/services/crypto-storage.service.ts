@@ -1,10 +1,13 @@
 import {Injectable}                                                            from '@angular/core';
 import {CryptoProvider, CryptoStorage}                                         from '@trale/persistence/crypto-storage';
+import { prefix } from '@trale/transport/log';
 import {BinaryLike, createCipheriv, createDecipheriv, createHash, randomBytes} from 'crypto';
 import * as fs                                                                 from 'fs';
 import * as os                                                                 from 'os';
 import * as path                                                               from 'path';
 import {Observable, Subject}                                                   from 'rxjs';
+
+const log = prefix('clients/desktop/services/crypto-storage');
 
 function cryptoProviderFactory(key: Buffer): CryptoProvider {
   return {
@@ -44,6 +47,7 @@ export class CryptoStorageService {
   private _isLoaded = new Subject<void>();
 
   public async load(username: string, key: Buffer) {
+    log('loading storage for user:', username);
     this._path = path.join(os.homedir(), '.trale');
     // .trale main directory
     try {
