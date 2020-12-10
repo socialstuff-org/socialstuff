@@ -119,7 +119,7 @@ export class RegisterComponent implements OnInit {
       hash.update(this.password);
       return hash.digest();
     })();
-    const userHandle = this.username + '@' + this.hostname + ':' + this.port;
+    const userHandle = this.username + '@' + this.hostname;
     await this.storage.load(userHandle, hash);
     await Promise.all([
       this.storage.storage.persistFileContent(['priv.pem'], Buffer.from(keys.priv.export({
