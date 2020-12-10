@@ -7,10 +7,8 @@ import {CryptoStorageService} from './crypto-storage.service';
 import {TitpServiceService} from './titp-service.service';
 import {ContactService} from './contact.service';
 import {ApiService} from './api.service';
-import {Router} from '@angular/router';
 import Swal from 'sweetalert2';
-import {delay} from '@socialstuff/utilities/common';
-import {interval} from 'rxjs';
+import {timer} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -23,11 +21,10 @@ export class DebugService {
     private titp: TitpServiceService,
     private contacts: ContactService,
     private api: ApiService,
-    private router: Router,
   ) {
   }
 
-  private connectWithAnimation(session: any) {
+  private async connectWithAnimation(session: any) {
     let now = new Date().toLocaleTimeString();
     const html = 'Please wait until we can connect you...<br>Reconnecting since: ' + now + '<br>\n' +
       '\n' +
@@ -47,44 +44,25 @@ export class DebugService {
       '</g>\n' +
       '</svg>\n';
 
-    return new Promise(async (res) => {
-      Swal.fire({
-        title: 'Disconnected!',
-        html: html,
-        allowOutsideClick: false,
-        showCloseButton: false,
-        showConfirmButton: false,
-      });
-      const attempt = async () => {
+    Swal.fire({
+      title: 'Disconnected!',
+      html,
+      allowOutsideClick: false,
+      showCloseButton: false,
+      showConfirmButton: false,
+    });
+
+    return new Promise<void>((res) => {
+      const a = timer(0, 5000).subscribe(async n => {
         try {
           await this.titp.connect(session.username, this.api.hostname, this.api.tralePort);
-          return true;
-        } catch {
-          return false;
-        }
-      }
-      const worked = await attempt();
-      if (worked) {
-        console.log('worked');
-        Swal.close();
-        res();
-        return;
-      }
-      console.log('after worked');
-      let attempts = 1;
-      const intervalSub = interval(5000).subscribe(async () => {
-        const connected = await attempt();
-        console.log('connected', connected);
-
-        if (connected) {
-          intervalSub.unsubscribe();
+          a.unsubscribe();
           Swal.close();
           res();
-        } else {
-          console.info('failed trale connect attempt #', (++attempts));
+        } catch (e) {
         }
-      });
-    })
+      })
+    });
   }
 
   public async loadSession() {
