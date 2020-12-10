@@ -1,10 +1,10 @@
 import {Component, OnInit}          from '@angular/core';
-import {ChatMenuItem, fromContact}  from '../models/ChatMenuItem';
 import {UtilService}                from '../services/util.service';
 import {ContactService}             from '../services/contact.service';
 import {acronymOfName, searchMatch} from '../../lib/helpers';
 import {TitpServiceService}         from '../services/titp-service.service';
-import { prefix } from '@trale/transport/log';
+import { prefix }                   from '@trale/transport/log';
+import {ContactWithLastMessage}     from '../models/Contact';
 
 const log = prefix('clients/desktop/app/sidenav-component');
 
@@ -14,9 +14,9 @@ const log = prefix('clients/desktop/app/sidenav-component');
   styleUrls:   ['./sidenav.component.scss'],
 })
 export class SidenavComponent implements OnInit {
-  public chats: ChatMenuItem[];
+  public chats: ContactWithLastMessage[];
   public loadingContacts = true;
-  public contactName: string = '';
+  public searchTerm = '';
 
   constructor(
     private utils: UtilService,
@@ -25,11 +25,10 @@ export class SidenavComponent implements OnInit {
   ) {
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.chats = [];
-
-    this.contacts.onContactListUpdated().subscribe(() => {
-      this.chats = this.contacts.readContacts().map(fromContact);
+    this.contacts.onContactListUpdated().subscribe(async () => {
+      this.chats = await this.contacts.loadLastMessages(this.contacts.readContacts() as any);
       this.loadingContacts = false;
       log('got the following chats:', this.chats);
     });
@@ -48,12 +47,12 @@ export class SidenavComponent implements OnInit {
   }
 
   searchContacts() {
-    if (this.contactName === '') {
+    if (this.searchTerm === '') {
       return this.contacts.readContacts();
     }
     return this.contacts.readContacts()
-      .filter(x => searchMatch(this.contactName, x.username)
-                   || searchMatch(this.contactName, x.displayName || ''));
+      .filter(x => searchMatch(this.searchTerm, x.username)
+                   || searchMatch(this.searchTerm, x.displayName || ''));
   }
 
 }

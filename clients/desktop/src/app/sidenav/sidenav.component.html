@@ -16,7 +16,7 @@
         <div style="margin-top: 10px"></div>
 
         <div style="text-align: center;">
-          <input type="text" placeholder="search contact ..." id="search-bar" [(ngModel)]="contactName" (change)="searchContacts()" />
+          <input type="text" placeholder="search contact ..." id="search-bar" [(ngModel)]="searchTerm" (change)="searchContacts()" />
         </div>
 
         <div style="margin-top: 10px"></div>
@@ -24,7 +24,7 @@
         <mat-divider class="contact-list-divider"></mat-divider>
         <mat-list-item routerLinkActive="active-list-item" class="contactListItem" *ngFor="let chat of chats">
           <mat-divider class="contact-list-divider"></mat-divider>
-          <a class="sidenav-link" [routerLink]="['chatview', chat.usernameHash]" routerLinkActive="active-link-item">
+          <a class="sidenav-link" [routerLink]="['chatview', chat.username]" routerLinkActive="active-link-item">
             <div style="width: 100%;">
               <div class="profile-picture">
                 <span *ngIf="chat.displayName; else noRealName">{{acronym(chat.displayName)}}</span>
@@ -33,12 +33,13 @@
                 </ng-template>
               </div>
               <div class="username">
-                <div *ngIf="chat.displayName; else onlyUsername">{{chat.displayName}}<br>
-                  @{{chat.username}}
+                <div>
+                  {{chat.displayName && chat.username}}
                 </div>
-                <ng-template #onlyUsername>
-                  <span style="line-height: 40px;">@{{chat.username}}</span>
-                </ng-template>
+                <div *ngIf="chat.lastMessage">
+                  {{chat.lastMessage.message | slice: 0:50}}
+                </div>
+
               </div>
             </div>
           </a>

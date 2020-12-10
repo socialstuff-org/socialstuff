@@ -1,5 +1,4 @@
 import {AppConfig} from '../environments/environment';
-import {ChatMenuItem, createEmptyChatMenuItem} from './models/ChatMenuItem';
 import {Component, OnInit} from '@angular/core';
 import {ElectronService} from './core/services';
 import {TranslateService} from '@ngx-translate/core';
