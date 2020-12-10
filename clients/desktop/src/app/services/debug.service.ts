@@ -9,6 +9,9 @@ import {ContactService} from './contact.service';
 import {ApiService} from './api.service';
 import Swal from 'sweetalert2';
 import {timer} from 'rxjs';
+import { prefix } from '@trale/transport/log';
+
+const log = prefix('clients/desktop/services/debug-service');
 
 @Injectable({
   providedIn: 'root',
@@ -54,12 +57,15 @@ export class DebugService {
 
     return new Promise<void>((res) => {
       const a = timer(0, 5000).subscribe(async n => {
+        log('trying to connect...');
         try {
           await this.titp.connect(session.username, this.api.hostname, this.api.tralePort);
           a.unsubscribe();
           Swal.close();
+          log('success!');
           res();
         } catch (e) {
+          log('failed', n, ';error:', e);
         }
       })
     });
@@ -69,16 +75,20 @@ export class DebugService {
     if (AppConfig.environment === 'PROD') {
       return false;
     }
+    log('loading session');
     const sessionPath = path.join(this.basePath, '.debug_session');
     try {
       await fs.promises.stat(sessionPath);
     } catch {
+      log('no debug session file found');
       return false;
     }
     const sessionString = (await fs.promises.readFile(sessionPath)).toString('utf8');
     const session = JSON.parse(sessionString);
+    log('session data:', session);
     const result = {username: session.username, key: Buffer.from(session.key.data)};
-    await this.storage.load(result.username, result.key);
+    await this.storage.load(`${session.username}@${session.hostname}`, result.key);
+    log('storage loaded');
     session.hostname && (this.api.hostname = session.hostname);
     session.port && (this.api.port = session.port);
     session.tralePort && (this.api.tralePort = session.tralePort);
@@ -87,12 +97,13 @@ export class DebugService {
     this.titp.onConnectionStateChanged.subscribe(isConnected => {
       if (isConnected) {
         console.log('did connect!');
-        this.titp.client.onDisconnect().subscribe(async hadError => {
+        const _a = this.titp.client.onDisconnect().subscribe(async hadError => {
           this.connectWithAnimation(session);
+          _a.unsubscribe();
         });
       }
-    })
-
+    });
+    log('done with session loading');
     return result;
   }
 
