@@ -26,7 +26,7 @@ import {enableLogging} from '@trale/transport/log';
 import { Binary } from 'mongodb';
 // @ts-ignore
 import customEnv from 'custom-env';
-customEnv();
+customEnv.env();
 
 if (process.env.APP_DEBUG) {
   enableLogging();
