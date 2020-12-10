@@ -42,6 +42,7 @@ import {CallFunctionComponent}     from './voice-communication/call-function/cal
 import { MicrophoneTestComponent } from './microphone-test/microphone-test.component';
 import {MatMenuModule}             from "@angular/material/menu";
 import { LanguageselectComponent } from './utils/languageselect/languageselect.component';
+import { ParticlesComponent } from './utils/particles/particles.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -68,6 +69,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     CallFunctionComponent,
     MicrophoneTestComponent,
     LanguageselectComponent,
+    ParticlesComponent,
   ],
   imports:      [
     BrowserModule,
