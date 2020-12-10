@@ -72,7 +72,7 @@ export class ContactService {
    */
   public async loadLastMessages(contacts: Contact[]): Promise<ContactWithLastMessage[]> {
     const foo = contacts.map(async contact => {
-      const records = await this.storage.storage.openTextRecordStorage([contact.usernameHash, 'chat.log']);
+      const records = await this.storage.storage.openTextRecordStorage(['chats', contact.usernameHash, 'chat.log']);
       const lastMessageString = await records.records().next();
       await records.close();
 
