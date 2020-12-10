@@ -1,0 +1,34 @@
+{
+  "auth": {
+    "login": "Login",
+    "enter_credentials": "Voer alstublieft uw inloggegevens in",
+    "domain": "Domein",
+    "port": "Poort",
+    "username": "Gebruikersnaam",
+    "forgot_password": "Wachtwoord vergeten",
+    "no_account": "Heeft u nog geen account?",
+    "enter_details": "Voer alstublieft uw gegevens in",
+    "confirm_password": "Bevestig wachtwoord",
+    "invite_code": "Uitnodigings-Code",
+    "register": "Registreren",
+    "already_account": "Heeft u al een account?",
+    "logout_successful": "U bent succesvol uitgelogd",
+    "logout_redirect": "U wordt spoedig omgeleid...",
+    "enter_username_email": "Voer alstublieft uw gebruikersnaam en uw e-mailadres in",
+    "email": "jouw@email.nl",
+    "reset_password": "Wachtwoord resetten",
+    "back_to_login": "Go terug naar login"
+  },
+  "admin": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "security": "Beveiliging",
+      "users": "Gebruikers"
+    }
+  },
+  "language": {
+    "german": "Duits",
+    "dutch": "Nederlands",
+    "english": "Engels"
+  }
+}
