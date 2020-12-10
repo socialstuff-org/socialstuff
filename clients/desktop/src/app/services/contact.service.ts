@@ -61,7 +61,7 @@ export class ContactService {
       rsaPublicKey:    createPublicKey(props.rsaPublicKey),
     }));
     this._contacts = contacts;
-    this._onContactListUpdated.next(contacts);
+    this._onContactListUpdated.next([...contacts]);
     log('contacts:', contacts);
   }
 
@@ -85,6 +85,7 @@ export class ContactService {
         lastMessage,
       };
     });
+    log('nr of last messages loading:', foo.length);
     return Promise.all(foo);
   }
 
@@ -165,7 +166,7 @@ export class ContactService {
     };
     const serializedProperties = Buffer.from(JSON.stringify(properties), 'utf8');
     await this.storage.storage.persistFileContent(['chats', usernameHash, 'chat.properties'], serializedProperties);
-    this._onContactListUpdated.next(this._contacts);
+    this._onContactListUpdated.next([...this._contacts]);
   }
 
   /**
@@ -187,7 +188,7 @@ export class ContactService {
     await this.storage.storage.persistFileContent(['chats', contact.usernameHash, 'chat.properties'], serializedProperties);
     const userIndex = this._contacts.map(x => x.username).indexOf(contact.username);
     this._contacts[userIndex] = contact;
-    this._onContactListUpdated.next(this._contacts);
+    this._onContactListUpdated.next([...this._contacts]);
   }
 
   /**
