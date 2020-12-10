@@ -65,15 +65,15 @@ export class HeaderComponent implements OnInit {
         return fetch(`//api.github.com/users/${login}`)
           .then(response => {
             if (!response.ok) {
-              throw new Error(response.statusText);
+              throw new Error(response.statusText)
             }
-            return response.json();
+            return response.json()
           })
           .catch(error => {
             Swal.showValidationMessage(
               `Request failed: ${error}`
-            );
-          });
+            )
+          })
       },
       allowOutsideClick: () => !Swal.isLoading()
     }).then((result) => {
@@ -82,8 +82,10 @@ export class HeaderComponent implements OnInit {
           icon: 'success',
           title: 'Success',
           text: 'Your handshake to $username has been initiated. Please wait for handshake to be finalized!',
-        });
+        })
       }
-    });
+    })
   }
+
+
 }

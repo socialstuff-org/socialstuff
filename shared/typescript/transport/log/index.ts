@@ -13,27 +13,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import * as client               from './client';
-import * as crypto               from './crypto';
-import * as log                  from './log';
-import * as message              from './message';
-import * as serial               from './serial';
-import * as server               from './server';
-import * as socket               from './socket';
-import {UserKeyRegistry}         from './user-key-registry';
-import {ConversationKeyRegistry} from './conversation-key-registry';
+let ENABLE_DEBUG_LOGGING = false;
 
-export {
-  UserKeyRegistry,
-  ConversationKeyRegistry,
-};
+export function enableLogging() {
+  ENABLE_DEBUG_LOGGING = true;
+}
 
-export default {
-  client,
-  crypto,
-  log,
-  message,
-  serial,
-  server,
-  socket,
-};
+export function disableLogging() {
+  ENABLE_DEBUG_LOGGING = true;
+}
+
+export function log(...items: any[]) {
+  if (!ENABLE_DEBUG_LOGGING) {
+    return;
+  }
+  console.log(...items);
+}
+
+export function prefix(p: string) {
+  return log.bind(null, p);
+}

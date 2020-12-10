@@ -1,8 +1,9 @@
-import {Component, OnInit}         from '@angular/core';
-import {ChatMenuItem, fromContact} from '../models/ChatMenuItem';
-import {UtilService}               from '../services/util.service';
-import {ContactService}    from '../services/contact.service';
-import {searchMatch}       from '../../lib/helpers';
+import {Component, OnInit}          from '@angular/core';
+import {ChatMenuItem, fromContact}  from '../models/ChatMenuItem';
+import {UtilService}                from '../services/util.service';
+import {ContactService}             from '../services/contact.service';
+import {acronymOfName, searchMatch} from '../../lib/helpers';
+import {TitpServiceService}         from '../services/titp-service.service';
 
 @Component({
   selector:    'app-sidenav',
@@ -16,17 +17,30 @@ export class SidenavComponent implements OnInit {
 
   constructor(
     private utils: UtilService,
-    private contacts: ContactService,
+    public contacts: ContactService,
+    private titp: TitpServiceService
   ) {
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.chats = [];
 
-    this.contacts.isLoaded.subscribe(() => {
+    this.contacts.onContactListUpdated().subscribe(() => {
       this.chats = this.contacts.readContacts().map(fromContact);
       this.loadingContacts = false;
     });
+
+    this.titp.onConnectionStateChanged.subscribe(isConnected => {
+      if (isConnected) {
+        this.titp.client.incomingMessage().subscribe(message => {
+          console.log('incoming message:', message);
+        });
+      }
+    });
+  }
+
+  public acronym(name: string) {
+    return acronymOfName(name);
   }
 
   searchContacts() {

@@ -130,6 +130,24 @@ textarea:focus, input:focus{
   outline: none;
 }
 
+.swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation {
+  background-color: #21142D !important;
+}
+
+.swal2-modal {
+  background-color: #21142D !important;
+  color: #ffffff !important;
+}
+
+.swal2-title {
+  font-weight: normal !important;
+  color: #ffffff !important;
+}
+
+.swal2-content {
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #ffffff !important;
+
 // MAT MENU
 .mat-menu-content {
   background-color: #21142D !important;

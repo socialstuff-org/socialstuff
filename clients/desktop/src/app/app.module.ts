@@ -49,8 +49,27 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, RegisterComponent, ChatListComponent, HeaderComponent, FooterComponent, ChatBubbleComponent, ChatViewComponent, ChatAppComponent, SidenavComponent, ForgotPasswordComponent, ContactInfoComponent, LogoutComponent, LandingComponent, MessageBoxComponent, CallFunctionComponent, MicrophoneTestComponent, LanguageselectComponent],
-  imports: [
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    RegisterComponent,
+    ChatListComponent,
+    HeaderComponent,
+    FooterComponent,
+    ChatBubbleComponent,
+    ChatViewComponent,
+    ChatAppComponent,
+    SidenavComponent,
+    ForgotPasswordComponent,
+    ContactInfoComponent,
+    LogoutComponent,
+    LandingComponent,
+    MessageBoxComponent,
+    CallFunctionComponent,
+    MicrophoneTestComponent,
+    LanguageselectComponent,
+  ],
+  imports:      [
     BrowserModule,
     FormsModule,
     HttpClientModule,

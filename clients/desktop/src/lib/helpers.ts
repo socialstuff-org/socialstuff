@@ -1,8 +1,15 @@
-import {createHash} from 'crypto';
+import {createHash, createHmac} from 'crypto';
 
 
 export function hashUsername(username: string) {
   return createHash('sha512')
+    .update(username)
+    .digest()
+    .toString('hex');
+}
+
+export function hashUsernameHmac(username: string, hmac: Buffer) {
+  return createHmac('sha512', hmac)
     .update(username)
     .digest()
     .toString('hex');
@@ -31,4 +38,8 @@ export function searchMatch(needle: string, haystack: string) {
     }
     return false;
   }
+}
+
+export function acronymOfName(name: string) {
+  return name.split(' ').map(x => x[0]).join('');
 }
