@@ -4,6 +4,9 @@ import {UtilService}                from '../services/util.service';
 import {ContactService}             from '../services/contact.service';
 import {acronymOfName, searchMatch} from '../../lib/helpers';
 import {TitpServiceService}         from '../services/titp-service.service';
+import { prefix } from '@trale/transport/log';
+
+const log = prefix('clients/desktop/app/sidenav-component');
 
 @Component({
   selector:    'app-sidenav',
@@ -28,6 +31,7 @@ export class SidenavComponent implements OnInit {
     this.contacts.onContactListUpdated().subscribe(() => {
       this.chats = this.contacts.readContacts().map(fromContact);
       this.loadingContacts = false;
+      log('got the following chats:', this.chats);
     });
 
     this.titp.onConnectionStateChanged.subscribe(isConnected => {
