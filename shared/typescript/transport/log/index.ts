@@ -15,7 +15,7 @@
 
 let ENABLE_DEBUG_LOGGING = false;
 
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 
 export function enableLogging() {
   ENABLE_DEBUG_LOGGING = true;
