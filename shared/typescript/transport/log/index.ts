@@ -33,5 +33,5 @@ export function log(...items: any[]) {
 }
 
 export function prefix(p: string, prefixColor: chalk.Chalk = chalk.blueBright) {
-  return log.bind(null, prefixColor, `[${prefix}]`, chalk.black);
+  return log.bind(null, prefixColor(`[${p}]`));
 }
