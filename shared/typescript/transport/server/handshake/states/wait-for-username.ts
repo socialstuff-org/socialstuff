@@ -29,11 +29,11 @@ export class WaitForUsername implements HandshakeState {
     let dataBuffer = Buffer.alloc(0);
     const sub = fromEvent<Buffer>(handshake.socket, 'data').subscribe(async data => {
       dataBuffer = Buffer.concat([dataBuffer, data]);
-      if (dataBuffer.length < 64) {
+      if (dataBuffer.length < 80) {
         return;
       }
       log('got username bytes');
-      data = dataBuffer.slice(0, 64);
+      data = dataBuffer.slice(0, 80);
       sub.unsubscribe();
       const usernameBytes = decrypt(data, handshake._syncKey);
       const username = usernameBytes.toString('utf-8').trimEnd();
