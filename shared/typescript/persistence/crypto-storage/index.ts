@@ -17,7 +17,7 @@ import path               from 'path';
 import * as fs from 'fs';
 import {BinaryLike}       from 'crypto';
 
-const RECORD_DELIMITER = Buffer.from('\n', 'ascii');
+const RECORD_DELIMITER = 10;
 
 export interface CryptoProvider {
   encrypt: (data: BinaryLike) => Buffer | Promise<Buffer>;
@@ -32,11 +32,11 @@ export class CryptoStorage {
     return this._storageDirectory;
   }
 
-  async openTextRecordStorage(file: string[] | fs.promises.FileHandle) {
+  async openTextRecordStorage(file: string[] | fs.promises.FileHandle, chunkSize: number = 16) {
     if (file instanceof Array) {
       file = await fs.promises.open(path.join(this._storageDirectory, ...file), 'r+');
     }
-    return new TextRecordStorage(file, this._crypt);
+    return new TextRecordStorage(file, this._crypt, chunkSize);
   }
 
   async loadFileContent(file: string[] | fs.promises.FileHandle) {
@@ -67,28 +67,46 @@ export class CryptoStorage {
 }
 
 export class TextRecordStorage {
-  constructor(private _handle: fs.promises.FileHandle, private _crypt: CryptoProvider) {
+  constructor(private _handle: fs.promises.FileHandle, private _crypt: CryptoProvider, private _chunkSize: number) {
   }
 
   async *records() {
     const stat = await this._handle.stat();
-    let buf = [];
+    let buf: string[] = [];
 
-    for (let i = stat.size - 1; i >= 0; --i) {
-      const b = Buffer.alloc(1);
-      await this._handle.read(b, 0, 1, i);
-      if (b.equals(RECORD_DELIMITER)) {
-        const record = Buffer.from(buf.reverse().join(''), 'base64');
-        if (record.length) {
-          let decrypted = this._crypt.decrypt(record);
-          if (decrypted instanceof Promise) {
-            decrypted = await decrypted;
+    for (let i = stat.size - 1 - this._chunkSize; ; i -= this._chunkSize) {
+      if (i === (-this._chunkSize)) {
+        break;
+      }
+      let chunkBuffer = Buffer.alloc(this._chunkSize);
+      await this._handle.read(chunkBuffer, 0, this._chunkSize, Math.max(0, i));
+      if (i < 0) {
+        console.log('i', i);
+        chunkBuffer = chunkBuffer.slice(0, this._chunkSize + i);
+        buf = [...buf, ...chunkBuffer.toString('ascii').split('').reverse()];
+        break;
+      }
+      chunkBuffer = Buffer.from(chunkBuffer.toString('ascii').split('').reverse().join(''), 'ascii');
+      
+      for (const b of chunkBuffer) {
+        if (b === 0) {
+          continue;
+        } else if (b === RECORD_DELIMITER) {
+          if (buf.length === 0) {
+            continue;
           }
-          yield decrypted;
+          const record = Buffer.from(buf.reverse().join(''), 'base64');
+          if (record.length) {
+            let decrypted = this._crypt.decrypt(record);
+            if (decrypted instanceof Promise) {
+              decrypted = await decrypted;
+            }
+            yield decrypted;
+          }
+          buf = [];
+        } else {
+          buf.push(String.fromCharCode(b));
         }
-        buf = [];
-      } else {
-        buf.push(b.toString('ascii'));
       }
     }
     const record = Buffer.from(buf.reverse().join(''), 'base64');
