@@ -34,7 +34,7 @@
               </div>
               <div class="username">
                 <div>
-                  {{chat.displayName && chat.username}}
+                  {{chat.displayName || ('@' + chat.username)}}
                 </div>
                 <div *ngIf="chat.lastMessage">
                   {{chat.lastMessage.message | slice: 0:50}}
