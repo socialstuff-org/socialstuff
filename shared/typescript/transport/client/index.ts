@@ -187,12 +187,16 @@ export class TitpClient extends CommonTitpClient {
     };
     const recipient = [{name: username, publicKey: recipientRsaPublicKey}];
     const serverMessage = buildServerMessage(message, this._rsa.priv, Buffer.alloc(0), recipient, ServerMessageType.initialHandshake, x => encryptRsa(x, recipientRsaPublicKey));
+    log('saving ecdh key for later common key computation');
     await this._keyRegistry.saveEcdhForHandshake(username, this._ecdh);
+    log('sending server message');
     await this.write(serializeServerMessage(serverMessage));
+    log('server message has been sent');
     return message;
   }
 
   private async _parseInitialHandshake(data: Buffer) {
+    log('got initial handshake');
     const signatureLength = data.readUInt16BE(0);
     const signature = data.slice(2, signatureLength + 2);
     // TODO verify signature
@@ -215,15 +219,20 @@ export class TitpClient extends CommonTitpClient {
     const savedEcdhKey = await this._keyRegistry.loadEcdhForHandshake(message.senderName);
     let conversationKey: Buffer;
     if (savedEcdhKey) {
+      log('computing secret from saved ecdh key');
       //! initiator of handshake
       conversationKey = savedEcdhKey.computeSecret(ecdhPub);
       await this._keyRegistry.removeEcdhForHandshake(message.senderName);
+      log('removed saved ecdh key for handshake with:', message.senderName);
     } else {
       //! recipient of handshake
+      log('answering key negotiation with user:', message.senderName);
       await this.negotiateKeyWith(message.senderName, ChatMessageType.handshakeReply);
       conversationKey = this._ecdh.computeSecret(ecdhPub);
+      log('computed new conversation key with user:', message.senderName);
     }
     await this._keyRegistry.saveConversationKey(message.senderName, conversationKey);
+    log('saved new conversation key for user:', message.senderName);
     return message;
   }
 
