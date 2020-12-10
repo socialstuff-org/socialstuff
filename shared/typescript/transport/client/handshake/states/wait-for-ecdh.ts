@@ -23,6 +23,8 @@ import { HandshakeState } from '../state';
 
 const log = prefix('@trale/transport/client/handshake/states/wait-for-ecdh');
 
+const maxUsernameLength = 60;
+
 export class WaitForEcdh extends HandshakeState {
   enter(handshake: Handshake) {
     let dataBuffer = Buffer.alloc(0);
@@ -44,10 +46,10 @@ export class WaitForEcdh extends HandshakeState {
         return;
       }
       handshake._syncKey = handshake.ecdh.computeSecret(ecdhPub).slice(0, 32);
-      const usernameBuffer = Buffer.from(handshake.username.padEnd(64, ' '), 'utf-8');
-      if (usernameBuffer.length > 64) {
+      const usernameBuffer = Buffer.from(handshake.username.padEnd(maxUsernameLength, ' '), 'utf-8');
+      if (usernameBuffer.length > maxUsernameLength) {
         log('username buffer was too long! username:', handshake.username);
-        throw new Error('the binary encoded username may not be londer than 64 bytes!');
+        throw new Error(`the binary encoded username may not be londer than ${maxUsernameLength} bytes!`);
       }
       handshake._write(encrypt(usernameBuffer, handshake._syncKey))
         .then(() => {
