@@ -39,7 +39,11 @@ export class WaitForEcdh extends HandshakeState {
         return;
       }
       handshake._syncKey = handshake.ecdh.computeSecret(ecdhPub).slice(0, 32);
-      handshake._write(encrypt(handshake.username.padEnd(20, ' '), handshake._syncKey))
+      const usernameBuffer = Buffer.from(handshake.username.padEnd(64, ' '), 'utf-8');
+      if (usernameBuffer.length > 64) {
+        throw new Error('the binary encoded username may not be londer than 64 bytes!');
+      }
+      handshake._write(encrypt(usernameBuffer, handshake._syncKey))
         .then(() => {
           handshake._handshakeResult.next();
           handshake._handshakeResult.complete();

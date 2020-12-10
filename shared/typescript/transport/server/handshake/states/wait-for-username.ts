@@ -23,11 +23,17 @@ import {HandshakeState}       from '../state';
 
 export class WaitForUsername implements HandshakeState {
   enter(handshake: Handshake) {
+    let dataBuffer = Buffer.alloc(0);
     const sub = fromEvent<Buffer>(handshake.socket, 'data').subscribe(async data => {
+      dataBuffer = Buffer.concat([dataBuffer, data]);
+      if (dataBuffer.length < 64) {
+        return;
+      }
+      data = dataBuffer.slice(0, 64);
       sub.unsubscribe();
       const usernameBytes = decrypt(data, handshake._syncKey);
       const username = usernameBytes.toString('utf-8').trimEnd();
-      const userRsa = await handshake._userKeyRegistry.fetchRsa(username.split('@')[0]);
+      const userRsa = await handshake._userKeyRegistry.fetchRsa(username);
       {
         const verifier = createVerify(SIGN);
         verifier.update(handshake._ecdhPub);
