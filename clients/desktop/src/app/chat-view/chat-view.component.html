@@ -4,11 +4,11 @@
 <div id="chat-view-container">
   <div class="chat-message-list">
 
-    <app-message-box style="z-index: 100;"></app-message-box>
+    <app-message-box style="z-index: 100;" (messageSent)="messageSentHandler($event)"></app-message-box>
 
-    <cdk-virtual-scroll-viewport [itemSize]="100" class="example-viewport" style="z-index: 100">
+    <cdk-virtual-scroll-viewport [itemSize]="100" class="example-viewport" #virtualScroll>
       <div *cdkVirtualFor="let message of messages;">
-        <div class="message-row">
+        <div class="message-row list-item">
           <app-chat-bubble [message]="message"></app-chat-bubble>
         </div>
       </div>

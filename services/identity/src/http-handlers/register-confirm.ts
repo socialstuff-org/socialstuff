@@ -48,7 +48,6 @@ async function registerConfirm(req: Request, res: Response) {
   const tokenHash = hashHmac(req.body.token);
   const [[{userId}]] = await db.query<RowDataPacket[]>(findTokenSql, [tokenHash]);
   await db.beginTransaction();
-  console.log(userId);
   try {
     await db.query(deleteRegistrationConfirmationSql, [tokenHash]);
     await db.query(enableUserLoginSql, [userId]);

@@ -1,6 +1,7 @@
 import { app, BrowserWindow, screen } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
+import { AppConfig } from './src/environments/environment';
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
@@ -30,7 +31,7 @@ function createWindow(): BrowserWindow {
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`)
     });
-    win.loadURL('http://localhost:4200');
+    win.loadURL('https://localhost:4200');
 
   } else {
     win.loadURL(url.format({
@@ -77,6 +78,13 @@ try {
       createWindow();
     }
   });
+
+  if (AppConfig.environment !== 'PROD') {
+    app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+      event.preventDefault();
+      callback(true);
+    });
+  }
 
 } catch (e) {
   // Catch Error

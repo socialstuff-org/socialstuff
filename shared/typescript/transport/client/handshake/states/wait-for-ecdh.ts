@@ -15,9 +15,9 @@
 
 import {createVerify}   from 'crypto';
 import {fromEvent}      from 'rxjs';
-import {SIGN}           from '../../../constants/crypto-algorithms';
-import {encryptAes384}  from '../../../crypto';
-import {Handshake}      from '../index';
+import {SIGN}                   from '../../../constants/crypto-algorithms';
+import {encrypt} from '../../../crypto';
+import {Handshake}              from '../index';
 import {HandshakeState} from '../state';
 
 export class WaitForEcdh extends HandshakeState {
@@ -38,8 +38,8 @@ export class WaitForEcdh extends HandshakeState {
         handshake._handshakeResult.error(new Error('Signature mismatch!'));
         return;
       }
-      handshake._syncKey = handshake.ecdh.computeSecret(ecdhPub);
-      handshake._write(encryptAes384(handshake.username.padEnd(20, ' '), handshake._syncKey))
+      handshake._syncKey = handshake.ecdh.computeSecret(ecdhPub).slice(0, 32);
+      handshake._write(encrypt(handshake.username.padEnd(20, ' '), handshake._syncKey))
         .then(() => {
           handshake._handshakeResult.next();
           handshake._handshakeResult.complete();

@@ -21,7 +21,7 @@ import router                                from './router';
 import {injectProcessEnvironmentIntoRequest} from '@socialstuff/utilities/express';
 
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
-const APP_HOST = process.env.APP_HOST || '0.0.0.0';
+const APP_HOST = process.env.APP_HOST || '::1';
 
 (async () => {
   await bootstrap;

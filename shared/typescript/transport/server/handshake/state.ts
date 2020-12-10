@@ -15,7 +15,7 @@
 
 import {Handshake} from './index';
 
-export abstract class HandshakeState {
-  public enter(handshake: Handshake): void { }
-  public exit(handshake: Handshake): void { }
+export interface HandshakeState {
+  enter?(handshake: Handshake): void;
+  exit?(handshake: Handshake): void;
 }

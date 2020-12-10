@@ -1,2 +1,34 @@
 {
+  "auth": {
+    "login": "Login",
+    "enter_credentials": "Please enter your credentials",
+    "domain": "domain",
+    "port": "port",
+    "username": "username",
+    "forgot_password": "Forgot password",
+    "no_account": "Don't have an account yet?",
+    "enter_details": "Please enter your details",
+    "confirm_password": "confirm password",
+    "invite_code": "Invite code",
+    "register": "Register",
+    "already_account": "Already have an account?",
+    "logout_successful": "You have successfully been logged out",
+    "logout_redirect": "You will be redirected shortly...",
+    "enter_username_email": "Please enter your username and email",
+    "email": "your@email.com",
+    "reset_password": "Reset password",
+    "back_to_login": "Go back to login"
+  },
+  "admin": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "security": "Security",
+      "users": "Users"
+    }
+  },
+  "language": {
+    "german": "German",
+    "dutch": "Dutch",
+    "english": "English"
+  }
 }

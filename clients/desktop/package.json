@@ -19,7 +19,7 @@
     "build": "npm run electron:serve-tsc && ng build --base-href ./",
     "build:dev": "npm run build -- -c dev",
     "build:prod": "npm run build -- -c production",
-    "ng:serve": "ng serve -c web -o --host 0.0.0.0 --disableHostCheck",
+    "ng:serve": "ng serve -c dev --ssl=true",
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
     "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && npx electron . --serve",
     "electron:local": "npm run build:prod && npx electron .",
@@ -49,6 +49,7 @@
     "@angular/router": "10.0.9",
     "@ngx-translate/core": "13.0.0",
     "@ngx-translate/http-loader": "6.0.0",
+    "@types/dom-mediacapture-record": "1.0.7",
     "@types/jasmine": "3.5.12",
     "@types/jasminewd2": "2.0.8",
     "@types/mocha": "8.0.2",
@@ -60,7 +61,7 @@
     "conventional-changelog-cli": "2.0.34",
     "core-js": "3.6.5",
     "cross-env": "7.0.2",
-    "electron": "9.2.0",
+    "electron": "11.0.1",
     "electron-builder": "22.8.0",
     "electron-reload": "1.5.0",
     "eslint": "7.6.0",
@@ -87,14 +88,15 @@
     "node": ">=10.13.0"
   },
   "dependencies": {
-    "@angular/animations": "^10.0.0 || ^11.0.0-0",
+    "@angular/animations": "10.2.3",
     "@angular/cdk": "10.2.0",
-    "@angular/forms": "^10.0.0 || ^11.0.0-0",
     "@angular/material": "10.2.0",
-    "@socialstuff/utilities": "0.5.0",
-    "@trale/transport": "file:../../shared/typescript/transport",
+    "@socialstuff/utilities": "0.6.2",
+    "@trale/persistence": "0.1.4",
+    "@trale/transport": "0.2.1",
     "idb": "5.0.6",
     "sweetalert2": "10.9.0",
-    "systeminformation": "4.27.7"
+    "systeminformation": "4.27.7",
+    "time-ago-pipe": "1.3.2"
   }
 }

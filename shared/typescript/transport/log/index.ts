@@ -13,8 +13,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {KeyObject} from 'crypto';
+let ENABLE_DEBUG_LOGGING = false;
 
-export interface ConversationKeyRegistry {
-  fetchConversationKey(username: string): Promise<Buffer>;
+export function enableLogging() {
+  ENABLE_DEBUG_LOGGING = true;
+}
+
+export function disableLogging() {
+  ENABLE_DEBUG_LOGGING = true;
+}
+
+export function log(...items: any[]) {
+  if (!ENABLE_DEBUG_LOGGING) {
+    return;
+  }
+  console.log(...items);
+}
+
+export function prefix(p: string) {
+  return log.bind(null, p);
 }

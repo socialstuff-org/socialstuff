@@ -13,12 +13,18 @@ export class AuthService {
   ) {
   }
 
+  /**
+   * Attempt a login at a Trale backend server.
+   * @param username
+   * @param password
+   */
   public login(username: string, password: string) {
-    return new Promise<void>((res, rej) => {
+    return new Promise<string>((res, rej) => {
       this.http.post<any>(this.api.remoteEndpoint() + '/identity/login', {username, password})
         .subscribe(response => {
           res(response.data.token);
         }, (error: HttpErrorResponse) => {
+          console.log(error);
           if (error.status === 400) {
             rej('Invalid Credentials!')
           } else {

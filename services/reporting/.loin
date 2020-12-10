@@ -1,0 +1,6 @@
+{
+  "packages": {
+    "utilities": "../../shared/typescript/utilities/",
+    "types": "../../shared/typescript/types/"
+  }
+}

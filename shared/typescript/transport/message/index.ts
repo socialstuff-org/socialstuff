@@ -14,11 +14,13 @@
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
 import {createSign, createVerify, KeyObject, sign} from 'crypto';
-import {decryptRsa, encryptAes384, encryptRsa}     from '../crypto';
+import {decryptRsa, encrypt, encryptRsa}           from '../crypto';
 
 export enum ChatMessageType {
   text,
   voice,
+  handshakeInitialization,
+  handshakeReply,
 }
 
 export interface MessageAttachment {
@@ -88,6 +90,8 @@ export function buildServerMessage(
   senderPrivateKey: KeyObject,
   key: Buffer,
   recipients: { name: string, publicKey: KeyObject }[],
+  messageType: ServerMessageType = ServerMessageType.chatMessage,
+  _encrypt: (data: Buffer, key: Buffer) => Buffer = encrypt,
 ): ServerMessage {
   // TODO encode participants
   const senderServer = message.senderName.split('@')[1];
@@ -103,8 +107,8 @@ export function buildServerMessage(
     }
   }
   return {
-    type:       ServerMessageType.chatMessage,
-    content:    encryptAes384(serializeChatMessage(message), key),
+    type:       messageType,
+    content:    _encrypt(serializeChatMessage(message), key),
     recipients: remoteRecipients,
     localRecipients,
   };
@@ -113,7 +117,7 @@ export function buildServerMessage(
 export function makeSenderNameSignature(senderName: string, senderPrivateKey: KeyObject, recipientPublicKey: KeyObject) {
   const senderNameLength = Buffer.alloc(2, 0);
   const senderNameBytes = Buffer.from(senderName, 'utf-8');
-  senderNameLength.writeInt16BE(senderNameBytes.length);
+  senderNameLength.writeInt16BE(senderNameBytes.length, 0);
   const signer = createSign('RSA-SHA512');
   signer.update(senderNameBytes);
   const senderNameSignature = signer.sign(senderPrivateKey);
@@ -123,7 +127,7 @@ export function makeSenderNameSignature(senderName: string, senderPrivateKey: Ke
 
 export function verifySenderNameSignature(signature: Buffer, senderPublicKey: KeyObject, recipientPrivateKey: KeyObject) {
   const data = decryptRsa(signature, recipientPrivateKey);
-  const senderNameLength = data.readInt16BE();
+  const senderNameLength = data.readInt16BE(0);
   const senderName = data.slice(2, 2 + senderNameLength);
   const senderNameSignature = data.slice(2 + senderNameLength);
   const verifier = createVerify('RSA-SHA512');

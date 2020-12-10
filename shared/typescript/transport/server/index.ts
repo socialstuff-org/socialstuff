@@ -19,6 +19,9 @@ import {KeyObject, ECDH}               from 'crypto';
 import {UserKeyRegistry}               from '../user-key-registry';
 import {TitpClientConnection}          from './client-connection';
 import {Handshake}                     from './handshake';
+import {prefix}                        from '../log';
+
+const log = prefix('@trale/transport/server/index');
 
 /**
  * The TitpServer is responsible for allowing users to connect to their relay server.
@@ -54,9 +57,10 @@ export class TitpServer {
    * @private
    */
   private async _handleIncomingConnection(socket: Socket) {
+    log('new connection attempt');
     const handshake = new Handshake(socket, this._ecdh, this._rsa, this._userKeyRegistry);
     const con = await handshake._handshakeResult.toPromise();
-    console.log(`Server> new successful connection with user '${con.username()}'.`);
+    log('new successful connection from:', con.username());
     this._newConnection.next(con);
   }
 

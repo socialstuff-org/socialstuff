@@ -1,33 +1,54 @@
+<app-languageselect></app-languageselect>
+
 <div id="login-container">
   <div id="sub-login-container">
   <form action="">
     <div class="input-wrapper" id="logo">
       <img src="assets/img/eye.svg" alt="img unavailable">
     </div>
-    
+
     <div class="input-wrapper" style="margin-bottom: 25px;">
-      <span id="login-headline">please enter your credentials</span>
+      <span id="login-headline">{{ 'auth.enter_credentials' | translate }}</span>
     </div>
 
     <div class="input-wrapper">
-      <input [(ngModel)]="hostname" name="domain" class="custom-input-field" id="custom-input-field-type-2" placeholder="domain"/>
-      <input [(ngModel)]="port" name="port" class="custom-input-field" id="custom-input-field-type-3" placeholder="port" type="number" min="1" max="65535"/>
+      <input [(ngModel)]="hostname" name="domain" class="custom-input-field" id="custom-input-field-type-2" placeholder="{{ 'auth.domain' | translate }}"/>
+      <input [(ngModel)]="port" name="port" class="custom-input-field" id="custom-input-field-type-3" placeholder="{{ 'auth.port' | translate }}" type="number" min="1" max="65535"/>
     </div>
     <div class="input-wrapper">
-      <input [(ngModel)]="username" name="username" class="custom-input-field wide-input-field" placeholder="username"/>
+      <input [(ngModel)]="username" name="username" class="custom-input-field wide-input-field" placeholder="{{ 'auth.username' | translate }}"/>
     </div>
     <div class="input-wrapper">
       <input [(ngModel)]="password" name="password" class="custom-input-field wide-input-field" placeholder="·········" type="password"/>
     </div>
     <div class="input-wrapper">
-      <button (click)="login()" class="custom-button">Login</button>
+      <button (click)="login()" class="custom-button">{{ 'auth.login' | translate }}</button>
     </div>
     <div class="input-wrapper">
-      <button (click)="forgotPassword()" class="custom-button">Forgot password</button>
+      <button (click)="forgotPassword()" class="custom-button">{{ 'auth.forgot_password' | translate }}</button>
     </div>
     <div class="input-wrapper">
-      <a routerLink="/register">Don't have an account yet?</a>
+      <a routerLink="/register">{{ 'auth.no_account' | translate }}</a>
     </div>
   </form>
+
+    <div *ngIf="loggingIn">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="100px" height="100px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+        <g transform="rotate(0 50 50)">
+          <rect x="0" y="30.5" rx="0" ry="0" width="100" height="3" fill="#ee4540">
+            <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.6666666666666666s" repeatCount="indefinite"></animate>
+          </rect>
+        </g><g transform="rotate(120 50 50)">
+        <rect x="0" y="30.5" rx="0" ry="0" width="100" height="3" fill="#ee4540">
+          <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.3333333333333333s" repeatCount="indefinite"></animate>
+        </rect>
+      </g><g transform="rotate(240 50 50)">
+        <rect x="0" y="30.5" rx="0" ry="0" width="100" height="3" fill="#ee4540">
+          <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animate>
+        </rect>
+      </g>
+      </svg>
+    </div>
+
   </div>
 </div>
