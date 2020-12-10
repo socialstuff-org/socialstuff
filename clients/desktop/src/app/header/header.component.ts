@@ -11,6 +11,9 @@ import {hashUsername, hashUsernameHmac}                     from '../../lib/help
 import {KeyRegistryService}                                 from '../services/key-registry.service';
 import {ChatMessage, ChatMessageType, serializeChatMessage} from '@trale/transport/message';
 import {CryptoStorageService}                               from '../services/crypto-storage.service';
+import { prefix } from '@trale/transport/log';
+
+const log = prefix('clients/desktop/components/header-component');
 
 @Component({
   selector: 'app-header',
@@ -80,8 +83,11 @@ export class HeaderComponent implements OnInit {
           rsaPublicKey: await this.keys.fetchRsa(username),
           conversationKey: Buffer.alloc(0)
         };
+        log('adding contact', contact);
         await this.contacts.addContact(contact);
+        log('done adding contact', contact);
         const chat = await this.contacts.openChat(contact);
+        log('opened chat with contact', contact)
         const initialMessage: ChatMessage = {
           senderName: this.titp.client.username(),
           content: Buffer.alloc(0),
@@ -89,7 +95,9 @@ export class HeaderComponent implements OnInit {
           sentAt: new Date(),
           attachments: []
         };
+        log('adding inital record for contact', contact);
         await chat.addRecord(serializeChatMessage(initialMessage));
+        log('closing chat for contact', contact);
         await chat.close();
         return contact;
       },
