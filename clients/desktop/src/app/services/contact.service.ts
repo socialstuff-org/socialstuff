@@ -8,6 +8,9 @@ import * as fs                           from 'fs';
 import * as path                         from 'path';
 import {Observable, Subject}             from 'rxjs';
 import {hashUsernameHmac}                from '../../lib/helpers';
+import { prefix } from '@trale/transport/log';
+
+const log = prefix('clients/desktop/app/contact-service');
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +23,9 @@ export class ContactService {
     private storage: CryptoStorageService,
   ) {
     storage.isLoaded.subscribe(async () => {
+      log('starting to load contacts');
       await this._loadContacts();
+      log('loaded contacts');
     });
   }
 
@@ -57,6 +62,7 @@ export class ContactService {
     }));
     this._contacts = contacts;
     this._onContactListUpdated.next(contacts);
+    log('contacts:', contacts);
   }
 
   /**

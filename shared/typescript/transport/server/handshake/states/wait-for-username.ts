@@ -17,9 +17,12 @@ import {createVerify}         from 'crypto';
 import {fromEvent}            from 'rxjs';
 import {SIGN}                 from '../../../constants/crypto-algorithms';
 import {decrypt}              from '../../../crypto';
+import { prefix } from '../../../log';
 import {TitpClientConnection} from '../../client-connection';
 import {Handshake}            from '../index';
 import {HandshakeState}       from '../state';
+
+const log = prefix('@trale/transport/server/handshake/state/wait-for-username');
 
 export class WaitForUsername implements HandshakeState {
   enter(handshake: Handshake) {
@@ -29,21 +32,25 @@ export class WaitForUsername implements HandshakeState {
       if (dataBuffer.length < 64) {
         return;
       }
+      log('got username bytes');
       data = dataBuffer.slice(0, 64);
       sub.unsubscribe();
       const usernameBytes = decrypt(data, handshake._syncKey);
       const username = usernameBytes.toString('utf-8').trimEnd();
       const userRsa = await handshake._userKeyRegistry.fetchRsa(username);
+      log('verifying signature for user', username);
       {
         const verifier = createVerify(SIGN);
         verifier.update(handshake._ecdhPub);
         const signatureMatch = verifier.verify(userRsa, handshake._ecdhSig);
         if (!signatureMatch) {
+          log('signature mismatch for user', username);
           handshake._handshakeResult.error(new Error('The signature did not match!'));
           return;
         }
       }
       const con = new TitpClientConnection(handshake.socket, username, handshake._syncKey);
+      log('established new connection with', con.username());
       handshake._handshakeResult.next(con);
       handshake._handshakeResult.complete();
     });

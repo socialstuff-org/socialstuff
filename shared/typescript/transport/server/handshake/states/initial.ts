@@ -15,9 +15,12 @@
 
 import {createSign}      from 'crypto';
 import {fromEvent}       from 'rxjs';
+import { prefix } from '../../../log';
 import {Handshake}       from '../index';
 import {HandshakeState}  from '../state';
 import {WaitForUsername} from './wait-for-username';
+
+const log = prefix('@trale/transport/server/handshake/state/initial');
 
 const ECDH_END_INDEX = 97;
 const ECDH_SIG_END_INDEX = ECDH_END_INDEX + 512;
@@ -30,6 +33,7 @@ export class Initial implements HandshakeState {
       if (dataBuffer.length < (ECDH_SIG_END_INDEX - 1)) {
         return;
       }
+      log('got ecdh signature')
       handshake._ecdhPub = dataBuffer.slice(0, ECDH_END_INDEX);
       handshake._ecdhSig = dataBuffer.slice(ECDH_END_INDEX, ECDH_SIG_END_INDEX);
 
@@ -42,6 +46,7 @@ export class Initial implements HandshakeState {
         reply.push(serverEcdhSig);
       }
       await handshake._write(Buffer.concat(reply));
+      log('sent reply to client');
       sub.unsubscribe();
       handshake._goToState(new WaitForUsername());
     });
