@@ -46,13 +46,13 @@ export class LoginComponent implements OnInit {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
       const token = await this.auth.login(this.username, this.password);
-      const userHandle = `${this.username}@${this.hostname}:${this.port}`;
+      const userHandle = `${this.username}@${this.hostname}`;
       const hash = createHash('sha256');
       hash.update(this.password);
       const key = hash.digest();
       await this.storage.load(userHandle, key);
       await this.storage.storage.persistFileContent(['session.token'], Buffer.from(token, 'utf8'));
-      await this.debug.persistSession(userHandle, key);
+      await this.debug.persistSession(this.username, key);
       this.loggingIn = false;
       this.router.navigateByUrl('/landing');
     } catch (e) {
