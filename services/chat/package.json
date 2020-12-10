@@ -16,7 +16,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "@socialstuff/utilities": "^0.3.1",
-    "@trale/transport": "^0.2.4",
+    "@trale/transport": "^0.2.5",
     "argon2": "^0.26.2",
     "asn1": "^0.2.4",
     "axios": "^0.20.0",
