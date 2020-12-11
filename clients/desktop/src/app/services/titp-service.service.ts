@@ -43,7 +43,7 @@ export class TitpServiceService {
     const client = new TitpClient(username, rsa, ecdh, this.keys);
     await client.connect(hostRsa, host, port);
     this._client = client;
-    this.keys.serverAddress = this.api.hostname + ':' + this.api.port;
+    this.keys.serverAddress = this.api.hostname;
     client.onDisconnect().subscribe(() => {
       this._onConnectionStateChanged.next(false);
       this._connected = false;
