@@ -34,6 +34,9 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
   }
 
   async fetchConversationKey(username: string) {
+    if (!username.includes('@')) {
+      username += '@' + this._serverAddress;
+    }
     if (this._conversationKeys[username]) {
       return this._conversationKeys[username];
     }
