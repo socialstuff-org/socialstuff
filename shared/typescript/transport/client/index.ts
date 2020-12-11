@@ -134,7 +134,7 @@ export class TitpClient extends CommonTitpClient {
     const recipientsWithPublicKeys = await Promise.all(recipients.map(async name => ({
       name, publicKey: await this._keyRegistry.fetchRsa(name),
     })));
-    const serverMessage = buildServerMessage(message, this._rsa.priv, conversationKey, recipientsWithPublicKeys);
+    const serverMessage = buildServerMessage(message, this._rsa.priv, conversationKey.slice(0, 32), recipientsWithPublicKeys);
     return this.write(serializeServerMessage(serverMessage));
   }
 
@@ -165,7 +165,8 @@ export class TitpClient extends CommonTitpClient {
       }
     }
     const messageBuffer = data.slice(signatureLength + 2);
-    const decryptedSerializedChatMessage = decrypt(messageBuffer, await this._keyRegistry.fetchConversationKey(senderName));
+    const conversationKey = await this._keyRegistry.fetchConversationKey(senderName);
+    const decryptedSerializedChatMessage = decrypt(messageBuffer, conversationKey.slice(0, 32));
     const message = deserializeChatMessage(decryptedSerializedChatMessage);
     log('parsed message', message);
     return message;
