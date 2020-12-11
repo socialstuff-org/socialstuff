@@ -109,12 +109,14 @@ html, body {
 
 .custom-button:hover {
   cursor: pointer;
+  box-shadow: 0 0 10px $coralRed;
 }
 
 .custom-button:disabled {
   background-color: #732423;
   color: #737373;
   cursor: default;
+  box-shadow: none;
 }
 
 // MAT INPUT STYLES
@@ -128,7 +130,13 @@ mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-f
 }
 
 textarea:focus, input:focus{
+  outline: none !important;
+  box-shadow: 0 0 10px $coralRed;
+}
+
+button:focus {
   outline: none;
+  box-shadow: 0 0 10px $coralRed;
 }
 
 .swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation {
