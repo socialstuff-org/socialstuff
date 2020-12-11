@@ -99,7 +99,7 @@ export function buildServerMessage(
   const remoteRecipients: { [server: string]: Buffer } = {};
   for (const r of recipients) {
     const server = r.name.split('@')[1];
-    if (server === senderServer) {
+    if (server === senderServer || server === undefined) {
       localRecipients[r.name.split('@')[0]] =
         makeSenderNameSignature(message.senderName, senderPrivateKey, r.publicKey);
     } else {
