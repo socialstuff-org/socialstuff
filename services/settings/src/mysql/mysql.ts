@@ -27,9 +27,10 @@ export async function updateReasonRequest(newReason:any) {
     method : 'put',
     url: 'http://[::]:3003/reporting/report-reasons',
     headers:{
-    }
+    },
+    data: newReason
   }
-
+  console.log('Carrying out request to reporting service')
   const updatedReason = await axios(config);
   console.log(updatedReason.data);
   return updatedReason.data;

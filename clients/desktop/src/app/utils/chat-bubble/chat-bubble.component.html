@@ -1,21 +1,33 @@
-<div class="bubble bubble-{{ message.isSender ? 'own' : 'foreign' }}">
-  <div class="message-container">
-    {{message.message}}
-  </div>
+<section *ngIf="message.type === ChatMessageType.handshake; else noHandshake" style="background-color: blue;">
+  Handshake received on: {{message.sentAt | date: 'd.M.y h:m'}}
+</section>
 
-  <div class="status-container">
-    <div *ngIf="message.sent">
-      <mat-icon class="status-sent">keyboard_backspace</mat-icon>
+<ng-template #noHandshake>
+  <div class="bubble bubble-{{ isSender ? 'own' : 'foreign' }}">
+    <div class="message-container">
+      <section *ngIf="message.type === ChatMessageType.text">
+        {{message.content.toString('utf-8')}}
+      </section>
+      <section *ngIf="message.type === ChatMessageType.voice">
+        Voice message:<br>
+        <audio #audioPlayer controls></audio>
+      </section>
     </div>
-    <div *ngIf="message.delivered">
-      <mat-icon class="status-delivered">swap_vert</mat-icon>
-    </div>
-    <div *ngIf="message.seen">
-      <mat-icon class="status-seen">visibility</mat-icon>
-    </div>
-  </div>
 
-  <div class="time-container">
-    {{message.time}}
+    <div class="status-container">
+      <!--<div *ngIf="message.sent">
+        <mat-icon class="status-sent">keyboard_backspace</mat-icon>
+      </div>
+      <div *ngIf="message.delivered">
+        <mat-icon class="status-delivered">swap_vert</mat-icon>
+      </div>
+      <div *ngIf="message.seen">
+        <mat-icon class="status-seen">visibility</mat-icon>
+      </div>-->
+    </div>
+
+    <div class="time-container">
+      {{message.sentAt | date: 'H:mm' }}
+    </div>
   </div>
-</div>
+</ng-template>

@@ -1,0 +1,17 @@
+<div style="position:fixed; top: 10px; right: 10px;">
+  <button mat-button [matMenuTriggerFor]="menu"><mat-icon>language</mat-icon></button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="translate.use('en')">
+      <img class="lang-icon" src="https://cdn.code-lake.com/socialstuff/img/icons/226-united-states.svg" alt="">
+      {{'language.english' | translate}}
+    </button>
+    <button mat-menu-item (click)="translate.use('de')">
+      <img class="lang-icon" src="https://cdn.code-lake.com/socialstuff/img/icons/162-germany.svg" alt="">
+      {{'language.german' | translate}}
+    </button>
+    <button mat-menu-item (click)="translate.use('nl')">
+      <img class="lang-icon" src="https://cdn.code-lake.com/socialstuff/img/icons/237-netherlands.svg" alt="">
+      {{'language.dutch' | translate}}
+    </button>
+  </mat-menu>
+</div>

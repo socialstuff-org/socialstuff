@@ -20,3 +20,13 @@
   text-transform: uppercase;
   color: $plainWhite;
 }
+
+.social-media-icon {
+  width: 20px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.social-media-icon:hover {
+  cursor: pointer;
+}

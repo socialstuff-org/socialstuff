@@ -4,9 +4,28 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ApiService {
-  private endpoint = 'http://127.0.0.1:8086';
-  public hostname: string = '';
-  public port: number = 8086;
+  set port(value: number) {
+    this._port = value;
+  }
+  set hostname(value: string) {
+    this._hostname = value;
+  }
+  set tralePort(value: number) {
+    this._tralePort = value;
+  }
+  get tralePort(): number {
+    return this._tralePort;
+  }
+  get port(): number {
+    return this._port;
+  }
+  get hostname(): string {
+    return this._hostname;
+  }
+  private _hostname: string = 'joern-neumeyer.de';
+  private _port: number = 8086;
+  private endpoint = `http://${this._hostname}:${this._port}`;
+  private _tralePort: number = 8087;
 
   constructor() { }
 
@@ -20,5 +39,8 @@ export class ApiService {
 
   public updateRemoteEndpoint(endpoint: string): void {
     this.endpoint = endpoint;
+    const [host,port] = endpoint.split('//')[1].split('/')[0].split(':');
+    this._hostname = host;
+    this._port = parseInt(port);
   }
 }

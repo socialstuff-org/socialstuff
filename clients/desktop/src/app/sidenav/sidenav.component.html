@@ -22,18 +22,18 @@
         <div style="margin-top: 10px"></div>
 
         <mat-divider class="contact-list-divider"></mat-divider>
-        <mat-list-item routerLinkActive="active-list-item" class="contactListItem" *ngFor="let chat of chats">
+        <mat-list-item routerLinkActive="active-list-item" class="contactListItem" *ngFor="let chat of contacts.onContactListUpdated() | async">
           <mat-divider class="contact-list-divider"></mat-divider>
-          <a class="sidenav-link" [routerLink]="['/chatview/1']" routerLinkActive="active-link-item">
+          <a class="sidenav-link" [routerLink]="['chatview', chat.usernameHash]" routerLinkActive="active-link-item">
             <div style="width: 100%;">
               <div class="profile-picture">
-                <span *ngIf="chat.realName; else noRealName">{{chat.acronym}}</span>
+                <span *ngIf="chat.displayName; else noRealName">{{acronym(chat.displayName)}}</span>
                 <ng-template #noRealName>
                   <mat-icon style="margin-top: 7px;">person</mat-icon>
                 </ng-template>
               </div>
               <div class="username">
-                <div *ngIf="chat.realName; else onlyUsername">{{chat.realName}}<br>
+                <div *ngIf="chat.displayName; else onlyUsername">{{chat.displayName}}<br>
                   @{{chat.username}}
                 </div>
                 <ng-template #onlyUsername>

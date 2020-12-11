@@ -2,15 +2,19 @@
   <span>
     <img src="https://cdn.code-lake.com/socialstuff/img/eye.svg" alt="img unavailable" id="logo">
   </span>
-  <a routerLink="/landing" id="socialstuff">SocialStuff - logged in as {{titp.client?.username()}}</a>
+
+  <span>Trale Messenger</span>
+
   <span class="example-spacer"></span>
-  <div id="profile-picture" *ngIf="chatPartner">
+
+  <div id="profile-picture" (click)="openContactInfo()" *ngIf="chatPartner">
     <span *ngIf="chatPartner.realName; else noRealName">{{chatPartner.acronym}}</span>
     <ng-template #noRealName>
       <mat-icon style="margin-top: 7px;">person</mat-icon>
     </ng-template>
   </div>
-  <div id="username" (click)="openContactInfo()"  *ngIf="chatPartner">
+
+  <div id="username" (click)="openContactInfo()" *ngIf="chatPartner">
     <div *ngIf="chatPartner.realName; else onlyUsername">{{chatPartner.realName}}<br>
       @{{chatPartner.username}}
     </div>
@@ -18,7 +22,9 @@
       <span style="line-height: 40px;">@{{chatPartner.username}}</span>
     </ng-template>
   </div>
+
   <span class="example-spacer"></span>
+
   <button
     (click)="addNewContact()"
     style="margin-right: 10px;"
@@ -27,6 +33,22 @@
   >
     <mat-icon>add</mat-icon>Add contact
   </button>
+
+  <button
+    mat-button
+    class="default-button"
+    style="margin-right: 10px; padding-left: 5px;"
+    [matMenuTriggerFor]="menu"
+  >
+    <mat-icon inline style="font-size: 2em;">arrow_drop_down</mat-icon>
+    {{titp.client?.username().split('@', 1)}}
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item>Profile</button>
+    <button mat-menu-item>Settings</button>
+    <span mat-menu-item>Connected to:</span>
+    <span mat-menu-item>{{titp.client?.username().split('@', 2)[1]}}</span>
+  </mat-menu>
   <button (click)="logout()" id="logout-btn">
     <mat-icon>exit_to_app</mat-icon>
   </button>

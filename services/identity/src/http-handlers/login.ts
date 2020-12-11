@@ -50,7 +50,7 @@ async function login(req: Request, res: Response) {
   }
 
   const token = v1().replace(/-/g, '');
-  const addTokenSql = 'INSERT INTO tokens (token, id_user, expires_at) VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 DAY));';
+  const addTokenSql = 'INSERT INTO tokens (token, id_user, expires_at) VALUES (unhex(?),?,DATE_ADD(NOW(), INTERVAL 1 DAY));';
   try {
     await db.query(addTokenSql, [hashHmac(token), id]);
     const response: DataResponse<{ token: string, isAdmin: boolean }> = {data: {token, isAdmin: isAdmin}};
