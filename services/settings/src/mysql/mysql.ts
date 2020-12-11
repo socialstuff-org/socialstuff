@@ -33,7 +33,7 @@ export async function updateReasonRequest(newReason:any) {
   console.log('Carrying out request to reporting service')
   const updatedReason = await axios(config);
   console.log(updatedReason.data);
-  return updatedReason.data;
+  return updatedReason;
 }
 
 /**
@@ -56,18 +56,18 @@ export async function getReportReasons() {
 
 /**
  * Adds a report reason to the Database
- * @param reason: The reason in a json format:
  * {
  *   "reason": "some reason",
  *   "max_report_violations": 5
  * }
  * @return 201 if insertion was successfull, 409 if report reason has already been detected in the database
+ * @param data
  */
 //TODO use different signature
 export async function insertReportReason(data: any) {
   const axios = require('axios');
 
-  var config = {
+  const config = {
     method: 'post',
     url: 'http://::1:3003/reporting/report-reasons',
     headers: {
@@ -75,8 +75,10 @@ export async function insertReportReason(data: any) {
     },
     data : data
   };
-
-  return await axios(config).data;
+  console.log("carrying out request: ")
+  const returnRes = await axios(config);
+  console.log(returnRes.status )
+  return await axios(config);
 
 }
 

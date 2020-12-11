@@ -16,13 +16,22 @@ async function getAllReports(req:Request, res: Response) {
 //TODO return correct error message
 async function addAReportReason(req: Request, res: Response) {
   const responseBody = await insertReportReason(req.body);
-  console.log("Status code addAReportReason: ", responseBody);
-  res.status(200).json(responseBody);
+  console.log('Status code: ', responseBody.validateStatus(200));
+  if (responseBody.validateStatus(200)) {
+    console.log("Status code addAReportReason: ", responseBody);
+    res.status(200).json(responseBody.data);
+  } else {
+    res.status(500).end()
+  }
 }
 
 async function updateReportReason(req: Request, res: Response) {
-  const responseBody = await updateReasonRequest(req.body);
-  res.status(200).json(responseBody);
+  const response = await updateReasonRequest(req.body);
+  if (response.validateStatus(200))
+    res.status(200).json(response.data);
+  else {
+    res.status(500).end();
+  }
 }
 
 reportCreationInterface.post("/", addAReportReason);
