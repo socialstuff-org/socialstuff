@@ -34,7 +34,7 @@ export class CryptoStorage {
 
   async openTextRecordStorage(file: string[] | fs.promises.FileHandle, chunkSize: number = 16) {
     if (file instanceof Array) {
-      file = await fs.promises.open(path.join(this._storageDirectory, ...file), 'r+');
+      file = await fs.promises.open(path.join(this._storageDirectory, ...file), 'a+');
     }
     return new TextRecordStorage(file, this._crypt, chunkSize);
   }
