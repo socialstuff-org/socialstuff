@@ -35,7 +35,6 @@ import { ContactInfoComponent }    from './contact-info/contact-info.component';
 import {MatDialogModule}           from "@angular/material/dialog";
 import {MatCheckboxModule}         from "@angular/material/checkbox";
 import { LogoutComponent }         from './auth/logout/logout.component';
-import { LandingComponent }        from './landing/landing.component';
 import {ScrollingModule}           from "@angular/cdk/scrolling";
 import { MessageBoxComponent }     from './message-box/message-box.component';
 import {CallFunctionComponent}     from './voice-communication/call-function/call-function.component';
@@ -64,7 +63,6 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ForgotPasswordComponent,
     ContactInfoComponent,
     LogoutComponent,
-    LandingComponent,
     MessageBoxComponent,
     CallFunctionComponent,
     MicrophoneTestComponent,

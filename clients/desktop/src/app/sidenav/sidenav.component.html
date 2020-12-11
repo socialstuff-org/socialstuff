@@ -24,7 +24,7 @@
         <mat-divider class="contact-list-divider"></mat-divider>
         <mat-list-item routerLinkActive="active-list-item" class="contactListItem" *ngFor="let chat of chats">
           <mat-divider class="contact-list-divider"></mat-divider>
-          <a class="sidenav-link" [routerLink]="['..', 'chatview', chat.username]" routerLinkActive="active-link-item">
+          <a class="sidenav-link" [routerLink]="['/chat-app', chat.username]" routerLinkActive="active-link-item">
             <div style="width: 100%;">
               <div class="profile-picture">
                 <span *ngIf="chat.displayName; else noRealName">{{acronym(chat.displayName)}}</span>
@@ -51,7 +51,4 @@
     </mat-list>
   </mat-sidenav>
 
-  <mat-sidenav-content>
-    <router-outlet></router-outlet>
-  </mat-sidenav-content>
 </mat-sidenav-container>

@@ -23,6 +23,7 @@ const log = prefix('clients/desktop/components/header-component');
 export class HeaderComponent implements OnInit {
 
   @Input() chatPartner: Contact;
+  @Input() username: string;
   private contactInfoIsOpen = false;
 
   constructor(

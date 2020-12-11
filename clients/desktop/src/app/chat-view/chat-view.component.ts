@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit}                   from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Message}                             from '../models/Message';
 import {ChatPartner, createEmptyChatPartner} from '../models/ChatPartner';
 import {UtilService}                         from '../services/util.service';
@@ -18,9 +18,11 @@ import { Contact } from 'app/models/Contact';
 })
 export class ChatViewComponent implements OnInit, OnDestroy {
 
+  @Input('contact') contact: Contact;
+
   public messages: Message[];
   public chat: TextRecordStorage;
-  public contact: Contact;
+  // public contact: Contact;
 
   constructor(
     private utils: UtilService,
@@ -33,7 +35,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     debug.loadSession();
   }
   ngOnDestroy(): void {
-    this.chat.close();
+    this.chat?.close();
   }
 
   ngOnInit() {
