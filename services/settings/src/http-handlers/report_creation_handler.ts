@@ -12,9 +12,15 @@ import {RowDataPacket} from 'mysql2';
 const reportCreationInterface = Router();
 
 async function getAllReports(req:Request, res: Response) {
-  console.log("report creation has been called");
-  const reports = await getReportReasons();
-  res.json(reports);
+  try {
+
+    console.log("report creation has been called");
+    const reports = await getReportReasons();
+    res.status(200).json(reports);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({error: 'The report reasons couldn\'t be fetched, pleas notify the administrator'})
+  }
 }
 
 //TODO return correct error message
