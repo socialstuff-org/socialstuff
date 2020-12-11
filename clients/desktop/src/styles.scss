@@ -28,6 +28,10 @@ html, body {
   color: $plainWhite;
 }
 
+::selection {
+  background-color: $coralRed;
+}
+
 .mat-toolbar {
   color: inherit;
   font-size: 1em;
