@@ -40,12 +40,15 @@ async function getAllReportReasons(req: Request, res: Response) {
 }
 
 async function editReportReason(req: Request, res: Response) {
-  const max_report_violations = req.body.max_report_violations;
+  const maxReportViolations = req.body.max_report_violations;
   const reason = req.body.reason;
   const sql = 'UPDATE report_reason SET reason = ?, max_report_violations = ? WHERE id = ?;';
   const db = (req as RequestWithDependencies).dbHandle;
   try {
-    await db.query(sql, [reason, max_report_violations, req.body.id]);
+    console.log('adding reason:     ', req.body.reason);
+    console.log('With ID:           ', req.body.id);
+    console.log('With max_report_v: ', maxReportViolations);
+    await db.query(sql, [reason, maxReportViolations, req.body.id]);
   } catch (e) {
     console.log(e);
     res.status(500).end();
@@ -78,7 +81,7 @@ async function addReportReason(req: Request, res: Response) {
 
 reportReasonHandler.use(injectProcessEnvironmentIntoRequest , injectDatabaseConnectionIntoRequest);
 reportReasonHandler.get('/', getAllReportReasons);
-reportReasonHandler.post('/', middleware, rejectOnValidationError, addReportReason);
 reportReasonHandler.put('/', middleware, rejectOnValidationError, editReportReason);
+reportReasonHandler.post('/', middleware, rejectOnValidationError, addReportReason);
 
 export default reportReasonHandler;
