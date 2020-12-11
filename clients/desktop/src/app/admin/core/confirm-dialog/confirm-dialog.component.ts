@@ -1,4 +1,4 @@
-import {Component, Inject, Input, OnInit} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 
 @Component({
@@ -18,6 +18,8 @@ export class ConfirmDialogComponent implements OnInit {
   private confirmButton: string;
   private cancelButton: string;
   private warn: boolean;
+
+  private warnIcon = '../../../../assets/icons/warn_icon.svg'
 
   constructor(
     private dialogRef: MatDialogRef<ConfirmDialogComponent>,

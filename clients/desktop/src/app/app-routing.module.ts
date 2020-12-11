@@ -18,16 +18,19 @@ import {DashboardViewComponent} from './admin/Dashboard/dashboard-view/dashboard
 import {CallFunctionComponent}   from './voice-communication/call-function/call-function.component';
 import {MicrophoneTestComponent} from './microphone-test/microphone-test.component';
 
-export const routesChat: Routes = [
+export const routesShared: Routes = [
   {
     path:       '',
-    redirectTo: 'login',
+    redirectTo: 'chatview/1',
     pathMatch:  'full',
   },
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'forgot-password', component: ForgotPasswordComponent},
   {path: 'logout', component: LogoutComponent},
+];
+
+export const routesChat: Routes = [
   {path: 'landing', component: LandingComponent},
   {path: 'chatview/:id', component: ChatViewComponent},
   {path: 'chap-app', component: ChatAppComponent},
@@ -117,7 +120,7 @@ export const routesSettings: Routes = [
   },
 ];
 
-const routes = routesChat.concat(routesSettings);
+const routes = routesChat.concat(routesSettings).concat(routesShared);
 
 @NgModule({
   imports: [

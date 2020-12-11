@@ -1,8 +1,10 @@
 import {Component, EventEmitter, Input, OnInit} from '@angular/core';
 import { ReportReason, defaultReportReason } from '../../../../../interfaces/ReportReason';
 import *as _ from 'lodash';
-import {AdminSettings} from "../../../../../../services/ap-settings.service";
-import {ApiService} from "../../../../../../services/api.service";
+import {AdminSettings} from '../../../../../../services/ap-settings.service';
+import {ApiService} from '../../../../../../services/api.service';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {ConfirmDialogComponent} from '../../../../../core/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-report-reason-entry',
@@ -17,6 +19,7 @@ export class ReportReasonEntryComponent implements OnInit {
   constructor(
     private adminSettings: AdminSettings,
     private api: ApiService,
+    private dialog: MatDialog
   ) {
   }
 
@@ -52,5 +55,37 @@ export class ReportReasonEntryComponent implements OnInit {
   cancelEditing () {
     this.reportReason = _.cloneDeep(this.backUpReportReason);
     this.editable = false;
+  }
+
+  deleteReportReason() {
+    this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
+    this.adminSettings.deleteReportReason(this.reportReason).then(response => {
+      this.reload.emit(null);
+    });
+    console.log('DELETED');
+  }
+
+  openDialog() {
+
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = false;
+    dialogConfig.autoFocus = true;
+
+    dialogConfig.data = {
+      header: 'Deletion',
+      message: 'You are about to delete the Reason: \'' + this.reportReason.reason + '\'. This deletion can\'t be reversed',
+      confirmButton: 'Delete',
+      cancelButton: 'Cancel',
+      warn: true
+    };
+
+    const confirmDialog = this.dialog.open(ConfirmDialogComponent, dialogConfig);
+
+    confirmDialog.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.deleteReportReason();
+      }
+    });
   }
 }

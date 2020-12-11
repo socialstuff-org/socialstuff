@@ -57,5 +57,10 @@ export class AdminSettings {
     return this.http.put<any>((this.api.remoteEndpoint() + '/reporting/report-reasons'), reportReason).toPromise();
   }
 
+  public deleteReportReason(reportReason): Promise<any> {
+    const headers = new HttpHeaders().set('id', reportReason.id.toString());
+    return this.http.put<any>((this.api.remoteEndpoint() + '/reporting/report-reasons'), headers).toPromise();
+  }
+
 
 }

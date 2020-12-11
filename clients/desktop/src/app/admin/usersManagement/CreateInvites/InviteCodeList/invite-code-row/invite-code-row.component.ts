@@ -35,7 +35,6 @@ export class InviteCodeRowComponent implements OnInit {
     this.loading = true;
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     this.adminSettings.deleteInviteCode(this.inviteCode.id).then(response => {
-      console.log(response)
       this.loading = false;
       this.reload.emit(null);
     });

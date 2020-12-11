@@ -1,5 +1,8 @@
-<h1 mat-dialog-title>{{header}}</h1>
+<h1 mat-dialog-title>
+  <div *ngIf="warn" class="operator-logo" [inlineSVG]="warnIcon"></div>
+</h1>
 <div mat-dialog-content>
+  <h2 class="header-text">{{header}}</h2>
   <p>{{message}}</p>
 </div>
 <div mat-dialog-actions>

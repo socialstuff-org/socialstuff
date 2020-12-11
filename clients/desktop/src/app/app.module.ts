@@ -72,6 +72,7 @@ import { ReasonsForReportComponent } from './admin/usersManagement/ReportSystem/
 import { InformationTypeTileComponent } from './admin/Dashboard/information-type-tile/information-type-tile.component';
 import { DashboardViewComponent } from './admin/Dashboard/dashboard-view/dashboard-view.component';
 import { ConfirmDialogComponent } from './admin/core/confirm-dialog/confirm-dialog.component';
+import {InlineSVGModule} from "ng-inline-svg";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -119,38 +120,39 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     CallFunctionComponent,
     MicrophoneTestComponent
   ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule,
-    CoreModule,
-    AppRoutingModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
-      },
-    }),
-    MatButtonModule,
-    MatToolbarModule,
-    MatIconModule,
-    MatSidenavModule,
-    MatListModule,
-    BrowserAnimationsModule,
-    MatInputModule,
-    MatDialogModule,
-    MatGridListModule,
-    MatSlideToggleModule,
-    MatCheckboxModule,
-    ScrollingModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    NgxMatDatetimePickerModule,
-    NgxMatTimepickerModule,
-    NgxNativeDateModule,
-    NgxMatNativeDateModule
-  ],
+    imports: [
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        CoreModule,
+        AppRoutingModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient],
+            },
+        }),
+        MatButtonModule,
+        MatToolbarModule,
+        MatIconModule,
+        MatSidenavModule,
+        MatListModule,
+        BrowserAnimationsModule,
+        MatInputModule,
+        MatDialogModule,
+        MatGridListModule,
+        MatSlideToggleModule,
+        MatCheckboxModule,
+        ScrollingModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        NgxMatDatetimePickerModule,
+        NgxMatTimepickerModule,
+        NgxNativeDateModule,
+        NgxMatNativeDateModule,
+        InlineSVGModule
+    ],
   providers:    [],
   bootstrap:    [AppComponent],
 })
