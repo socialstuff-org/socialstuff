@@ -23,7 +23,7 @@
       <input [(ngModel)]="password" name="password" class="custom-input-field wide-input-field" placeholder="·········" type="password"/>
     </div>
     <div class="input-wrapper">
-      <button (click)="login()" class="custom-button">{{ 'auth.login' | translate }}</button>
+      <button (click)="login()" class="custom-button" [disabled]="username == '' || password == ''">{{ 'auth.login' | translate }}</button>
     </div>
     <div class="input-wrapper">
       <button (click)="forgotPassword()" class="custom-button">{{ 'auth.forgot_password' | translate }}</button>
