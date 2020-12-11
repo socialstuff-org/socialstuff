@@ -96,10 +96,7 @@ export class ContactService {
    * @param username
    */
   public async exists(username: string): Promise<string | false> {
-    const usernameHash = createHash('sha512')
-      .update(username)
-      .digest()
-      .toString('hex');
+    const usernameHash = hashUsernameHmac(username, this.storage.masterKey);
     try {
       await fs.promises.stat(path.join(this.storage.storage.storageDirectory, 'chats', usernameHash));
       return usernameHash;
