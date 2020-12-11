@@ -22,7 +22,7 @@ const log = prefix('clients/desktop/components/header-component');
 })
 export class HeaderComponent implements OnInit {
 
-  @Input() chatPartner: ChatPartner;
+  @Input() chatPartner: Contact;
   private contactInfoIsOpen = false;
 
   constructor(
@@ -99,6 +99,7 @@ export class HeaderComponent implements OnInit {
         await chat.addRecord(serializeChatMessage(initialMessage));
         log('closing chat for contact', contact);
         await chat.close();
+        log('done closing chat for contact', contact);
         return contact;
       },
       allowOutsideClick: () => !Swal.isLoading()
