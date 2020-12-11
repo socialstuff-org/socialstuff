@@ -129,7 +129,11 @@ mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-f
   color: $plainWhite !important;
 }
 
-textarea:focus, input:focus{
+textarea:focus {
+  outline: none;
+}
+
+input:focus{
   outline: none !important;
   box-shadow: 0 0 10px $coralRed;
 }
