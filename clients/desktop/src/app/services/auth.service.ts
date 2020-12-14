@@ -21,7 +21,7 @@ export class AuthService {
    * @param username
    * @param password
    */
-  public login(username: string, password: string) {
+  public login(username: string, password: string): Promise<string> {
     return new Promise<string>((res, rej) => {
       this.http.post<any>(this.api.remoteEndpoint() + '/identity/login', {username, password})
         .subscribe(response => {
