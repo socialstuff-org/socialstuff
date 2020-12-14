@@ -52,7 +52,10 @@
           <mat-divider class="contact-list-divider"></mat-divider>
         </mat-list-item>
       </ng-template>
-      <span *ngIf="chats.length === 0">No chats logs found.</span>
+      <div style="text-align: center; margin-top: 20px;">
+        <span *ngIf="chats.length === 0" style="font-style: italic;">No contacts found.</span>
+      </div>
+
 
     </mat-list>
   </mat-sidenav>
