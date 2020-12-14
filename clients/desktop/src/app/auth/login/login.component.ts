@@ -54,9 +54,8 @@ export class LoginComponent implements OnInit {
    * loggingIn will be set to true for loading animation handling. Update remote endpoint with entered hostname and port
    * data. Attempt a login on Trale server with provided credentials.
    *
-   * If attempt was successful load user storage from
-   * local drive and persist session token. Store current session in debug session for development. Set loggingIn to false
-   * to stop animation. Redirect to chat application.
+   * If attempt was successful load user storage from local drive and persist session token. Store current session in
+   * debug session for development. Set loggingIn to false to stop animation. Redirect to chat application.
    *
    * If attempt was unsuccessful fire sweetalert error and set status of loggingIn to false.
    */

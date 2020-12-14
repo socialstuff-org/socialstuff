@@ -42,9 +42,9 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
   /**
    * Fetches conversation key for a specific user. If local array of conversation keys does not contain the requested
    * key, the key will be requested from contact service.
-   * @error Throws error if conversation key could not be loaded.
    * @param username The username from which the conversation key shall be loaded
    * @return Promise<Buffer> containing conversation key
+   * @throws Throws error if conversation key could not be loaded.
    */
   async fetchConversationKey(username: string): Promise<Buffer> {
     if (!username.includes('@')) {
