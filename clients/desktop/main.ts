@@ -1,11 +1,11 @@
-import { app, BrowserWindow, screen } from 'electron';
-import * as path from 'path';
-import * as url from 'url';
-import { AppConfig } from './src/environments/environment';
+import {app, BrowserWindow, screen} from 'electron';
+import * as path                    from 'path';
+import * as url                     from 'url';
+import {AppConfig}                  from './src/environments/environment';
 
 let win: BrowserWindow = null;
-const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
+const args  = process.argv.slice(1),
+      serve = args.some(val => val === '--serve');
 
 function createWindow(): BrowserWindow {
 
@@ -14,14 +14,15 @@ function createWindow(): BrowserWindow {
 
   // Create the browser window.
   win = new BrowserWindow({
-    x: 0,
-    y: 0,
-    width: size.width,
-    height: size.height,
+    x:              0,
+    y:              0,
+    width:          size.width,
+    height:         size.height,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration:             true,
       allowRunningInsecureContent: (serve) ? true : false,
     },
+    // TODO enable --> frame: false,
   });
 
   if (serve) {
@@ -37,7 +38,7 @@ function createWindow(): BrowserWindow {
     win.loadURL(url.format({
       pathname: path.join(__dirname, 'dist/index.html'),
       protocol: 'file:',
-      slashes: true
+      slashes:  true
     }));
   }
 

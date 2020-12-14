@@ -5,6 +5,7 @@ import { AppModule } from './app/app.module';
 import { AppConfig } from './environments/environment';
 
 import { enableLogging } from '@trale/transport/log';
+import {titlebar} from 'electron-titlebar';
 
 if (!AppConfig.production) {
   enableLogging();
