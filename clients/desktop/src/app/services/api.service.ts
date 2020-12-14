@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 
 /**
+ * API Service
+ *
  * Service responsible for managing API access
  */
 @Injectable({
@@ -8,79 +10,79 @@ import { Injectable } from '@angular/core';
 })
 export class ApiService {
 
-  private _hostname: string = 'trale.org';
-  private _port: number = 8086;
-  private endpoint = `http://${this._hostname}:${this._port}`;
-  private _tralePort: number = 8087;
+  private _hostname = 'trale.org';
+  private _port = 8086;
+  private _remoteEndpoint = `http://${this._hostname}:${this._port}`;
+  private _tralePort = 8087;
 
   constructor() { }
 
   /**
    * The HTTP remote endpoint of the reverse proxy, via which all services may be accessed.
-   * @return endpoint
+   * @return {string} remoteEndpoint
    */
-  public remoteEndpoint(): string {
+  public get remoteEndpoint(): string {
     // return `http://${this.hostname}:${this.port}`;
-    return this.endpoint;
+    return this._remoteEndpoint;
   }
 
   /**
    * TODO @joernneumeyer
-   * @param endpoint
+   * @param {string} remoteEndpoint
    */
-  public updateRemoteEndpoint(endpoint: string): void {
-    this.endpoint = endpoint;
-    const [host,port] = endpoint.split('//')[1].split('/')[0].split(':');
+  public updateRemoteEndpoint(remoteEndpoint: string): void {
+    this._remoteEndpoint = remoteEndpoint;
+    const [host,port] = remoteEndpoint.split('//')[1].split('/')[0].split(':');
     this._hostname = host;
     this._port = parseInt(port);
   }
 
   /**
-   * Setter for API port
-   * @param value The port
+   * Getter for API hostname
+   * @return {string} hostname
    */
-  set port(value: number) {
-    this._port = value;
+  public get hostname(): string {
+    return this._hostname;
   }
 
   /**
    * Setter for API hostname
-   * @param value The hostname
+   * @param {string} value The hostname
    */
-  set hostname(value: string) {
+  public set hostname(value: string) {
     this._hostname = value;
   }
 
   /**
-   * Setter for API Trale port
-   * @param value The Trale port
-   */
-  set tralePort(value: number) {
-    this._tralePort = value;
-  }
-
-  /**
-   * Getter for API Trale port
-   * @return tralePort
-   */
-  get tralePort(): number {
-    return this._tralePort;
-  }
-
-  /**
    * Getter for API port
-   * @return port
+   * @return {number} port
    */
-  get port(): number {
+  public get port(): number {
     return this._port;
   }
 
   /**
-   * Getter for API hostname
-   * @return hostname
+   * Setter for API port
+   * @param {number} value The port
    */
-  get hostname(): string {
-    return this._hostname;
+  public set port(value: number) {
+    this._port = value;
+  }
+
+  /**
+   * Getter for API Trale port
+   * @return {number} tralePort
+   */
+  public get tralePort(): number {
+    return this._tralePort;
+  }
+
+  /**
+   * Setter for API Trale port
+   * @param {number} value The Trale port
+   */
+  public set tralePort(value: number) {
+    this._tralePort = value;
   }
 
 }

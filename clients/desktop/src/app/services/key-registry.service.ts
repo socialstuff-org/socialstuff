@@ -84,7 +84,7 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
     } else {
       console.log('different server');
     }
-    const {data: {public_key}} = await this.http.get<DataResponse<{ public_key: string }>>(this.api.remoteEndpoint() + '/identity/public-key-of/' + username).toPromise();
+    const {data: {public_key}} = await this.http.get<DataResponse<{ public_key: string }>>(this.api.remoteEndpoint + '/identity/public-key-of/' + username).toPromise();
     const rsa = createPublicKey(public_key);
     this._rsaKeys[username] = rsa;
     return rsa;

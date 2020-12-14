@@ -82,7 +82,7 @@ export class RegisterComponent implements OnInit {
   async checkForInviteTokenRequired(): Promise<void> {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
-      await this.http.post<ErrorResponse>(this.api.remoteEndpoint() + '/identity/register', {}).toPromise();
+      await this.http.post<ErrorResponse>(this.api.remoteEndpoint + '/identity/register', {}).toPromise();
     } catch (e) {
       if (e.error.errors.invite) {
         this.inviteCodeRequired = true;
@@ -101,7 +101,7 @@ export class RegisterComponent implements OnInit {
     let decryptedToken: Buffer;
     try {
       const response = await this.http.post<DataResponse<{ message: string, mfa_seed: string, token: string }>>
-      (this.api.remoteEndpoint() + '/identity/register', {
+      (this.api.remoteEndpoint + '/identity/register', {
         username:   this.username,
         password:   this.password,
         public_key: keys.pub.export({type: 'pkcs1', format: 'pem'}).toString(),
@@ -125,7 +125,7 @@ export class RegisterComponent implements OnInit {
       return;
     }
     try {
-      await this.http.post<DataResponse<{ message: string }>>(this.api.remoteEndpoint() + '/identity/register/confirm', {
+      await this.http.post<DataResponse<{ message: string }>>(this.api.remoteEndpoint + '/identity/register/confirm', {
         token: decryptedToken.toString('utf-8'),
       }).toPromise();
     } catch (e) {
