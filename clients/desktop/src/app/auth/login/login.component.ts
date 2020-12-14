@@ -9,6 +9,8 @@ import {createHash}           from 'crypto';
 import sweetalert             from 'sweetalert2';
 
 /**
+ * Login component
+ *
  * Component responsible for handling login operations.
  */
 @Component({
@@ -35,8 +37,9 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Retrieve default API port and hostname from API service. Load session from debug service. If a valid session is found,
+   * Retrieve default API port and hostname from {@link ApiService}. Load session from {@link DebugService}. If a valid session is found,
    * redirect to landing component.
+   * @return {Promise<void>}
    */
   async ngOnInit(): Promise<void> {
     this.port = this.api.port;
@@ -58,6 +61,7 @@ export class LoginComponent implements OnInit {
    * debug session for development. Set loggingIn to false to stop animation. Redirect to chat application.
    *
    * If attempt was unsuccessful fire sweetalert error and set status of loggingIn to false.
+   * @return {Promise<void>}
    */
   public async login(): Promise<void> {
     this.loggingIn = true;
