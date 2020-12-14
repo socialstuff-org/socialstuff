@@ -3,6 +3,7 @@
 <app-chat-view *ngIf="chatPartner; else landing" [contact]="chatPartner"></app-chat-view>
 <ng-template #landing>
   <div id="landing-container">
+    <app-particles></app-particles>
     <div id="sub-landing-container">
       <div class="input-wrapper" id="logo">
         <img src="assets/img/eye.svg" alt="img unavailable">
