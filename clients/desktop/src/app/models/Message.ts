@@ -1,3 +1,6 @@
+/**
+ * Message interface for Trale communication
+ */
 export interface Message {
   id: number;
   message: string;
@@ -8,6 +11,9 @@ export interface Message {
   isSender: boolean;
 }
 
+/**
+ * Function declaration returns an object of type message with empty default values
+ */
 export const createEmptyMessage = (): Message => ({
   id: null,
   message: '',
