@@ -21,9 +21,13 @@ export class TitpServiceService {
   get client(): TitpClient {
     return this._client;
   }
+  get host(): string {
+    return this._host;
+  }
 
   private _onConnectionStateChanged = new Subject<boolean>();
   private _connected = false;
+  private _host: string;
 
   private _client: TitpClient;
 
@@ -50,5 +54,6 @@ export class TitpServiceService {
     });
     this._onConnectionStateChanged.next(true);
     this._connected = true;
+    this._host = host;
   }
 }
