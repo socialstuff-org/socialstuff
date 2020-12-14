@@ -76,7 +76,7 @@ mat-list-item:hover {
 
 .username {
   line-height: 20px;
-  width: 100%;
+  width: calc (250px - 60px);
   margin-left: 65px;
 }
 
