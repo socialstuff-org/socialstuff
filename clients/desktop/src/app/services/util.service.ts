@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 
+/**
+ * Utility service providing small utility functions which can be used across the whole application.
+ */
 @Injectable({
   providedIn: 'root'
 })

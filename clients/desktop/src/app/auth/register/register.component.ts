@@ -13,6 +13,9 @@ import {CryptoStorageService}        from '../../services/crypto-storage.service
 import sweetalert                    from 'sweetalert2';
 import {DataResponse, ErrorResponse} from '@socialstuff/utilities/responses';
 
+/**
+ * TODO @joernneumeyer
+ */
 function newKeyPair(mod) {
   return new Promise((res, rej) => {
     generateKeyPair('rsa', {
@@ -35,6 +38,9 @@ function newKeyPair(mod) {
   });
 }
 
+/**
+ * Responsible for handling registration attempts
+ */
 @Component({
   selector:    'app-register',
   templateUrl: './register.component.html',
@@ -57,12 +63,19 @@ export class RegisterComponent implements OnInit {
   ) {
   }
 
+  /**
+   * Retrieve default API port and hostname from API service.
+   */
   ngOnInit(): void {
     this.hostname = this.api.hostname;
     this.port = this.api.port;
   }
 
-  async foo() {
+  /**
+   * Responsible for checking at the entered server address whether an invite code is required for registration. If so
+   * an input field asking for an invite token will be displayed.
+   */
+  async checkForInviteTokenRequired(): Promise<void> {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
       await this.http.post<ErrorResponse>(this.api.remoteEndpoint() + '/identity/register', {}).toPromise();
@@ -73,6 +86,10 @@ export class RegisterComponent implements OnInit {
     }
   }
 
+  /**
+   * TODO @joernneumeyer
+   * TODO can this be outsourced to auth.service.ts? --> would be much tidier and registration is related to authentication
+   */
   public async register() {
     const keys = (await newKeyPair(4096)) as { pub: KeyObject, priv: KeyObject };
     let decryptedToken: Buffer;

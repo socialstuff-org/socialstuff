@@ -1,18 +1,20 @@
-import {Injectable} from '@angular/core';
-
-import {ConversationKeyRegistry}                      from '@trale/transport/conversation-key-registry';
-import {UserKeyRegistry}                              from '@trale/transport/user-key-registry';
-import {HttpClient}                                   from '@angular/common/http';
-import {ApiService}                                   from './api.service';
-import {createECDH, createPublicKey, ECDH, KeyObject} from 'crypto';
-import {CryptoStorageService}                         from './crypto-storage.service';
-import {DataResponse}                                 from '@socialstuff/utilities/responses';
-import {ContactService}                               from './contact.service';
-import {hashUsername}                                 from '../../lib/helpers';
-import {CURVE}                                        from '@trale/transport/constants/crypto-algorithms';
 import * as fs                                        from 'fs';
 import * as path                                      from 'path';
+import {ApiService}                                   from './api.service';
+import {DataResponse}                                 from '@socialstuff/utilities/responses';
+import {ContactService}                               from './contact.service';
+import {ConversationKeyRegistry}                      from '@trale/transport/conversation-key-registry';
+import {createECDH, createPublicKey, ECDH, KeyObject} from 'crypto';
+import {CryptoStorageService}                         from './crypto-storage.service';
+import {CURVE}                                        from '@trale/transport/constants/crypto-algorithms';
+import {hashUsername}                                 from '../../lib/helpers';
+import {HttpClient}                                   from '@angular/common/http';
+import {Injectable}                                   from '@angular/core';
+import {UserKeyRegistry}                              from '@trale/transport/user-key-registry';
 
+/**
+ * Service responsible for managing encryption keys.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -29,11 +31,22 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
   ) {
   }
 
-  set serverAddress(a: string) {
-    this._serverAddress = a;
+  /**
+   * Setter for server address.
+   * @param address The server address to be set
+   */
+  set serverAddress(address: string) {
+    this._serverAddress = address;
   }
 
-  async fetchConversationKey(username: string) {
+  /**
+   * Fetches conversation key for a specific user. If local array of conversation keys does not contain the requested
+   * key, the key will be requested from contact service.
+   * @param username The username from which the conversation key shall be loaded
+   * @return Promise<Buffer> containing conversation key
+   * @throws Throws error if conversation key could not be loaded.
+   */
+  async fetchConversationKey(username: string): Promise<Buffer> {
     if (!username.includes('@')) {
       username += '@' + this._serverAddress;
     }
@@ -49,7 +62,14 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
     }
   }
 
-  async fetchRsa(username: string) {
+  /**
+   * Fetches RSA public key of a specific user. If local array of RSA public keys does not contain the requested
+   * key, the key will be requested from contact service. If the contact service cannot load the specified user the RSA
+   * public key will be requested from the identity service located on the server.
+   * @param username The username from which the rsa public key shall be loaded
+   * @return Promise<KeyObject> containing RSA public key
+   */
+  async fetchRsa(username: string): Promise<KeyObject> {
     if (this._rsaKeys[username]) {
       return this._rsaKeys[username];
     }
@@ -70,6 +90,10 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
     return rsa;
   }
 
+  /**
+   * TODO @joernneumeyer
+   * @param username
+   */
   async loadEcdhForHandshake(username: string): Promise<ECDH | false> {
     try {
       const ecdhPrivateKey = await this.storage.storage.loadFileContent(['handshakes', hashUsername(username)]);
@@ -81,10 +105,21 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
     }
   }
 
+  /**
+   * TODO @joernneumeyer
+   * @param username
+   */
   async removeEcdhForHandshake(username: string): Promise<void> {
     await fs.promises.unlink(path.join(this.storage.storage.storageDirectory, 'handshakes', hashUsername(username)));
   }
 
+  /**
+   * Saves a conversation key for a specific user/contact. The user will be fetched from the contact service by its
+   * username. If the user/contact could not be loaded a new contact instance will be created and registered to the
+   * contact service.
+   * @param username The username to which the conversation key belongs to
+   * @param key The conversation key object
+   */
   async saveConversationKey(username: string, key: Buffer): Promise<void> {
     let contact = await this.contacts.load(username);
     if (contact) {
@@ -101,6 +136,11 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
     }
   }
 
+  /**
+   * TODO @joernneumeyer
+   * @param username
+   * @param ecdh
+   */
   async saveEcdhForHandshake(username: string, ecdh: ECDH): Promise<void> {
     const serialized = Buffer.from(ecdh.getPrivateKey());
     await this.storage.storage.persistFileContent(['handshakes', hashUsername(username)], serialized);
