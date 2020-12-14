@@ -8,14 +8,14 @@
   <span class="example-spacer"></span>
 
   <div id="profile-picture" (click)="openContactInfo()" *ngIf="chatPartner">
-    <span *ngIf="chatPartner.realName; else noRealName">{{chatPartner.username}}</span>
+    <span *ngIf="chatPartner.displayName; else noRealName">{{chatPartner.username}}</span>
     <ng-template #noRealName>
       <mat-icon style="margin-top: 7px;">person</mat-icon>
     </ng-template>
   </div>
 
   <div id="username" (click)="openContactInfo()" *ngIf="chatPartner">
-    <div *ngIf="chatPartner.realName; else onlyUsername">{{chatPartner.username}}<br>
+    <div *ngIf="chatPartner.displayName; else onlyUsername">{{chatPartner.username}}<br>
       @{{chatPartner.username}}
     </div>
     <ng-template #onlyUsername>
