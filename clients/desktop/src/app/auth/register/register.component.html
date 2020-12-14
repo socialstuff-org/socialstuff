@@ -56,7 +56,7 @@
 
       <div class="input-wrapper">
         <input
-          [(ngModel)]="password_confirm"
+          [(ngModel)]="passwordConfirm"
           name="password_confirm"
           class="custom-input-field wide-input-field"
           type="password"
@@ -78,7 +78,7 @@
         <button
           (click)="register()"
           class="custom-button"
-          [disabled]="password !== password_confirm || !password"
+          [disabled]="password !== passwordConfirm || !password"
         >
           {{ 'auth.register' | translate }}
         </button>

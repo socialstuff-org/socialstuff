@@ -39,6 +39,8 @@ function newKeyPair(mod) {
 }
 
 /**
+ * Register component
+ *
  * Responsible for handling registration attempts
  */
 @Component({
@@ -50,7 +52,7 @@ export class RegisterComponent implements OnInit {
 
   public username = '';
   public password = '';
-  public password_confirm = '';
+  public passwordConfirm = '';
   public hostname = '';
   public port = 8086;
   public inviteCodeRequired = false;
