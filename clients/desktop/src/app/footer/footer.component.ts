@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {UtilService}       from '../services/util.service';
+import {Component}   from '@angular/core';
+import {UtilService} from '../services/util.service';
 
 /**
  * Footer component
@@ -7,16 +7,15 @@ import {UtilService}       from '../services/util.service';
  * Responsible for displaying the footer
  */
 @Component({
-  selector: 'app-footer',
+  selector:    'app-footer',
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss']
+  styleUrls:   ['./footer.component.scss']
 })
-export class FooterComponent implements OnInit {
+export class FooterComponent {
 
   constructor(
     public util: UtilService,
-  ) { }
-
-  ngOnInit(): void {
+  ) {
   }
+
 }
