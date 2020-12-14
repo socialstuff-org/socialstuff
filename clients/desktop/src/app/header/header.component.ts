@@ -70,7 +70,10 @@ export class HeaderComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Connect',
       showLoaderOnConfirm: true,
-      preConfirm: async (username) => {
+      preConfirm: async (username: string) => {
+        if (!username.includes('@')) {
+          username += '@' + this.titp.host;
+        }
         try {
           await this.titp.client.negotiateKeyWith(username);
         } catch {
