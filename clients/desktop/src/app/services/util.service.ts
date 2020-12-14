@@ -21,4 +21,12 @@ export class UtilService {
     return acronym.charAt(0) + acronym.charAt(acronym.length - 1);
   }
 
+  /**
+   * Navigate to an url.
+   * @param url The url to which the window should be redirected to
+   */
+  public navigate(url: string): void {
+    window.open(url);
+  }
+
 }
