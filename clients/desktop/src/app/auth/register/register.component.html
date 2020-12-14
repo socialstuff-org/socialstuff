@@ -1,38 +1,91 @@
 <app-languageselect></app-languageselect>
 
-<div id="register-container">
+<div class="auth-container">
   <app-particles></app-particles>
-  <div id="sub-register-container">
-    <form action="">
+  <div class="auth-sub-container">
+    <form>
       <div class="input-wrapper" id="logo">
         <img src="assets/img/eye.svg" alt="img unavailable">
       </div>
 
-      <div class="input-wrapper" style="margin-bottom: 25px;">
-        <span id="register-headline">{{ 'auth.enter_details' | translate }}</span>
+      <div class="input-wrapper auth-headline-wrapper">
+        <span class="auth-headline">{{ 'auth.enter_details' | translate }}</span>
       </div>
 
       <div class="input-wrapper">
-        <input [(ngModel)]="hostname" name="domain" class="custom-input-field" id="custom-input-field-type-2" placeholder="{{ 'auth.domain' | translate }}" (focusout)="foo()"/>
-        <input [(ngModel)]="port" name="port" class="custom-input-field" id="custom-input-field-type-3" placeholder="{{ 'auth.port' | translate }}" type="number" min="1" max="65535" (focusout)="foo()"/>
+        <input
+          [(ngModel)]="hostname"
+          name="domain"
+          class="custom-input-field"
+          id="custom-input-field-type-2"
+          placeholder="{{ 'auth.domain' | translate }}"
+          (focusout)="checkForInviteTokenRequired()"
+        />
+        <input
+          [(ngModel)]="port"
+          name="port"
+          class="custom-input-field"
+          id="custom-input-field-type-3"
+          type="number"
+          min="1"
+          max="65535"
+          placeholder="{{ 'auth.port' | translate }}"
+          (focusout)="checkForInviteTokenRequired()"
+        />
       </div>
+
       <div class="input-wrapper">
-        <input [(ngModel)]="username" name="username" class="custom-input-field wide-input-field" placeholder="{{ 'auth.username' | translate }}"/>
+        <input
+          [(ngModel)]="username"
+          name="username"
+          class="custom-input-field wide-input-field"
+          class="custom-input-field wide-input-field"
+          placeholder="{{ 'auth.username' | translate }}"
+        />
       </div>
+
       <div class="input-wrapper">
-        <input [(ngModel)]="password" name="password" class="custom-input-field wide-input-field" placeholder="·········" type="password"/>
+        <input
+          [(ngModel)]="password"
+          name="password"
+          class="custom-input-field wide-input-field"
+          type="password"
+          placeholder="·········"
+        />
       </div>
+
       <div class="input-wrapper">
-        <input [(ngModel)]="password_confirm" name="password_confirm" class="custom-input-field wide-input-field" placeholder="{{ 'auth.confirm_password' | translate }}" type="password"/>
+        <input
+          [(ngModel)]="password_confirm"
+          name="password_confirm"
+          class="custom-input-field wide-input-field"
+          type="password"
+          placeholder="{{ 'auth.confirm_password' | translate }}"
+        />
       </div>
+
       <div class="input-wrapper" *ngIf="inviteCodeRequired">
-        <input [(ngModel)]="inviteCode" name="inviteCode" class="custom-input-field wide-input-field" placeholder="{{ 'auth.invite_code' | translate }}" type="text"/>
+        <input
+          [(ngModel)]="inviteCode"
+          name="inviteCode"
+          class="custom-input-field wide-input-field"
+          type="text"
+          placeholder="{{ 'auth.invite_code' | translate }}"
+        />
       </div>
+
       <div class="input-wrapper">
-        <button (click)="register()" class="custom-button" [disabled]="password !== password_confirm || !password">{{ 'auth.register' | translate }}</button>
+        <button
+          (click)="register()"
+          class="custom-button"
+          [disabled]="password !== password_confirm || !password"
+        >
+          {{ 'auth.register' | translate }}
+        </button>
       </div>
+
       <div class="input-wrapper">
-        <a routerLink="/login">{{ 'auth.already_account' | translate }}</a>
+        <a class="auth-anchor" routerLink="/login">{{ 'auth.already_account' | translate }}</a>
       </div>
     </form>
   </div>
