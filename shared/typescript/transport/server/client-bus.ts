@@ -61,7 +61,7 @@ export class TitpClientBus {
   }
 
   private _onClientData(client: TitpClientConnection, data: Buffer) {
-    log(`client '${client.username()}' got data`);
+    log(`got data from client '${client.username()}'`);
     const message = deserializeServerMessage(data);
     switch (message.type) {
       case ServerMessageType.chatMessage:
