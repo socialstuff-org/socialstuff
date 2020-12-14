@@ -1,16 +1,16 @@
 import {json, Request, response, Response, Router} from 'express';
-import {getReportReasons, updateReasonRequest} from '../mysql/mysql';
+import {getReportReasons, editReasonRequest} from '../mysql/mysql';
 import {insertReportReason} from '../mysql/mysql'
-import secSettings from '../res/security_settings.json';
-import {ErrorResponse} from '@socialstuff/utilities/responses';
 import {body, header, ValidationChain} from 'express-validator';
 import {rejectOnValidationError} from '@socialstuff/utilities/express';
-import exp from 'constants';
-import {sharedConnection} from '../../../reporting/src/mysql';
-import {RowDataPacket} from 'mysql2';
 
 const reportCreationInterface = Router();
 
+/**
+ * gets all reports
+ * @param req request from client
+ * @param res response that is sent back to client. contains status code 200 if successful and 500 in case of error
+ */
 async function getAllReports(req:Request, res: Response) {
   try {
 
@@ -23,7 +23,11 @@ async function getAllReports(req:Request, res: Response) {
   }
 }
 
-//TODO return correct error message
+/**
+ * adds a new report reason
+ * @param req request from client
+ * @param res response that is sent back to client. contains status code 200 if successful and 500 in case of error
+ */
 async function addAReportReason(req: Request, res: Response) {
   try {
     const response = await insertReportReason(req.body);
@@ -33,16 +37,26 @@ async function addAReportReason(req: Request, res: Response) {
   }
 }
 
+/**
+ * adds a new report reason
+ * @param req request from client
+ * @param res response that is sent back to client. contains status code 200 if successful and 500 in case of error
+ */
 async function updateReportReason(req: Request, res: Response) {
   let response;
   try {
-    response = await updateReasonRequest(req.body);
+    response = await editReasonRequest(req.body);
     res.status(200).json(response.data);
   } catch (e) {
     res.status(500).json({error: 'Couldn\'t update the reason, is there a already a reason with the same name?'});
   }
 }
 
+/**
+ * deletes report reason
+ * @param req request from client
+ * @param res response that is sent back to client. contains status code 200 if successful and 500 in case of error
+ */
 async function deleteReportReason(req: Request, res: Response) {
   try {
 
@@ -64,15 +78,28 @@ async function deleteReportReason(req: Request, res: Response) {
   }
 }
 
+/**
+ * middleware for delete request. validates if:
+ * - id is integer
+ */
 export const deleteMiddleware:ValidationChain[] = [
 
   header('id').isInt()
 ]
 
-
+/**
+ * middleware for put request. validates if:
+ * - id is integer
+ */
 export const putMiddleware:ValidationChain[] = [
   header('id').isInt()
 ]
+
+/**
+ * middleware for post and put. Validates if:
+ * - max_report_violations is of type int
+ * - reason is of type string
+ */
 export const middleware:ValidationChain[] = [
   body('max_report_violations').isInt(),
   body('reason').isString()
