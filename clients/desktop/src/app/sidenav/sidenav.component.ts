@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { UtilService } from '../services/util.service';
+import {Component, Input, OnInit} from '@angular/core';
+import { UtilService }            from '../services/util.service';
 import { ContactService } from '../services/contact.service';
 import { acronymOfName, searchMatch } from '../../lib/helpers';
 import { TitpServiceService } from '../services/titp-service.service';
@@ -17,6 +17,9 @@ const log = prefix('clients/desktop/app/sidenav-component');
   styleUrls: ['./sidenav.component.scss'],
 })
 export class SidenavComponent implements OnInit {
+
+  @Input() username: string;
+
   public chats: ContactWithLastMessage[] = [];
   public loadingContacts = true;
   public searchTerm = '';

@@ -6,9 +6,15 @@
         <mat-divider class="contact-list-divider"></mat-divider>
 
         <section style="background-color: #510A32; margin-top: 10px; margin-bottom: 10px; text-align: center;">
-          <!-- TODO update color -->
-          <!-- TODO implement line below -->
-          Avatar and username here
+          <div class="profile-picture">
+            <span *ngIf="username">{{acronym(username)}}</span>
+          </div>
+          <div class="username" style="text-align: left;">
+            <div>
+              Logged in as:<br>
+              @{{username}}
+            </div>
+          </div>
         </section>
 
         <mat-divider class="contact-list-divider"></mat-divider>
