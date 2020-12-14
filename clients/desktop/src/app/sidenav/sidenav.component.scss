@@ -49,10 +49,12 @@ mat-list-item:hover {
   width: 80%;
   border: none;
   height: 20px;
+  padding: 5px;
 }
 
 #search-bar::placeholder {
   color: $plainWhite;
+  padding-left: 8px;
 }
 
 .contact-list-divider {
