@@ -29,8 +29,12 @@ input[type=number] {
 
 .input-wrapper {
   width: 100%;
-  margin: 0 auto 25px;
+  margin: 0 auto;
   text-align: center;
+}
+
+#login-headline-wrapper {
+  margin-bottom: 25px;
 }
 
 #login-headline {
