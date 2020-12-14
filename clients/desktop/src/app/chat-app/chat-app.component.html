@@ -1,5 +1,5 @@
 <app-header *ngIf="username" [username]="username"></app-header>
-<app-sidenav></app-sidenav>
+<app-sidenav [username]="username"></app-sidenav>
 <app-chat-view *ngIf="chatPartner; else landing" [contact]="chatPartner"></app-chat-view>
 <ng-template #landing>
   <div id="landing-container">
