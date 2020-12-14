@@ -3,6 +3,9 @@ import {ApiService}                      from './api.service';
 import {HttpClient}                      from '@angular/common/http';
 import {HttpErrorResponse, HttpResponse} from '../types';
 
+/**
+ * Service responsible for managing authentication related tasks such as login, logout, registration etc.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -31,6 +34,6 @@ export class AuthService {
             rej(error.error.errors);
           }
         });
-    })
+    });
   }
 }
