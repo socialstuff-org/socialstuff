@@ -5,6 +5,7 @@
   width: calc(100% - 250px);
   margin-left: 250px;
   display: table;
+  text-align: center;
 }
 
 #sub-landing-container {
@@ -14,6 +15,19 @@
 
 #logo {
   margin-bottom: 20px;
+}
+
+#landing-main-headline {
+  font-size: 2em;
+}
+
+#landing-sub-headline {
+  font-size: 1.5em;
+}
+
+#share-container {
+  text-transform: uppercase;
+  font-size: 0.75em;
 }
 
 .landing-text {
