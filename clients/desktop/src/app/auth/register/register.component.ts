@@ -76,6 +76,8 @@ export class RegisterComponent implements OnInit {
   /**
    * Responsible for checking at the entered server address whether an invite code is required for registration. If so
    * an input field asking for an invite token will be displayed.
+   *
+   * @return{Promise<void>}
    */
   async checkForInviteTokenRequired(): Promise<void> {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
@@ -91,8 +93,10 @@ export class RegisterComponent implements OnInit {
   /**
    * TODO @joernneumeyer
    * TODO can this be outsourced to auth.service.ts? --> would be much tidier and registration is related to authentication
+   *
+   * @return{Promise<void>}
    */
-  public async register() {
+  public async register(): Promise<void> {
     const keys = (await newKeyPair(4096)) as { pub: KeyObject, priv: KeyObject };
     let decryptedToken: Buffer;
     try {
