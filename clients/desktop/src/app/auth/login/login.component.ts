@@ -1,13 +1,16 @@
-import {Component, OnInit}                                           from '@angular/core';
-import {AuthService}                                                 from '../../services/auth.service';
-import {ApiService}                                                  from '../../services/api.service';
-import {AppConfigService}                                            from '../../services/app-config.service';
-import {Router}                                                      from '@angular/router';
-import sweetalert                                                    from 'sweetalert2';
-import {createHash, createPrivateKey, privateDecrypt, publicEncrypt} from 'crypto';
-import {CryptoStorageService}                                        from '../../services/crypto-storage.service';
-import {DebugService}                                                from '../../services/debug.service';
+import {Component, OnInit}    from '@angular/core';
+import {Router}               from '@angular/router';
+import {AuthService}          from '../../services/auth.service';
+import {ApiService}           from '../../services/api.service';
+import {AppConfigService}     from '../../services/app-config.service';
+import {CryptoStorageService} from '../../services/crypto-storage.service';
+import {DebugService}         from '../../services/debug.service';
+import {createHash}           from 'crypto';
+import sweetalert             from 'sweetalert2';
 
+/**
+ * Component responsible for handling login operations
+ */
 @Component({
   selector:    'app-login',
   templateUrl: './login.component.html',
@@ -25,9 +28,9 @@ export class LoginComponent implements OnInit {
     private auth: AuthService,
     private api: ApiService,
     private config: AppConfigService,
-    private router: Router,
     private storage: CryptoStorageService,
     private debug: DebugService,
+    private router: Router,
   ) {
   }
 
