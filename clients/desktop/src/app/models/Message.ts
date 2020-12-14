@@ -12,7 +12,7 @@ export interface Message {
 }
 
 /**
- * Function declaration returns an object of type message with empty default values
+ * Function declaration returns an object of type Message with empty default values
  */
 export const createEmptyMessage = (): Message => ({
   id: null,
