@@ -9,7 +9,7 @@ import {createHash}           from 'crypto';
 import sweetalert             from 'sweetalert2';
 
 /**
- * Component responsible for handling login operations
+ * Component responsible for handling login operations.
  */
 @Component({
   selector:    'app-login',
@@ -34,7 +34,11 @@ export class LoginComponent implements OnInit {
   ) {
   }
 
-  async ngOnInit() {
+  /**
+   * Retrieve default API port and hostname from API service. Load session from debug service. If a valid session is found,
+   * redirect to landing component.
+   */
+  async ngOnInit(): Promise<void> {
     this.port = this.api.port;
     this.hostname = this.api.hostname;
     const session = await this.debug.loadSession();
@@ -44,7 +48,19 @@ export class LoginComponent implements OnInit {
     this.router.navigateByUrl('/landing');
   }
 
-  public async login() {
+  /**
+   * Responsible for handling login attempts.
+   *
+   * loggingIn will be set to true for loading animation handling. Update remote endpoint with entered hostname and port
+   * data. Attempt a login on Trale server with provided credentials.
+   *
+   * If attempt was successful load user storage from
+   * local drive and persist session token. Store current session in debug session for development. Set loggingIn to false
+   * to stop animation. Redirect to chat application.
+   *
+   * If attempt was unsuccessful fire sweetalert error and set status of loggingIn to false.
+   */
+  public async login(): Promise<void> {
     this.loggingIn = true;
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
@@ -73,7 +89,10 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  public forgotPassword() {
+  /**
+   * Responsible for redirecting to forgot password component.
+   */
+  public forgotPassword(): void {
     this.router.navigateByUrl('/forgot-password');
   }
 
