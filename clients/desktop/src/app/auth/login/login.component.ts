@@ -48,7 +48,7 @@ export class LoginComponent implements OnInit {
     if (session === false) {
       return;
     }
-    this.router.navigateByUrl('/landing');
+    this.router.navigateByUrl('/chat-app').then(r => r);
   }
 
   /**
