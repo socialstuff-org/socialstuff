@@ -1,17 +1,16 @@
-import {Injectable} from '@angular/core';
-
-import {ConversationKeyRegistry}                      from '@trale/transport/conversation-key-registry';
-import {UserKeyRegistry}                              from '@trale/transport/user-key-registry';
-import {HttpClient}                                   from '@angular/common/http';
-import {ApiService}                                   from './api.service';
-import {createECDH, createPublicKey, ECDH, KeyObject} from 'crypto';
-import {CryptoStorageService}                         from './crypto-storage.service';
-import {DataResponse}                                 from '@socialstuff/utilities/responses';
-import {ContactService}                               from './contact.service';
-import {hashUsername}                                 from '../../lib/helpers';
-import {CURVE}                                        from '@trale/transport/constants/crypto-algorithms';
 import * as fs                                        from 'fs';
 import * as path                                      from 'path';
+import {ApiService}                                   from './api.service';
+import {DataResponse}                                 from '@socialstuff/utilities/responses';
+import {ContactService}                               from './contact.service';
+import {ConversationKeyRegistry}                      from '@trale/transport/conversation-key-registry';
+import {createECDH, createPublicKey, ECDH, KeyObject} from 'crypto';
+import {CryptoStorageService}                         from './crypto-storage.service';
+import {CURVE}                                        from '@trale/transport/constants/crypto-algorithms';
+import {hashUsername}                                 from '../../lib/helpers';
+import {HttpClient}                                   from '@angular/common/http';
+import {Injectable}                                   from '@angular/core';
+import {UserKeyRegistry}                              from '@trale/transport/user-key-registry';
 
 /**
  * Service responsible for managing encryption keys.
