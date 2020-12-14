@@ -29,6 +29,8 @@ export class ApiService {
   /**
    * TODO @joernneumeyer
    * @param {string} remoteEndpoint
+   *
+   * @example updateRemoteEndpoint('http://trale.org:8086')
    */
   public updateRemoteEndpoint(remoteEndpoint: string): void {
     this._remoteEndpoint = remoteEndpoint;
@@ -48,6 +50,8 @@ export class ApiService {
   /**
    * Setter for API hostname
    * @param {string} value The hostname
+   *
+   * @example hostname('https://trale.org')
    */
   public set hostname(value: string) {
     this._hostname = value;
@@ -64,6 +68,8 @@ export class ApiService {
   /**
    * Setter for API port
    * @param {number} value The port
+   *
+   * @example port(8086)
    */
   public set port(value: number) {
     this._port = value;
@@ -80,6 +86,8 @@ export class ApiService {
   /**
    * Setter for API Trale port
    * @param {number} value The Trale port
+   *
+   * @example tralePort(8087)
    */
   public set tralePort(value: number) {
     this._tralePort = value;
