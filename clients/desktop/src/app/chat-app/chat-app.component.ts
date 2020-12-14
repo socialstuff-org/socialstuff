@@ -6,6 +6,12 @@ import {TitpServiceService}   from '../services/titp-service.service';
 import {CryptoStorageService} from '../services/crypto-storage.service';
 import {DebugService}         from '../services/debug.service';
 
+/**
+ * Chat app component
+ *
+ * This is the main component of [Trale messenger]{@link https://trale.org}. It is responsible for handling the active chat view as well as current
+ * header and sidenav data.
+ */
 @Component({
   selector:    'app-chat-app',
   templateUrl: './chat-app.component.html',
@@ -25,8 +31,16 @@ export class ChatAppComponent implements OnInit {
   ) {
   }
 
-  async ngOnInit() {
-    this.debug.loadSession();
+  /**
+   * Initialization of chat application
+   *
+   * Loading debug session, loading [local storage]{@link CryptoStorageService} and awaiting connection to Trale server.
+   * If storage loaded and connection established ... TODO @joernneumeyer
+   *
+   * @return {Promise<void>}
+   */
+  async ngOnInit(): Promise<void> {
+    await this.debug.loadSession();
     await new Promise((res) => {
       let localStorageLoaded = false;
       let titpConnected = false;
