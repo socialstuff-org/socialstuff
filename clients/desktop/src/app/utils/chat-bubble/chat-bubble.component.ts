@@ -1,5 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Message} from "../../models/Message";
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {ChatMessage, ChatMessageType} from '@trale/transport/message';
+import {TitpServiceService} from '../../services/titp-service.service';
 
 @Component({
   selector: 'app-chat-bubble',
@@ -8,11 +9,27 @@ import {Message} from "../../models/Message";
 })
 export class ChatBubbleComponent implements OnInit {
 
-  @Input() message: Message;
+  ChatMessageType = ChatMessageType;
 
-  constructor() { }
+  @Input() message: ChatMessage;
+  public isSender = false;
+
+  @ViewChild('audioPlayer')
+  private audioPlayer: ElementRef<HTMLAudioElement>;
+
+  constructor(
+    private titp: TitpServiceService
+  ) { }
 
   ngOnInit(): void {
+    this.isSender = this.message.senderName === 'this.titp.client.username()';
+
+    if (this.message.type === ChatMessageType.voice) {
+      const blob = new Blob([this.message.content], {type: 'audio/webm'});
+      const url = window.URL.createObjectURL(blob);
+      this.audioPlayer.nativeElement.src = url;
+    }
+
   }
 
 }

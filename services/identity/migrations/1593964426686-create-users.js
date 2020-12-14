@@ -22,8 +22,8 @@ module.exports.up = async next => {
     username varchar(64) unique not null,
     password text not null,
     public_key text not null,
-    mfa_seed varchar(64),
-    is_admin boolean DEFAULT false,
+    is_admin tinyint(1) default false,
+    mfa_seed text,
     can_login TINYINT(1) not null default false
   );`);
 };

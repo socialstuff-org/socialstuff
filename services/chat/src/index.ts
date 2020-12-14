@@ -25,7 +25,7 @@ import {hashHmac}                            from '@socialstuff/utilities/securi
 import { Binary } from 'mongodb';
 
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
-const APP_HOST = process.env.APP_HOST || '127.0.0.1';
+const APP_HOST = process.env.APP_HOST || '::1';
 const TRALE_PORT = parseInt(process.env.TRALE_PORT || '3002');
 
 (async () => {

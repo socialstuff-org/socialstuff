@@ -40,6 +40,8 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
 import { MessageBoxComponent } from './message-box/message-box.component';
 import {CallFunctionComponent} from './voice-communication/call-function/call-function.component';
 import { MicrophoneTestComponent } from './microphone-test/microphone-test.component';
+import {MatMenuModule}             from "@angular/material/menu";
+import { LanguageselectComponent } from './utils/languageselect/languageselect.component';
 
 import { SettingsViewComponent } from './admin/settings-view/settings-view.component';
 import { NavigationContainerComponent } from './admin/SideNav/navigation-container/navigation-container.component';
@@ -118,41 +120,64 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     DashboardViewComponent,
     ConfirmDialogComponent,
     CallFunctionComponent,
-    MicrophoneTestComponent
+    MicrophoneTestComponent,
   ],
-    imports: [
-        BrowserModule,
-        FormsModule,
-        HttpClientModule,
-        CoreModule,
-        AppRoutingModule,
-        TranslateModule.forRoot({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: HttpLoaderFactory,
-                deps: [HttpClient],
-            },
-        }),
-        MatButtonModule,
-        MatToolbarModule,
-        MatIconModule,
-        MatSidenavModule,
-        MatListModule,
-        BrowserAnimationsModule,
-        MatInputModule,
-        MatDialogModule,
-        MatGridListModule,
-        MatSlideToggleModule,
-        MatCheckboxModule,
-        ScrollingModule,
-        MatDatepickerModule,
-        MatNativeDateModule,
-        NgxMatDatetimePickerModule,
-        NgxMatTimepickerModule,
-        NgxNativeDateModule,
-        NgxMatNativeDateModule,
-        InlineSVGModule
-    ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule,
+    CoreModule,
+    AppRoutingModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide:    TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps:       [HttpClient],
+      },
+    }),
+    MatButtonModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatSidenavModule,
+    MatListModule,
+    BrowserAnimationsModule,
+    MatInputModule,
+    MatDialogModule,
+    MatCheckboxModule,
+    ScrollingModule,
+    MatMenuModule,
+    BrowserModule,
+    FormsModule,
+    HttpClientModule,
+    CoreModule,
+    AppRoutingModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
+    MatButtonModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatSidenavModule,
+    MatListModule,
+    BrowserAnimationsModule,
+    MatInputModule,
+    MatDialogModule,
+    MatGridListModule,
+    MatSlideToggleModule,
+    MatCheckboxModule,
+    ScrollingModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    NgxMatDatetimePickerModule,
+    NgxMatTimepickerModule,
+    NgxNativeDateModule,
+    NgxMatNativeDateModule,
+    InlineSVGModule
+  ],
   providers:    [],
   bootstrap:    [AppComponent],
 })

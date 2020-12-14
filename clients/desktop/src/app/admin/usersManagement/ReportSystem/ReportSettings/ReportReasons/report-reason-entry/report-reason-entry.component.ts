@@ -14,7 +14,7 @@ import {ConfirmDialogComponent} from '../../../../../core/confirm-dialog/confirm
 export class ReportReasonEntryComponent implements OnInit {
 
   public hostname = '[::1]';
-  public port = 3003;
+  public port = 3002;
 
   constructor(
     private adminSettings: AdminSettings,

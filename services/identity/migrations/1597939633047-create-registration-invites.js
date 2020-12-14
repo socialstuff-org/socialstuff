@@ -25,7 +25,7 @@ module.exports.up = async next => {
     times_used      int        default 0 not null,
     expiration_date datetime             null,
     active          tinyint(1) default 1 not null,
-    code            varchar(100)         not null,
+    code            varchar(190)         not null,
     constraint invite_code_code_uindex
         unique (code)
 );`);

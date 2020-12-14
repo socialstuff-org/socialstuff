@@ -10,7 +10,7 @@ import {ApiService} from '../../../../../services/api.service';
 })
 export class InviteCodeListComponent implements OnInit {
 
-  public inviteCodes: Array<InviteCode> = []
+  public inviteCodes: Array<InviteCode> = [defaultInviteCode()]
   public hostname = '[::1]';
   public port = 3000;
 

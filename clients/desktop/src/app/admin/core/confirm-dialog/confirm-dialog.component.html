@@ -3,10 +3,10 @@
 </h1>
 <div mat-dialog-content>
   <h2 class="header-text">{{header}}</h2>
-  <p>{{message}}</p>
+  <p class="header-text">{{message}}</p>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="false">{{cancelButton}}</button>
+  <button mat-button style="color: black" [mat-dialog-close]="false">{{cancelButton}}</button>
   <span class="spacer"></span>
   <button mat-button [color]="warn ? 'warn' : 'primary'" [mat-dialog-close]="true" (click)="callFunction()" cdkFocusInitial>{{confirmButton}}</button>
 </div>

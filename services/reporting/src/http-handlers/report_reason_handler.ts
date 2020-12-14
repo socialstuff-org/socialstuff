@@ -1,6 +1,6 @@
 import {Request, Response, Router} from 'express';
 import {RequestWithDependencies} from '../request-with-dependencies';
-import {body, ValidationChain} from 'express-validator';
+import {body, header, ValidationChain} from 'express-validator';
 import {injectProcessEnvironmentIntoRequest} from '@socialstuff/utilities/express';
 import {injectDatabaseConnectionIntoRequest} from '../utilities';
 import {rejectOnValidationError} from '@socialstuff/utilities/express';
@@ -31,6 +31,8 @@ export const middleware:ValidationChain[] = [
   })
 ];
 
+
+
 async function getAllReportReasons(req: Request, res: Response) {
   const sql = 'SELECT * FROM report_reason;';
   const db = (req as RequestWithDependencies).dbHandle;
@@ -40,13 +42,16 @@ async function getAllReportReasons(req: Request, res: Response) {
 }
 
 async function editReportReason(req: Request, res: Response) {
-  const max_report_violations = req.body.max_report_violations;
+  const maxReportViolations = req.body.max_report_violations;
   const reason = req.body.reason;
   const sql = 'UPDATE report_reason SET reason = ?, max_report_violations = ? WHERE id = ?;';
   console.log(sql);
   const db = (req as RequestWithDependencies).dbHandle;
   try {
-    await db.query(sql, [reason, max_report_violations, req.body.id]);
+    console.log('adding reason:     ', req.body.reason);
+    console.log('With ID:           ', req.body.id);
+    console.log('With max_report_v: ', maxReportViolations);
+    await db.query(sql, [reason, maxReportViolations, req.body.id]);
   } catch (e) {
     console.log(e);
     res.status(500).end();
@@ -55,6 +60,17 @@ async function editReportReason(req: Request, res: Response) {
   const retSQL = 'SELECT * FROM report_reason WHERE id = ?;';
   res.status(200).json((await db.query(retSQL, [req.body.id]))[0]);
 
+}
+
+
+async function removeReportReason(req: Request, res: Response) {
+  console.log('Removing reason');
+  const db = (req as RequestWithDependencies).dbHandle;
+  const deleteFromSQL = 'DELETE FROM report_reason WHERE id = ?';
+  await db.query(deleteFromSQL, [req.headers.id]);
+  res.status(200).json({
+    msg: 'Deleted report reqson with id ' + req.headers.id,
+  });
 }
 
 async function addReportReason(req: Request, res: Response) {
@@ -78,9 +94,12 @@ async function addReportReason(req: Request, res: Response) {
   }
 }
 
+export const validateHeader: ValidationChain[] = [header('id').isInt()];
+
 reportReasonHandler.use(injectProcessEnvironmentIntoRequest , injectDatabaseConnectionIntoRequest);
 reportReasonHandler.get('/', getAllReportReasons);
-reportReasonHandler.post('/', middleware, rejectOnValidationError, addReportReason);
 reportReasonHandler.put('/', middleware, rejectOnValidationError, editReportReason);
+reportReasonHandler.post('/', middleware, rejectOnValidationError, addReportReason);
+reportReasonHandler.delete('/', validateHeader, rejectOnValidationError, removeReportReason);
 
 export default reportReasonHandler;

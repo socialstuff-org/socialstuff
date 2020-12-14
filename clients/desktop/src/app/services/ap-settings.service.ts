@@ -46,20 +46,20 @@ export class AdminSettings {
     let headers = new HttpHeaders().set('rows_per_page', '100');
     headers = headers.append('current_page', '1');
 
-    return this.http.get<any>(this.api.remoteEndpoint() + '/reporting/report-reasons', {headers: headers}).toPromise();
+    return this.http.get<any>(this.api.remoteEndpoint() + '/settings/report-reasons', {headers: headers}).toPromise();
   }
 
   public createReportReason(reportReason): Promise<ReportReason> {
-    return this.http.post<any>((this.api.remoteEndpoint() + '/reporting/report-reasons'), reportReason).toPromise();
+    return this.http.post<any>((this.api.remoteEndpoint() + '/settings/report-reasons'), reportReason).toPromise();
   }
 
   public editReportReason(reportReason): Promise<ReportReason> {
-    return this.http.put<any>((this.api.remoteEndpoint() + '/reporting/report-reasons'), reportReason).toPromise();
+    return this.http.put<any>((this.api.remoteEndpoint() + '/settings/report-reasons'), reportReason).toPromise();
   }
 
   public deleteReportReason(reportReason): Promise<any> {
     const headers = new HttpHeaders().set('id', reportReason.id.toString());
-    return this.http.put<any>((this.api.remoteEndpoint() + '/reporting/report-reasons'), headers).toPromise();
+    return this.http.put<any>((this.api.remoteEndpoint() + '/settings/report-reasons'), headers).toPromise();
   }
 
 

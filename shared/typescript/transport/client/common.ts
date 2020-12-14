@@ -26,11 +26,16 @@ export abstract class CommonTitpClient {
   protected abstract _key: Buffer;
   protected _write: (data: (Uint8Array | string)) => Promise<void>;
   protected _onData = new Subject<Buffer>();
+  protected _onDisconnect = new Subject<boolean>();
 
   protected constructor(protected _username: string, protected _socket: Socket) {
     this._write = makeWriteP(this._socket);
+    _socket.on('close', hadError => this._onDisconnect.next(hadError));
   }
 
+  public onDisconnect(): Observable<boolean> {
+    return this._onDisconnect;
+  }
 
   /**
    * Exposes the negotiated key for the communication channel.

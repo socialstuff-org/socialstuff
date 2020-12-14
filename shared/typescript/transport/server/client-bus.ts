@@ -17,6 +17,9 @@ import {deserializeServerMessage, ServerMessageType} from '../message';
 import {TitpClientConnection}                        from './client-connection';
 import {Observable, Subject}                         from 'rxjs';
 import {CommonTitpClient}                            from '../client/common';
+import {prefix}                                      from '../log';
+
+const log = prefix('@trale/transport/server/client-bus');
 
 export class TitpClientBus {
   get onForwardToOfflineUsers(): Observable<{ message: Buffer; recipient: string }[]> {
@@ -47,15 +50,18 @@ export class TitpClientBus {
    * @private
    */
   private _registerNewClient(client: TitpClientConnection) {
+    log('new client:', client.username());
     this._clients[client.username()] = client;
     client.on('close').subscribe(() => {
       this._onDisconnect.next(client);
       delete this._clients[client.username()];
+      log('client disconnected:', client.username());
     });
     client.data().subscribe(this._onClientData.bind(this, client));
   }
 
   private _onClientData(client: TitpClientConnection, data: Buffer) {
+    log(`client '${client.username()}' got data`);
     const message = deserializeServerMessage(data);
     switch (message.type) {
       case ServerMessageType.chatMessage:
@@ -79,6 +85,7 @@ export class TitpClientBus {
           }
         }
         if (offlineRecipients.length) {
+          log('some users were offline:', offlineRecipients);
           this._onForwardToOfflineUsers.next(offlineRecipients);
         }
         break;

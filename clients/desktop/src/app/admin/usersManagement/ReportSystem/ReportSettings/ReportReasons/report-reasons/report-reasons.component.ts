@@ -13,7 +13,7 @@ export class ReportReasonsComponent implements OnInit {
 
   public reportReasons: Array<ReportReason> = [];
   public hostname = '[::1]';
-  public port = 3003;
+  public port = 3002;
 
   public reload: EventEmitter<any> = new EventEmitter<any>();
 
