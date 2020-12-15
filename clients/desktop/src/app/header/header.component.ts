@@ -95,7 +95,7 @@ export class HeaderComponent implements OnInit {
         const chat = await this.contacts.openChat(contact);
         log('opened chat with contact', contact)
         const initialMessage: ChatMessage = {
-          senderName: this.titp.client.username() + this.api.hostname,
+          senderName: this.titp.client.userHandle,
           content: Buffer.alloc(0),
           type: ChatMessageType.handshakeInitialization,
           sentAt: new Date(),
