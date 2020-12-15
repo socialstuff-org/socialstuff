@@ -53,7 +53,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
       this.contact = contact;
       this.chat = await this.contacts.openChat(contact);
       this.chatConsumer = take(this.chat.records());
-      this.messages = (await this.chatConsumer(10)).reverse().map(deserializeChatMessage);
+      this.messages = (await this.chatConsumer(50)).reverse().map(deserializeChatMessage);
       console.log('contact', contact);
     });
     
@@ -76,6 +76,6 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     message.senderName = this.titp.client.userHandle;
     log('message', message);
     await this.titp.client.sendChatMessageTo(message, [this.contact.username]);
-    this.handleIncomingMessage(message);
+    await this.handleIncomingMessage(message);
   }
 }
