@@ -36,9 +36,6 @@ export class SidenavComponent implements OnInit {
     this.contacts.onContactListUpdated().subscribe(async () => {
       this.chats = await this.contacts.loadLastMessages(this.contacts.readContacts() as any);
       log('got the following chats with last messages:', this.chats);
-      this.chats[0].displayName = 'Jörn Neumeyer';
-      this.chats[0].lastMessage = createEmptyMessage();
-      this.chats[0].lastMessage.message = 'Trale ist so geil! Lorem pisum dolor sit amet foo';
     });
 
     let sub;
