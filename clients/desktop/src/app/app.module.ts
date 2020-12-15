@@ -16,7 +16,6 @@ import {TranslateHttpLoader}              from '@ngx-translate/http-loader';
 import {AppComponent}            from './app.component';
 import {LoginComponent}          from './auth/login/login.component';
 import {RegisterComponent}       from './auth/register/register.component';
-import {ChatListComponent}       from './chat-list/chat-list.component';
 import {HeaderComponent}         from './header/header.component';
 import {MatButtonModule}         from '@angular/material/button';
 import {MatToolbarModule}        from '@angular/material/toolbar';
@@ -54,7 +53,6 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    ChatListComponent,
     HeaderComponent,
     FooterComponent,
     ChatBubbleComponent,
