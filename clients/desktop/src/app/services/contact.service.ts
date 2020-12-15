@@ -8,7 +8,8 @@ import * as fs                           from 'fs';
 import * as path                         from 'path';
 import {Observable, Subject}             from 'rxjs';
 import {hashUsernameHmac}                from '../../lib/helpers';
-import { prefix } from '@trale/transport/log';
+import { prefix }                        from '@trale/transport/log';
+import {deserializeChatMessage}          from "@trale/transport/message";
 
 const log = prefix('clients/desktop/app/contact-service');
 
@@ -79,7 +80,7 @@ export class ContactService {
       const lastMessage =
               lastMessageString.done
               ? null
-              : JSON.parse((lastMessageString.value as Buffer).toString('utf-8')) as Message;
+              : deserializeChatMessage(lastMessageString.value as Buffer);
       return {
         ...contact,
         lastMessage,
