@@ -22,7 +22,7 @@ export class ChatBubbleComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.isSender = this.message.senderName === 'this.titp.client.username()';
+    this.isSender = this.message.senderName === this.titp.client.userHandle;
 
     if (this.message.type === ChatMessageType.voice) {
       const blob = new Blob([this.message.content], {type: 'audio/webm'});
