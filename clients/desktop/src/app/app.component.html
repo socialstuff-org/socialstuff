@@ -1,4 +1,39 @@
-<div id="titlebar" style="-webkit-app-region: drag; background-color: #21142D; height: 40px;">
-  <div style="width: 100%; height: 100%; text-align: center; line-height: 40px;">Trale Messenger</div>
+<div id="titlebar" style="-webkit-app-region: drag; background-color: #510A32; height: 40px;">
+  <div style="width: 100%; height: 100%; text-align: center; line-height: 40px;">
+    Trale Messenger
+    <button
+      class="titlebar-button"
+      style="
+      -webkit-app-region: none;
+      position:fixed;
+      top:0;
+      right: 80px;"
+      (click)="minimize()"
+    >
+      <mat-icon>minimize</mat-icon>
+    </button>
+    <button
+      class="titlebar-button"
+      style="
+      -webkit-app-region: none;
+      position:fixed;
+      top:0;
+      right: 40px;"
+      (click)="maximize()"
+    >
+      <mat-icon>maximize</mat-icon>
+    </button>
+    <button
+      class="titlebar-button"
+      style="
+      -webkit-app-region: none;
+      position:fixed;
+      top:0;
+      right: 0;"
+      (click)="close()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 </div>
 <router-outlet></router-outlet>
