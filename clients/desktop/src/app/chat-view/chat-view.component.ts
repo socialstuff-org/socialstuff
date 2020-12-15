@@ -76,6 +76,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     message.senderName = this.titp.client.username() + '@' + this.titp.host;
     log('message', message);
     await this.titp.client.sendChatMessageTo(message, [this.contact.username]);
+    this.chat.addRecord(serializeChatMessage(message));
     console.log('sent message');
     
   }
