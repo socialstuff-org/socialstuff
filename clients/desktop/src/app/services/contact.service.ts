@@ -131,7 +131,7 @@ export class ContactService {
    * @param contact
    */
   public async openChat(contact: Contact) {
-    return this.storage.storage.openTextRecordStorage(['chats', contact.usernameHash, 'chat.log']);
+    return this.storage.storage.openTextRecordStorage(['chats', contact.usernameHash, 'chat.log'], 1024);
   }
 
   /**
