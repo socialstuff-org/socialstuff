@@ -77,11 +77,11 @@ export class TitpClientBus {
           const signatureLength = Buffer.alloc(2, 0);
           signatureLength.writeInt16BE(message.localRecipients[recipient].length);
           const msg = Buffer.concat([t, signatureLength, message.localRecipients[recipient], message.content]);
-
-          if (this._clients[recipient]) {
-            this._clients[recipient].write(msg);
+          const recipientUsername = recipient.split('@')[0];
+          if (this._clients[recipientUsername]) {
+            this._clients[recipientUsername].write(msg);
           } else {
-            offlineRecipients.push({recipient, message: msg});
+            offlineRecipients.push({recipient: recipientUsername, message: msg});
           }
         }
         if (offlineRecipients.length) {
