@@ -1,10 +1,13 @@
 import {Component, OnInit}    from '@angular/core';
 import {Contact}              from '../models/Contact';
-import {ActivatedRoute}       from '@angular/router';
+import {ActivatedRoute, Router}       from '@angular/router';
 import {ContactService}       from '../services/contact.service';
 import {TitpServiceService}   from '../services/titp-service.service';
 import {CryptoStorageService} from '../services/crypto-storage.service';
 import {DebugService}         from '../services/debug.service';
+import { prefix } from '@trale/transport/log';
+
+const log = prefix('clients/desktop/component/chat-app');
 
 /**
  * Chat app component
@@ -28,6 +31,7 @@ export class ChatAppComponent implements OnInit {
     private contacts: ContactService,
     private storage: CryptoStorageService,
     private debug: DebugService,
+    private router: Router,
   ) {
   }
 
@@ -40,40 +44,21 @@ export class ChatAppComponent implements OnInit {
    * @return {Promise<void>}
    */
   async ngOnInit(): Promise<void> {
-    await this.debug.loadSession();
-    await new Promise((res) => {
-      let localStorageLoaded = false;
-      let titpConnected = false;
-      this.storage.isLoaded.subscribe(value => {
-        localStorageLoaded = true;
-        if (localStorageLoaded === titpConnected) {
-          res();
-        }
-      });
-
-      const _a = this.titp.onConnectionStateChanged.subscribe((isConnected) => {
-        if (!isConnected) {
-          return;
-        }
-        titpConnected = true;
-        _a.unsubscribe();
-        if (localStorageLoaded === titpConnected) {
-          res();
-        }
-      });
-
-    });
+    const debugSession = await this.debug.loadSession();
+    if (debugSession === false && this.titp.connected === false) {
+      this.router.navigate(['/', 'login']);
+      return;
+    }
+    log('required chat app resources are loaded!');
+    
 
     this.username = this.titp.client.username();
-    console.log('username', this.username);
     this.activatedRoute.params.subscribe(async params => {
       const username = params.username;
-      console.log(username);
       if (!username) {
         return;
       }
       const loadedContact = await this.contacts.load(username);
-      console.log(loadedContact);
       if (!loadedContact) {
         return;
       }
