@@ -1,4 +1,5 @@
-<section *ngIf="message.type === ChatMessageType.handshake; else noHandshake" style="background-color: blue;">
+<section *ngIf="message.type === ChatMessageType.handshakeInitialization
+                || message.type === ChatMessageType.handshakeReply; else noHandshake" style="background-color: blue;">
   Handshake received on: {{message.sentAt | date: 'd.M.y h:m'}}
 </section>
 
