@@ -27,13 +27,13 @@
     "src/app/services/key-registry.service.ts",
     "src/app/services/key-registry.service.spec.ts",
     "src/app/services/app-config.service.spec.ts",
-    "src/app/services/titp-service.service.spec.ts",
+    "src/app/services/titp.service.spec.ts",
     "src/app/services/ap-settings.service.ts",
     "src/app/services/app-config.service.ts",
     "src/app/services/ap-settings.service.spec.ts",
     "src/app/services/debug.service.spec.ts",
     "src/app/services/api.service.ts",
-    "src/app/services/titp-service.service.ts",
+    "src/app/services/titp.service.ts",
     "src/app/services/debug.service.ts",
     "src/app/services/auth.service.spec.ts",
     "src/app/app-routing.module.ts",
@@ -101,6 +101,6 @@
     "src/app/chat-app/chat-app.component.spec.ts",
     "src/app/chat-app/chat-app.component.ts",
     "src/lib/helpers.ts",
-    "src/lib/functional.ts",
+    "src/lib/functional.ts"
   ],
 }

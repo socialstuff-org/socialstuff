@@ -2,9 +2,9 @@ import {Component, Input, OnInit}     from '@angular/core';
 import {Router}                                             from '@angular/router';
 import {ChatPartner}                                        from '../models/ChatPartner';
 import {MatDialog}                                          from '@angular/material/dialog';
-import {ContactInfoComponent}                               from '../contact-info/contact-info.component';
-import {TitpServiceService}                                 from '../services/titp-service.service';
-import Swal                                                 from 'sweetalert2';
+import {ContactInfoComponent} from '../contact-info/contact-info.component';
+import {TitpService}          from '../services/titp.service';
+import Swal                   from 'sweetalert2';
 import {ContactService}                                     from '../services/contact.service';
 import {Contact}                                            from '../models/Contact';
 import {hashUsername, hashUsernameHmac}                     from '../../lib/helpers';
@@ -30,7 +30,7 @@ export class HeaderComponent implements OnInit {
   constructor(
     private router: Router,
     public dialog: MatDialog,
-    public titp: TitpServiceService,
+    public titp: TitpService,
     private contacts: ContactService,
     private keys: KeyRegistryService,
     private storage: CryptoStorageService,

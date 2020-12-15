@@ -4,8 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import {CryptoStorageService} from './crypto-storage.service';
-import {TitpServiceService} from './titp-service.service';
-import {ContactService} from './contact.service';
+import {TitpService}          from './titp.service';
+import {ContactService}       from './contact.service';
 import {ApiService} from './api.service';
 import Swal from 'sweetalert2';
 import {timer} from 'rxjs';
@@ -21,7 +21,7 @@ export class DebugService {
 
   constructor(
     private storage: CryptoStorageService,
-    private titp: TitpServiceService,
+    private titp: TitpService,
     private contacts: ContactService,
     private api: ApiService,
   ) {

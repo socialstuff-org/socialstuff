@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit}    from '@angular/core';
 import {Contact}              from '../models/Contact';
 import {ActivatedRoute, Router}       from '@angular/router';
 import {ContactService}       from '../services/contact.service';
-import {TitpServiceService}   from '../services/titp-service.service';
+import {TitpService}          from '../services/titp.service';
 import {CryptoStorageService} from '../services/crypto-storage.service';
 import {DebugService}         from '../services/debug.service';
 import { prefix } from '@trale/transport/log';
@@ -28,7 +28,7 @@ export class ChatAppComponent implements OnInit, OnDestroy {
   public username = '';
 
   constructor(
-    private titp: TitpServiceService,
+    private titp: TitpService,
     private activatedRoute: ActivatedRoute,
     private contacts: ContactService,
     private storage: CryptoStorageService,

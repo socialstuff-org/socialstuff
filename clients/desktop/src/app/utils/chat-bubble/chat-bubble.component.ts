@@ -1,6 +1,6 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {ChatMessage, ChatMessageType} from '@trale/transport/message';
-import {TitpServiceService} from '../../services/titp-service.service';
+import {TitpService}                  from '../../services/titp.service';
 
 @Component({
   selector: 'app-chat-bubble',
@@ -18,7 +18,7 @@ export class ChatBubbleComponent implements OnInit {
   private audioPlayer: ElementRef<HTMLAudioElement>;
 
   constructor(
-    private titp: TitpServiceService
+    private titp: TitpService
   ) { }
 
   ngOnInit(): void {

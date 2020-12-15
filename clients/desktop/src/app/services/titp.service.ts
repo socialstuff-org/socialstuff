@@ -11,7 +11,7 @@ import {Subject}                                       from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class TitpServiceService {
+export class TitpService {
   get connected(): boolean {
     return this._connected;
   }

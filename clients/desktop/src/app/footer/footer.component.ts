@@ -1,6 +1,6 @@
 import {Component}          from '@angular/core';
-import {UtilService}        from '../services/util.service';
-import {TitpServiceService} from "../services/titp-service.service";
+import {UtilService} from '../services/util.service';
+import {TitpService} from "../services/titp.service";
 
 /**
  * Footer component
@@ -16,7 +16,7 @@ export class FooterComponent {
 
   constructor(
     public util: UtilService,
-    public titp: TitpServiceService,
+    public titp: TitpService,
   ) {
   }
 

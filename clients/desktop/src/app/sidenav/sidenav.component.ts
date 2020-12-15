@@ -2,7 +2,7 @@ import {Component, Input, OnInit}     from '@angular/core';
 import { UtilService }                from '../services/util.service';
 import { ContactService }             from '../services/contact.service';
 import { acronymOfName, searchMatch } from '../../lib/helpers';
-import { TitpServiceService }         from '../services/titp-service.service';
+import { TitpService }                from '../services/titp.service';
 import { prefix }                     from '@trale/transport/log';
 import { ContactWithLastMessage }     from '../models/Contact';
 import { ChatMessage }                from '@trale/transport/message';
@@ -26,7 +26,7 @@ export class SidenavComponent implements OnInit {
 
   constructor(
     public contacts: ContactService,
-    private titp: TitpServiceService,
+    private titp: TitpService,
     private api: ApiService,
   ) {
   }

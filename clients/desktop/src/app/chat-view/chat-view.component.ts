@@ -6,7 +6,7 @@ import {ActivatedRoute}                                            from '@angula
 import {TextRecordStorage}                                         from '@trale/persistence/crypto-storage';
 import {CryptoStorageService}                                      from 'app/services/crypto-storage.service';
 import {ChatMessage, deserializeChatMessage, serializeChatMessage} from '@trale/transport/message';
-import {TitpServiceService}                                        from 'app/services/titp-service.service';
+import {TitpService}                                               from 'app/services/titp.service';
 import {Contact}                                                   from 'app/models/Contact';
 import {prefix}                                                    from '@trale/transport/log';
 import {filter}                                                    from 'rxjs/operators';
@@ -41,7 +41,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     private contacts: ContactService,
     private route: ActivatedRoute,
     private storage: CryptoStorageService,
-    private titp: TitpServiceService
+    private titp: TitpService
   ) {
     debug.loadSession();
   }
