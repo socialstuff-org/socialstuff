@@ -15,6 +15,9 @@
 
 import {createSign, createVerify, KeyObject, sign} from 'crypto';
 import {decryptRsa, encrypt, encryptRsa}           from '../crypto';
+import { prefix } from '../log';
+
+const log = prefix('@trale/transport/message');
 
 export enum ChatMessageType {
   text,
@@ -105,12 +108,15 @@ export function buildServerMessage(
       // TODO populate remoteRecipients
     }
   }
-  return {
+  const serverMessage = {
     type:       messageType,
     content:    _encrypt(serializeChatMessage(message), key),
     recipients: remoteRecipients,
     localRecipients,
   };
+  log('built following server message:', serverMessage);
+  log('the message was built from the following parameters:', arguments);
+  return serverMessage;
 }
 
 export function makeSenderNameSignature(senderName: string, senderPrivateKey: KeyObject, recipientPublicKey: KeyObject) {
