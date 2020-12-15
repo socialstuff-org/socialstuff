@@ -41,8 +41,6 @@
     "src/app/models/ChatPartner.ts",
     "src/app/models/Message.ts",
     "src/app/models/Contact.ts",
-    "src/app/chat-list/chat-list.component.ts",
-    "src/app/chat-list/chat-list.component.spec.ts",
     "src/app/core/services/index.ts",
     "src/app/core/services/electron/electron.service.spec.ts",
     "src/app/core/services/electron/electron.service.ts",
