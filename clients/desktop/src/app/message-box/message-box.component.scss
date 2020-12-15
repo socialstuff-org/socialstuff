@@ -4,7 +4,7 @@
   background-color: $boysenberry;
   color: $plainWhite;
   border-radius: 5px;
-  width: 70%;
+  width: 100%;
   min-height: 28px;
   max-height: 120px;
   margin-top: 10px;
@@ -20,8 +20,8 @@
   color: $plainWhite;
   min-height: 28px;
   max-height: 100px;
-  min-width: calc(100% - 60px);
-  max-width: calc(100% - 60px);
+  min-width: calc(100% - 140px);
+  max-width: calc(100% - 140px);
 }
 
 #send-button {
