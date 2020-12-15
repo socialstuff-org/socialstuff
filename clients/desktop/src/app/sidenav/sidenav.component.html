@@ -40,15 +40,29 @@
               </div>
               <div class="username">
                 <div>
-                  {{chat.displayName || chat.username}}
+                  {{chat.displayName || chat.username }}
                 </div>
-                <div *ngIf="chat.lastMessage" class="last-message">
-                  {{chat.lastMessage.message | slice: 0:15}}
-                  <section *ngIf="chat.lastMessage.message == ''">
-                    <span *ngIf="chat.lastMessage.message.length > 15">...</span>
-                  </section>
+                <div *ngIf="chat.lastMessage">
+                  <div [ngSwitch]="chat.lastMessage.type">
+                    <div *ngSwitchCase="ChatMessageType.handshakeInitialization">
+                      Handshake init sent
+                    </div>
+                    <div *ngSwitchCase="ChatMessageType.handshakeReply">
+                      Handshake reply sent
+                    </div>
+                    <div *ngSwitchCase="ChatMessageType.voice">
+                      Voice message <!-- TODO calculate length of message and display value -->
+                    </div>
+                    <div *ngSwitchCase="ChatMessageType.text">
+                      <span *ngIf="chat.lastMessage.senderName !== titp.client.userHandle">&gt;</span>
+                      {{chat.lastMessage.content.toString('utf8') | slice: 0:15}}
+                      <section>
+                        <span *ngIf="chat.lastMessage.content.toString('utf8').length > 15">...</span>
+                      </section>
+                    </div>
+                    <div *ngSwitchDefault>Unknown message type</div>
+                  </div>
                 </div>
-
               </div>
             </div>
           </a>

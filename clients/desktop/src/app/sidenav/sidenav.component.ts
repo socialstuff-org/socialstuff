@@ -1,25 +1,25 @@
-import {Component, Input, OnInit}     from '@angular/core';
-import { UtilService }                from '../services/util.service';
-import { ContactService }             from '../services/contact.service';
-import { acronymOfName, searchMatch } from '../../lib/helpers';
-import { TitpService }                from '../services/titp.service';
-import { prefix }                     from '@trale/transport/log';
-import { ContactWithLastMessage }     from '../models/Contact';
-import { ChatMessage }                from '@trale/transport/message';
-import { KeyRegistryService }         from 'app/services/key-registry.service';
-import { ApiService }                 from 'app/services/api.service';
+import {Component, Input, OnInit}   from '@angular/core';
+import {ContactService}             from '../services/contact.service';
+import {acronymOfName, searchMatch} from '../../lib/helpers';
+import {TitpService}                from '../services/titp.service';
+import {prefix}                     from '@trale/transport/log';
+import {ContactWithLastMessage}     from '../models/Contact';
+import {ChatMessage}                from '@trale/transport/message';
+import {ApiService}                 from 'app/services/api.service';
+import {ChatMessageType}            from '@trale/transport/message';
 
 const log = prefix('clients/desktop/app/sidenav-component');
 
 @Component({
-  selector: 'app-sidenav',
+  selector:    'app-sidenav',
   templateUrl: './sidenav.component.html',
-  styleUrls: ['./sidenav.component.scss'],
+  styleUrls:   ['./sidenav.component.scss'],
 })
 export class SidenavComponent implements OnInit {
 
   @Input() username: string;
 
+  public ChatMessageType = ChatMessageType;
   public chats: ContactWithLastMessage[] = [];
   public loadingContacts = true;
   public searchTerm = '';
@@ -74,7 +74,7 @@ export class SidenavComponent implements OnInit {
     }
     return this.contacts.readContacts()
       .filter(x => searchMatch(this.searchTerm, x.username)
-        || searchMatch(this.searchTerm, x.displayName || ''));
+                   || searchMatch(this.searchTerm, x.displayName || ''));
   }
 
 }
