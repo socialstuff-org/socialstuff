@@ -1,4 +1,4 @@
-import {Component, OnInit}    from '@angular/core';
+import {Component, OnDestroy, OnInit}    from '@angular/core';
 import {Contact}              from '../models/Contact';
 import {ActivatedRoute, Router}       from '@angular/router';
 import {ContactService}       from '../services/contact.service';
@@ -22,7 +22,7 @@ declare let particlesJS: any;
   templateUrl: './chat-app.component.html',
   styleUrls:   ['./chat-app.component.scss']
 })
-export class ChatAppComponent implements OnInit {
+export class ChatAppComponent implements OnInit, OnDestroy {
 
   public chatPartner: Contact;
   public username = '';
@@ -35,6 +35,9 @@ export class ChatAppComponent implements OnInit {
     private debug: DebugService,
     private router: Router,
   ) {
+  }
+  ngOnDestroy(): void {
+    this.titp.client.end();
   }
 
   /**
@@ -70,6 +73,14 @@ export class ChatAppComponent implements OnInit {
       }
       this.chatPartner = loadedContact;
     });
+
+    this.titp.onConnectionStateChanged.subscribe(isConnected => {
+      if (isConnected) {
+        const _sub = this.titp.client.incomingMessage().subscribe(message => {
+          log('got message', message);
+        });
+      }
+    })
 
   }
 
