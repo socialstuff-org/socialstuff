@@ -1,7 +1,5 @@
 /**
  * Message interface for Trale communication
- *
- * @typedef {{id: number, message: string, time: string, sent: boolean, delivered: boolean, seen: boolean, isSender: boolean}} Message
  */
 export interface Message {
   id: number;
