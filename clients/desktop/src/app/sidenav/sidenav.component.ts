@@ -8,7 +8,6 @@ import { ContactWithLastMessage }     from '../models/Contact';
 import { ChatMessage }                from '@trale/transport/message';
 import { KeyRegistryService }         from 'app/services/key-registry.service';
 import { ApiService }                 from 'app/services/api.service';
-import {createEmptyMessage}           from "../models/Message";
 
 const log = prefix('clients/desktop/app/sidenav-component');
 

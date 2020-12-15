@@ -44,7 +44,9 @@
                 </div>
                 <div *ngIf="chat.lastMessage" class="last-message">
                   {{chat.lastMessage.message | slice: 0:15}}
-                  <span *ngIf="chat.lastMessage.message.length > 15">...</span>
+                  <section *ngIf="chat.lastMessage.message == ''">
+                    <span *ngIf="chat.lastMessage.message.length > 15">...</span>
+                  </section>
                 </div>
 
               </div>
