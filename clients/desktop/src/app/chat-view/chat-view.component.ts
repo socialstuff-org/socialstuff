@@ -12,6 +12,7 @@ import {prefix}                                                    from '@trale/
 import {filter}                                                    from 'rxjs/operators';
 import {take}                                                      from '../../lib/functional';
 import {CdkVirtualScrollViewport}                                  from '@angular/cdk/scrolling';
+import {delay}                                                     from "@socialstuff/utilities/common";
 
 const log = prefix('clients/desktop/component/chat-view');
 
@@ -61,6 +62,8 @@ export class ChatViewComponent implements OnInit, OnDestroy {
       this.chat = await this.contacts.openChat(contact);
       this.chatConsumer = take(this.chat.records());
       this.messages = (await this.chatConsumer(50)).reverse().map(deserializeChatMessage);
+      await delay(20);
+      this.virtualScroll.scrollTo({bottom: 0});
       console.log('contact', contact);
     });
 
