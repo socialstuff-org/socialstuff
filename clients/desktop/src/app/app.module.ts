@@ -42,6 +42,7 @@ import {MatMenuModule}             from "@angular/material/menu";
 import { LanguageselectComponent } from './utils/languageselect/languageselect.component';
 import { ParticlesComponent } from './utils/particles/particles.component';
 import { LoadingComponent } from './utils/loading/loading.component';
+import { VoiceMessageComponent } from './message-box/voice-message/voice-message.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -68,6 +69,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     LanguageselectComponent,
     ParticlesComponent,
     LoadingComponent,
+    VoiceMessageComponent,
   ],
   imports:      [
     BrowserModule,

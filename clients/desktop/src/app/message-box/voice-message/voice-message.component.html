@@ -1,0 +1,7 @@
+<button (click)="toggleRecording()" id="toggle-recording-btn">
+  <mat-icon *ngIf="recordingState">mic</mat-icon>
+  <mat-icon *ngIf="!recordingState">mic_none</mat-icon>
+</button>
+<button (click)="cancel()" *ngIf="recordingState">
+  <mat-icon>cancel</mat-icon>
+</button>
