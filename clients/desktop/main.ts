@@ -22,7 +22,6 @@ function createWindow(): BrowserWindow {
       nodeIntegration:             true,
       allowRunningInsecureContent: (serve) ? true : false,
     },
-    // TODO enable --> frame: false,
   });
 
   if (serve) {
