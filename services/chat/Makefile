@@ -20,7 +20,7 @@ login-web:
 
 prod: base-image
 	npx loin i
-	docker build -t socialstuff-identity:prod -f docker/prod/Dockerfile .
+	docker build -t socialstuff-chat:prod -f docker/prod/Dockerfile .
 
 base-image:
 	docker build ../base-image -t socialstuff-node:base
