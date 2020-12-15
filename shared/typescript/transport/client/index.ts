@@ -50,6 +50,15 @@ export class TitpClient extends CommonTitpClient {
   private _ecdh: ECDH;
   protected _key: Buffer = Buffer.alloc(0, 0);
   protected _onIncomingMessage = new Subject<ChatMessage>();
+  private _hostname: string = '';
+
+  public get hostname(): string {
+    return this._hostname;
+  }
+
+  public get userHandle(): string {
+    return this._username + '@' + this._hostname;
+  }
 
   /**
    *
@@ -96,6 +105,7 @@ export class TitpClient extends CommonTitpClient {
     const handshake = new Handshake(this._username, this._socket, this._ecdh, this._rsa, hostRsaPub);
     await handshake._handshakeResult.toPromise();
     this._key = handshake._syncKey;
+    this._hostname = host;
     this._init();
   }
 
@@ -118,10 +128,12 @@ export class TitpClient extends CommonTitpClient {
    * @param groupId Optional: An identifier, which indicates the association of a message to a group chat.
    */
   public async sendChatMessageTo(message: ChatMessage, recipients: string[], groupId?: string) {
+    message.senderName = this.userHandle;
     log('sending chat message', message, 'to recipients', recipients);
     if (recipients.length < 1) {
       throw new Error('Please provide at least one recipient for the message!');
     }
+    recipients = recipients.map(r => r.includes('@') ? r : r + '@' + this._hostname);
     let conversationKey: Buffer;
     if (groupId) {
       conversationKey = await this._keyRegistry.fetchConversationKey('~' + groupId);
@@ -173,6 +185,9 @@ export class TitpClient extends CommonTitpClient {
   }
 
   public async negotiateKeyWith(username: string, type: ChatMessageType = ChatMessageType.handshakeInitialization) {
+    if (!username.includes('@')) {
+      username += '@' + this._hostname;
+    }
     log(`client rsa of ${username}:`, this._rsa.pub.export({type: 'pkcs1', format: 'pem'}));
     const recipientRsaPublicKey = await this._keyRegistry.fetchRsa(username);
     const ecdhSig = createSign('RSA-SHA512')
@@ -180,7 +195,7 @@ export class TitpClient extends CommonTitpClient {
       .sign(this._rsa.priv);
     const e = Buffer.concat([this._ecdh.getPublicKey(), ecdhSig]);
     const message: ChatMessage = {
-      senderName:  this._username,
+      senderName:  this.userHandle,
       sentAt:      new Date(),
       attachments: [],
       type:        type,
@@ -188,7 +203,7 @@ export class TitpClient extends CommonTitpClient {
     };
     const recipient = [{name: username, publicKey: recipientRsaPublicKey}];
     const serverMessage = buildServerMessage(message, this._rsa.priv, Buffer.alloc(0), recipient, ServerMessageType.initialHandshake, x => encryptRsa(x, recipientRsaPublicKey));
-    log('saving ecdh key for later common key computation');
+    log('saving ecdh key for later common key computation; server message:', serverMessage);
     await this._keyRegistry.saveEcdhForHandshake(username, this._ecdh);
     log('sending server message');
     await this.write(serializeServerMessage(serverMessage));
