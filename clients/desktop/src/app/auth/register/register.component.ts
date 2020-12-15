@@ -12,6 +12,7 @@ import {ApiService}                  from '../../services/api.service';
 import {CryptoStorageService}        from '../../services/crypto-storage.service';
 import sweetalert                    from 'sweetalert2';
 import {DataResponse, ErrorResponse} from '@socialstuff/utilities/responses';
+import { Router } from '@angular/router';
 
 /**
  * TODO @joernneumeyer
@@ -62,6 +63,7 @@ export class RegisterComponent implements OnInit {
     private http: HttpClient,
     private api: ApiService,
     private storage: CryptoStorageService,
+    private router: Router
   ) {
   }
 
@@ -158,6 +160,7 @@ export class RegisterComponent implements OnInit {
       title:           'Registration confirmation successful!',
       showCloseButton: true,
     });
+    await this.router.navigate(['/', 'login']);
   }
 
 }
