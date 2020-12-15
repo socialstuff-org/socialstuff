@@ -15,11 +15,12 @@
   </div>
 
   <div id="username" (click)="openContactInfo()" *ngIf="chatPartner">
-    <div *ngIf="chatPartner.displayName; else onlyUsername">{{chatPartner.username}}<br>
-      @{{chatPartner.username}}
+    <div *ngIf="chatPartner.displayName; else onlyUsername">
+      {{chatPartner.displayName}}<br>
+      {{chatPartner.username}}
     </div>
     <ng-template #onlyUsername>
-      <span style="line-height: 40px;">@{{chatPartner.username}}</span>
+      <span style="line-height: 40px;">{{chatPartner.username}}</span>
     </ng-template>
   </div>
 
