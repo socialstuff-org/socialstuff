@@ -10,6 +10,9 @@ import { CryptoStorageService } from 'app/services/crypto-storage.service';
 import { ChatMessage } from '@trale/transport/message';
 import { TitpServiceService } from 'app/services/titp-service.service';
 import { Contact } from 'app/models/Contact';
+import { prefix } from '@trale/transport/log';
+
+const log = prefix('clients/desktop/component/chat-view');
 
 @Component({
   selector:    'app-chat-view',
@@ -41,7 +44,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const _a = this.storage.isLoaded.subscribe(async () => {
       _a.unsubscribe();
-      const contact = await this.contacts.load(this.route.snapshot.params.id);
+      const contact = await this.contacts.load(this.route.snapshot.params.username);
       if (contact === false) {
         console.error('contact could not be loaded!');
         return;
@@ -54,6 +57,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
 
   public async messageSentHandler(message: ChatMessage) {
     message.senderName = this.titp.client.username() + '@' + this.titp.host;
+    log('message', message);
     await this.titp.client.sendChatMessageTo(message, [this.contact.username]);
     console.log('sent message');
     
