@@ -1,16 +1,17 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {UtilService}                         from '../services/util.service';
-import {DebugService}                        from '../services/debug.service';
-import {ContactService}                      from '../services/contact.service';
-import { ActivatedRoute } from '@angular/router';
-import { TextRecordStorage } from '@trale/persistence/crypto-storage';
-import { CryptoStorageService } from 'app/services/crypto-storage.service';
-import { ChatMessage, ChatMessageType, deserializeChatMessage, serializeChatMessage } from '@trale/transport/message';
-import { TitpServiceService } from 'app/services/titp-service.service';
-import { Contact } from 'app/models/Contact';
-import { prefix } from '@trale/transport/log';
-import { filter } from 'rxjs/operators';
-import { take } from '../../lib/functional';
+import {Component, Input, OnDestroy, OnInit, ViewChild}            from '@angular/core';
+import {UtilService}                                               from '../services/util.service';
+import {DebugService}                                              from '../services/debug.service';
+import {ContactService}                                            from '../services/contact.service';
+import {ActivatedRoute}                                            from '@angular/router';
+import {TextRecordStorage}                                         from '@trale/persistence/crypto-storage';
+import {CryptoStorageService}                                      from 'app/services/crypto-storage.service';
+import {ChatMessage, deserializeChatMessage, serializeChatMessage} from '@trale/transport/message';
+import {TitpServiceService}                                        from 'app/services/titp-service.service';
+import {Contact}                                                   from 'app/models/Contact';
+import {prefix}                                                    from '@trale/transport/log';
+import {filter}                                                    from 'rxjs/operators';
+import {take}                                                      from '../../lib/functional';
+import {CdkVirtualScrollViewport}                                  from '@angular/cdk/scrolling';
 
 const log = prefix('clients/desktop/component/chat-view');
 
@@ -23,9 +24,14 @@ export class ChatViewComponent implements OnInit, OnDestroy {
 
   @Input('contact') contact: Contact;
 
+  @ViewChild(CdkVirtualScrollViewport)
+  public virtualScroll?: CdkVirtualScrollViewport;
+
+
   public messages: ChatMessage[] = [];
   public chat: TextRecordStorage;
   private chatConsumer: (n: number) => Promise<Buffer[]>
+
   // public contact: Contact;
 
   constructor(
@@ -38,11 +44,12 @@ export class ChatViewComponent implements OnInit, OnDestroy {
   ) {
     debug.loadSession();
   }
+
   ngOnDestroy(): void {
     this.chat?.close();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     const _a = this.storage.isLoaded.subscribe(async () => {
       _a.unsubscribe();
       const contact = await this.contacts.load(this.route.snapshot.params.username);
@@ -56,7 +63,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
       this.messages = (await this.chatConsumer(10)).reverse().map(deserializeChatMessage);
       console.log('contact', contact);
     });
-    
+
     this.titp.onConnectionStateChanged.subscribe(_ => {
       this.titp.client.incomingMessage()
         .pipe(
@@ -67,15 +74,16 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  async handleIncomingMessage(message: ChatMessage) {
+  async handleIncomingMessage(message: ChatMessage): Promise<void> {
     this.messages = [...this.messages, message];
     await this.chat.addRecord(serializeChatMessage(message));
+    this.virtualScroll.scrollTo({bottom: 0});
   }
 
-  public async messageSentHandler(message: ChatMessage) {
+  public async messageSentHandler(message: ChatMessage): Promise<void> {
     message.senderName = this.titp.client.userHandle;
     log('message', message);
     await this.titp.client.sendChatMessageTo(message, [this.contact.username]);
-    this.handleIncomingMessage(message);
+    await this.handleIncomingMessage(message);
   }
 }
