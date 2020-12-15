@@ -1,13 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
-import { UtilService }            from '../services/util.service';
-import { ContactService } from '../services/contact.service';
+import {Component, Input, OnInit}     from '@angular/core';
+import { UtilService }                from '../services/util.service';
+import { ContactService }             from '../services/contact.service';
 import { acronymOfName, searchMatch } from '../../lib/helpers';
-import { TitpServiceService } from '../services/titp-service.service';
-import { prefix } from '@trale/transport/log';
-import { ContactWithLastMessage } from '../models/Contact';
-import { ChatMessage } from '@trale/transport/message';
-import { KeyRegistryService } from 'app/services/key-registry.service';
-import { ApiService } from 'app/services/api.service';
+import { TitpServiceService }         from '../services/titp-service.service';
+import { prefix }                     from '@trale/transport/log';
+import { ContactWithLastMessage }     from '../models/Contact';
+import { ChatMessage }                from '@trale/transport/message';
+import { KeyRegistryService }         from 'app/services/key-registry.service';
+import { ApiService }                 from 'app/services/api.service';
+import {createEmptyMessage}           from "../models/Message";
 
 const log = prefix('clients/desktop/app/sidenav-component');
 
@@ -35,6 +36,9 @@ export class SidenavComponent implements OnInit {
     this.contacts.onContactListUpdated().subscribe(async () => {
       this.chats = await this.contacts.loadLastMessages(this.contacts.readContacts() as any);
       log('got the following chats with last messages:', this.chats);
+      this.chats[0].displayName = 'Jörn Neumeyer';
+      this.chats[0].lastMessage = createEmptyMessage();
+      this.chats[0].lastMessage.message = 'Trale ist so geil! Lorem pisum dolor sit amet foo';
     });
 
     let sub;

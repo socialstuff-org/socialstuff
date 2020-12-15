@@ -6,7 +6,7 @@
         <mat-divider class="contact-list-divider"></mat-divider>
 
         <section style="background-color: #510A32; margin-top: 10px; margin-bottom: 10px; text-align: center;">
-          <div class="profile-picture">
+          <div class="profile-picture" style="margin-left: 15px;">
             <span *ngIf="username">{{acronym(username)}}</span>
           </div>
           <div class="username" style="text-align: left;">
@@ -42,8 +42,9 @@
                 <div>
                   {{chat.displayName || ('@' + chat.username)}}
                 </div>
-                <div *ngIf="chat.lastMessage">
-                  {{chat.lastMessage.message | slice: 0:50}}
+                <div *ngIf="chat.lastMessage" class="last-message">
+                  {{chat.lastMessage.message | slice: 0:15}}
+                  <span *ngIf="chat.lastMessage.message.length > 15">...</span>
                 </div>
 
               </div>
