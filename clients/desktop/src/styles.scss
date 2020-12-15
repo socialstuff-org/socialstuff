@@ -1,24 +1,13 @@
-// IMPORTS
-// TODO fix imports
-// @import url(app/styles/colors.scss);
-@import 'assets/styles/trale-theme';
+/* You can add global styles to this file, and also import other style files */
 
+// IMPORTS
+@import 'assets/styles/colors';
+@import 'assets/styles/trale-theme';
 // END OF IMPORTS
 
-// COLOR DEFINITION
-$elderberry: #21142D;
-$plumViolet: #510A32;
-$boysenberry: #801336;
-$frenchRasperry: #C72C41;
-$coralRed: #EE4540;
-$operaMauve: #BB89A6;
-$plainWhite: #ffffff;
-
-/* You can add global styles to this file, and also import other style files */
 html, body {
   margin: 0;
   padding: 0;
-
   height: 100%;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -27,6 +16,26 @@ html, body {
   background-color: $elderberry;
   color: $plainWhite;
 }
+
+.hover::selection {
+  background-color: $coralRed;
+}
+
+// Input field: Remove de/increase buttons on input field with type number
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+// Angular Material Global Styles
 
 .mat-toolbar {
   color: inherit;
@@ -53,10 +62,9 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   // background: url(./assets/background.jpg) no-repeat center fixed;
-  -webkit-background-size: cover; /* pour anciens Chrome et Safari */
-  background-size: cover; /* version standardisée */
+  -webkit-background-size: cover; /* Chrome and Safari */
+  background-size: cover; /* Other browsers */
 
   .title {
     color: white;
@@ -107,17 +115,69 @@ html, body {
   text-transform: uppercase;
 }
 
-.custom-button:hover {
+.hover:hover {
   cursor: pointer;
+  box-shadow: 0 0 10px $coralRed;
 }
 
 .custom-button:disabled {
-  background-color: #535353;
-  color: #8f8f8f;
+  background-color: #732423;
+  color: #737373;
   cursor: default;
+  box-shadow: none;
 }
 
-// MAT INPUT STYLES
+.custom-input-field {
+  border-radius: 100px;
+  border: none;
+  background-color: $plumViolet;
+  color: $plainWhite;
+  font-size: 1.25em;
+  margin-bottom: 10px;
+  height: 26px;
+}
+
+.custom-input-field::placeholder {
+  color: #BB89A6;
+}
+
+.custom-input-field-type-1 {
+  padding: 5px 5px 5px 15px;
+  width: 280px;
+}
+
+#custom-input-field-type-2 {
+  padding: 5px 5px 5px 15px;
+  width: 180px;
+}
+
+#custom-input-field-type-3 {
+  padding: 5px;
+  width: 70px;
+  margin-left: 20px;
+  text-align: center;
+}
+
+.wide-input-field {
+  padding: 5px 5px 5px 15px;
+  width: 280px;
+}
+
+// Titlebar
+
+.titlebar-button {
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  color: #ffffff;
+  // border: 1px solid $coralRed !important;
+  border: none;
+}
+
+// End of titlebar
+
+// Angular Material Input
+
 mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-field-wrapper > div.mat-form-field-flex > div.mat-form-field-infix  { padding: 0.4em 0px }
 mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-field-wrapper > div.mat-form-field-flex > div.mat-form-field-infix > span.mat-form-field-label-wrapper { top: -1.5em; }
 
@@ -127,9 +187,26 @@ mat-form-field.mat-form-field.mat-form-field-appearance-outline > div.mat-form-f
   color: $plainWhite !important;
 }
 
-textarea:focus, input:focus{
+textarea:focus {
   outline: none;
 }
+
+input:focus{
+  outline: none !important;
+  box-shadow: 0 0 10px $coralRed;
+}
+
+button:focus {
+  outline: none;
+}
+
+.shadow button:focus {
+  box-shadow: 0 0 10px $coralRed;
+}
+
+// End of Angular Material Input
+
+// SweetAlert2
 
 .swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation {
   background-color: #21142D !important;
@@ -150,7 +227,10 @@ textarea:focus, input:focus{
   color: #ffffff !important;
 }
 
-// MAT MENU
+// End of SweetAlert2
+
+// Angular Material Menu
+
 .mat-menu-content {
   background-color: #21142D !important;
   border: 1px solid #ed3330 !important;
@@ -164,8 +244,61 @@ textarea:focus, input:focus{
   color: #ed3330 !important;
 }
 
-// LANGUAGE MENU
+// End of Angular Material Menu
+
+// Language Menu
+
 .lang-icon {
   width: 25px;
   vertical-align: middle;
+}
+
+// Authentication components
+
+.auth-container {
+  height: 100vh;
+  width: 100%;
+  display: table;
+}
+
+.auth-sub-container {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.auth-headline-wrapper {
+  margin-bottom: 25px;
+}
+
+.auth-headline {
+  text-transform: uppercase;
+  color: $plainWhite;
+  font-size: 1em;
+}
+
+.auth-anchor {
+  color: $coralRed;
+  text-decoration: none;
+}
+
+.input-wrapper {
+  width: 100%;
+  text-align: center;
+}
+
+#logo {
+  margin-bottom: 20px;
+}
+
+// End of authentication components
+
+// ParticlesJS
+
+#particles-js {
+  width: 100%;
+  height: calc(100vh - 40px);
+  margin-top: 40px;
+  position: absolute;
+  top: 0;
+  z-index: -1;
 }

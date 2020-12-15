@@ -1,6 +1,5 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ChatMessage, ChatMessageType} from "@trale/transport/message";
-import {TitpServiceService} from "../services/titp-service.service";
 
 @Component({
   selector: 'app-message-box',
@@ -14,7 +13,6 @@ export class MessageBoxComponent implements OnInit {
   @Output() messageSent: EventEmitter<ChatMessage> = new EventEmitter();
 
   constructor(
-    private titp: TitpServiceService,
   ) {
     this.message = '';
   }
@@ -31,7 +29,7 @@ export class MessageBoxComponent implements OnInit {
     const message: ChatMessage = {
       content: Buffer.from(this.message),
       attachments: [],
-      senderName: 'this.titp.client.username()',
+      senderName: '',
       sentAt: new Date(),
       type: ChatMessageType.text,
     };

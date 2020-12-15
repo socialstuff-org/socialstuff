@@ -22,7 +22,15 @@ import {server}                              from './titp-server';
 import {TitpClientBus}                       from '@trale/transport/server/client-bus';
 import {sharedConnection}                    from './mongodb';
 import {hashHmac}                            from '@socialstuff/utilities/security';
+import {enableLogging} from '@trale/transport/log';
 import { Binary } from 'mongodb';
+// @ts-ignore
+import customEnv from 'custom-env';
+customEnv.env();
+
+if (process.env.APP_DEBUG) {
+  enableLogging();
+}
 
 const APP_PORT = parseInt(process.env.APP_PORT || '3000');
 const APP_HOST = process.env.APP_HOST || '::1';

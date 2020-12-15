@@ -1,6 +1,6 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
-import {ChatPartner} from "../models/ChatPartner";
+import {Component, Inject, OnInit}     from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {Contact}                       from '../models/Contact';
 
 @Component({
   selector: 'app-contact-info',
@@ -9,12 +9,16 @@ import {ChatPartner} from "../models/ChatPartner";
 })
 export class ContactInfoComponent implements OnInit {
 
+  public chatPartner: Contact;
+
   constructor(
     public dialogRef: MatDialogRef<ContactInfoComponent>,
-    @Inject(MAT_DIALOG_DATA) public data) {
+    @Inject(MAT_DIALOG_DATA) public data: {chatPartner: Contact}) {
   }
 
   ngOnInit(): void {
+    this.chatPartner = this.data.chatPartner;
+    console.log(this.chatPartner);
   }
 
   public closeContactInfo() {

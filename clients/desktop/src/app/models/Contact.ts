@@ -1,7 +1,9 @@
-import {KeyObject} from 'crypto';
-import {Message}   from './Message';
+import {KeyObject}   from 'crypto';
+import {ChatMessage} from '@trale/transport/message';
 
-
+/**
+ * Contact interface. Used for standardized contact objects.
+ */
 export interface Contact {
   username: string;
   usernameHash: string;
@@ -10,6 +12,9 @@ export interface Contact {
   conversationKey: Buffer;
 }
 
+/**
+ * Extended interface providing a contact with an optional latest message from the related contact.
+ */
 export interface ContactWithLastMessage extends Contact {
-  lastMessage?: Message
+  lastMessage?: ChatMessage
 }

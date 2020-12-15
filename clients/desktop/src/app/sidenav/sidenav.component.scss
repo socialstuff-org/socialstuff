@@ -2,7 +2,7 @@
 
 #sidenav-container {
   position: absolute;
-  top: 60px;
+  top: 100px;
   bottom: 60px;
   left: 0;
   right: 0;
@@ -25,7 +25,6 @@
 
 .sidenav-link {
   text-decoration: none;
-  margin-left: 10px;
   color: $plainWhite;
 }
 
@@ -49,10 +48,12 @@ mat-list-item:hover {
   width: 80%;
   border: none;
   height: 20px;
+  padding: 5px;
 }
 
 #search-bar::placeholder {
   color: $plainWhite;
+  padding-left: 8px;
 }
 
 .contact-list-divider {
@@ -60,6 +61,7 @@ mat-list-item:hover {
 }
 
 .profile-picture {
+  margin-right: 10px;
   width: 40px;
   height: 40px;
   border: 2px solid $frenchRasperry;
@@ -72,8 +74,12 @@ mat-list-item:hover {
 
 .username {
   line-height: 20px;
-  width: 100%;
-  margin-left: 65px;
+  width: calc (250px - 60px);
+  margin-left: 55px;
+}
+
+.last-message {
+  font-style: italic;
 }
 
 mat-form-field input::placeholder {

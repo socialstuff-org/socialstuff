@@ -13,12 +13,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with TITP.  If not, see <https://www.gnu.org/licenses/>.
 
-import {createVerify}   from 'crypto';
-import {fromEvent}      from 'rxjs';
-import {SIGN}                   from '../../../constants/crypto-algorithms';
-import {encrypt} from '../../../crypto';
-import {Handshake}              from '../index';
-import {HandshakeState} from '../state';
+import { createVerify } from 'crypto';
+import { fromEvent } from 'rxjs';
+import { SIGN } from '../../../constants/crypto-algorithms';
+import { encrypt } from '../../../crypto';
+import { prefix } from '../../../log';
+import { Handshake } from '../index';
+import { HandshakeState } from '../state';
+
+const log = prefix('@trale/transport/client/handshake/states/wait-for-ecdh');
+
+const maxUsernameLength = 60;
 
 export class WaitForEcdh extends HandshakeState {
   enter(handshake: Handshake) {
@@ -28,6 +33,7 @@ export class WaitForEcdh extends HandshakeState {
       if (dataBuffer.length < 609) {
         return;
       }
+      log('got ecdh')
       sub.unsubscribe();
       const ecdhPub = dataBuffer.slice(0, 97);
       const ecdhSig = dataBuffer.slice(97, 609);
@@ -35,11 +41,17 @@ export class WaitForEcdh extends HandshakeState {
       verifier.update(ecdhPub);
       const signatureMatches = verifier.verify(handshake.serverRsaPublicKey, ecdhSig);
       if (!signatureMatches) {
+        log('signatures didn\'t match!');
         handshake._handshakeResult.error(new Error('Signature mismatch!'));
         return;
       }
       handshake._syncKey = handshake.ecdh.computeSecret(ecdhPub).slice(0, 32);
-      handshake._write(encrypt(handshake.username.padEnd(20, ' '), handshake._syncKey))
+      const usernameBuffer = Buffer.from(handshake.username.padEnd(maxUsernameLength, ' '), 'utf-8');
+      if (usernameBuffer.length > maxUsernameLength) {
+        log('username buffer was too long! username:', handshake.username);
+        throw new Error(`the binary encoded username may not be londer than ${maxUsernameLength} bytes!`);
+      }
+      handshake._write(encrypt(usernameBuffer, handshake._syncKey))
         .then(() => {
           handshake._handshakeResult.next();
           handshake._handshakeResult.complete();

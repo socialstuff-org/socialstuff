@@ -22,7 +22,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
+            "scripts": ["node_modules/particles.js/particles.js"],
             "customWebpackConfig": {
               "path": "./angular.webpack.js"
             }

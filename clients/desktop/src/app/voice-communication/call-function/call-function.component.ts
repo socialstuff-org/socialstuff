@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import {createEmptyMessage, Message} from '../../models/Message';
-import {ChatMenuItem} from '../../models/ChatMenuItem';
 
 @Component({
   selector: 'app-call-function',

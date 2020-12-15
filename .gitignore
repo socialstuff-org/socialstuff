@@ -6,3 +6,4 @@ node_modules/
 *.pem
 *.pub
 *.priv
+package-lock.json

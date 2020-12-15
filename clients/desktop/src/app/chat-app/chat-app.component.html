@@ -1,0 +1,38 @@
+<app-header [username]="username" [chatPartner]="chatPartner"></app-header>
+<app-sidenav [username]="username"></app-sidenav>
+<app-chat-view *ngIf="chatPartner; else landing" [contact]="chatPartner"></app-chat-view>
+<ng-template #landing>
+  <div id="landing-container">
+    <!-- <app-particles></app-particles> -->
+    <div id="particles-js" style="width: calc(100% - 250px);"></div>
+    <div id="sub-landing-container">
+      <div class="input-wrapper" id="logo">
+        <img src="assets/img/eye.svg" alt="img unavailable">
+      </div>
+
+      <div class="landing-text">
+        <span id="landing-main-headline">Stay private with us</span>
+        <br>
+        <span id="landing-sub-headline">We protect you. You protect yourself.</span>
+      </div>
+
+      <section style="margin-top: 30px;"><!-- SPACER --></section>
+
+      <div id="share-container">
+        Share Trale. For a better connected world.
+      </div>
+      <div style="margin-top: 10px;">
+        <a href="">
+          <img src="assets/icons/socialmedia/013-twitter.svg" alt="Twitter icon unavailable" class="social-media-icon">
+        </a>
+        <a href="">
+          <img src="assets/icons/socialmedia/011-instagram.svg" alt="Instagram icon unavailable" class="social-media-icon">
+        </a>
+        <a href="">
+          <img src="assets/icons/socialmedia/010-linkedin.svg" alt="LinkedIn icon unavailable" class="social-media-icon">
+        </a>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<app-footer></app-footer>

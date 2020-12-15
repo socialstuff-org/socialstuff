@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TitpServiceService } from './titp-service.service';
+import { TitpService } from './titp.service';
 
 describe('TitpServiceService', () => {
-  let service: TitpServiceService;
+  let service: TitpService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(TitpServiceService);
+    service = TestBed.inject(TitpService);
   });
 
   it('should be created', () => {
