@@ -94,7 +94,7 @@
     "@angular/material": "10.2.0",
     "@socialstuff/utilities": "0.6.2",
     "@trale/persistence": "0.1.7",
-    "@trale/transport": "0.2.14",
+    "@trale/transport": "0.3.0",
     "custom-electron-titlebar": "3.2.5",
     "electron-titlebar": "0.0.3",
     "idb": "5.0.6",
