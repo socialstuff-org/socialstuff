@@ -1,16 +1,16 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {Message}                             from '../models/Message';
-import {ChatPartner, createEmptyChatPartner} from '../models/ChatPartner';
 import {UtilService}                         from '../services/util.service';
 import {DebugService}                        from '../services/debug.service';
 import {ContactService}                      from '../services/contact.service';
 import { ActivatedRoute } from '@angular/router';
 import { TextRecordStorage } from '@trale/persistence/crypto-storage';
 import { CryptoStorageService } from 'app/services/crypto-storage.service';
-import { ChatMessage } from '@trale/transport/message';
+import { ChatMessage, ChatMessageType, deserializeChatMessage, serializeChatMessage } from '@trale/transport/message';
 import { TitpServiceService } from 'app/services/titp-service.service';
 import { Contact } from 'app/models/Contact';
 import { prefix } from '@trale/transport/log';
+import { filter } from 'rxjs/operators';
+import { take } from '../../lib/functional';
 
 const log = prefix('clients/desktop/component/chat-view');
 
@@ -23,8 +23,9 @@ export class ChatViewComponent implements OnInit, OnDestroy {
 
   @Input('contact') contact: Contact;
 
-  public messages: Message[];
+  public messages: ChatMessage[] = [];
   public chat: TextRecordStorage;
+  private chatConsumer: (n: number) => Promise<Buffer[]>
   // public contact: Contact;
 
   constructor(
@@ -51,8 +52,24 @@ export class ChatViewComponent implements OnInit, OnDestroy {
       }
       this.contact = contact;
       this.chat = await this.contacts.openChat(contact);
+      this.chatConsumer = take(this.chat.records());
+      this.messages = (await this.chatConsumer(10)).reverse().map(deserializeChatMessage);
       console.log('contact', contact);
     });
+    
+    this.titp.onConnectionStateChanged.subscribe(_ => {
+      this.titp.client.incomingMessage()
+        .pipe(
+          // @ts-ignore
+          filter<ChatMessage>(x => x.senderName === this.contact.username)
+        )
+        .subscribe(this.handleIncomingMessage.bind(this));
+    });
+  }
+
+  async handleIncomingMessage(message: ChatMessage) {
+    this.messages = [...this.messages, message];
+    await this.chat.addRecord(serializeChatMessage(message));
   }
 
   public async messageSentHandler(message: ChatMessage) {
