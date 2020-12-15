@@ -93,17 +93,16 @@ export class DebugService {
     session.port && (this.api.port = session.port);
     session.tralePort && (this.api.tralePort = session.tralePort);
     console.log('connecting to chat service...');
-    const _connectPromise = this.connectWithAnimation(session);
     this.titp.onConnectionStateChanged.subscribe(isConnected => {
       if (isConnected) {
-        console.log('did connect!');
+        log('connected; listening for disconnects.');
         const _a = this.titp.client.onDisconnect().subscribe(hadError => {
           this.connectWithAnimation(session);
           _a.unsubscribe();
         });
       }
     });
-    await _connectPromise;
+    await this.connectWithAnimation(session);
     log('done with session loading');
     return result;
   }
