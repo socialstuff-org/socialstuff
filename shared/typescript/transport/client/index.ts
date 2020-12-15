@@ -50,6 +50,11 @@ export class TitpClient extends CommonTitpClient {
   private _ecdh: ECDH;
   protected _key: Buffer = Buffer.alloc(0, 0);
   protected _onIncomingMessage = new Subject<ChatMessage>();
+  private _hostname: string = '';
+
+  public get hostname(): string {
+    return this._hostname;
+  }
 
   /**
    *
@@ -96,6 +101,7 @@ export class TitpClient extends CommonTitpClient {
     const handshake = new Handshake(this._username, this._socket, this._ecdh, this._rsa, hostRsaPub);
     await handshake._handshakeResult.toPromise();
     this._key = handshake._syncKey;
+    this._hostname = host;
     this._init();
   }
 
@@ -118,10 +124,12 @@ export class TitpClient extends CommonTitpClient {
    * @param groupId Optional: An identifier, which indicates the association of a message to a group chat.
    */
   public async sendChatMessageTo(message: ChatMessage, recipients: string[], groupId?: string) {
+    message.senderName = this._username + '@' + this._hostname;
     log('sending chat message', message, 'to recipients', recipients);
     if (recipients.length < 1) {
       throw new Error('Please provide at least one recipient for the message!');
     }
+    recipients = recipients.map(r => r.includes('@') ? r : r + '@' + this._hostname);
     let conversationKey: Buffer;
     if (groupId) {
       conversationKey = await this._keyRegistry.fetchConversationKey('~' + groupId);
@@ -173,6 +181,9 @@ export class TitpClient extends CommonTitpClient {
   }
 
   public async negotiateKeyWith(username: string, type: ChatMessageType = ChatMessageType.handshakeInitialization) {
+    if (!username.includes('@')) {
+      username += '@' + this._hostname;
+    }
     log(`client rsa of ${username}:`, this._rsa.pub.export({type: 'pkcs1', format: 'pem'}));
     const recipientRsaPublicKey = await this._keyRegistry.fetchRsa(username);
     const ecdhSig = createSign('RSA-SHA512')
