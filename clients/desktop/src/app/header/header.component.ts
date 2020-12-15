@@ -12,6 +12,7 @@ import {KeyRegistryService}                                 from '../services/ke
 import {ChatMessage, ChatMessageType, serializeChatMessage} from '@trale/transport/message';
 import {CryptoStorageService}                               from '../services/crypto-storage.service';
 import { prefix } from '@trale/transport/log';
+import { ApiService } from 'app/services/api.service';
 
 const log = prefix('clients/desktop/components/header-component');
 
@@ -32,7 +33,8 @@ export class HeaderComponent implements OnInit {
     public titp: TitpServiceService,
     private contacts: ContactService,
     private keys: KeyRegistryService,
-    private storage: CryptoStorageService
+    private storage: CryptoStorageService,
+    private api: ApiService,
   ) {
   }
 
@@ -93,12 +95,13 @@ export class HeaderComponent implements OnInit {
         const chat = await this.contacts.openChat(contact);
         log('opened chat with contact', contact)
         const initialMessage: ChatMessage = {
-          senderName: this.titp.client.username(),
+          senderName: this.titp.client.username() + this.api.hostname,
           content: Buffer.alloc(0),
           type: ChatMessageType.handshakeInitialization,
           sentAt: new Date(),
           attachments: []
         };
+        log('initial message', initialMessage);
         log('adding inital record for contact', contact);
         await chat.addRecord(serializeChatMessage(initialMessage));
         log('closing chat for contact', contact);
