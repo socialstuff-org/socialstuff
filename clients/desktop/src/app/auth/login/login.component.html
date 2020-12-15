@@ -54,7 +54,7 @@
     <div class="input-wrapper">
       <button
         (click)="login()"
-        class="custom-button"
+        class="custom-button hover"
         [disabled]="username == '' || password == ''"
       >
         {{ 'auth.login' | translate }}
@@ -64,7 +64,7 @@
     <div class="input-wrapper">
       <button
         (click)="forgotPassword()"
-        class="custom-button"
+        class="custom-button hover"
       >
         {{ 'auth.forgot_password' | translate }}
       </button>
