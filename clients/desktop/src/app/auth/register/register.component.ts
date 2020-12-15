@@ -139,11 +139,7 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    const hash = (() => {
-      const hash = createHash('sha256');
-      hash.update(this.password);
-      return hash.digest();
-    })();
+    const hash = createHash('sha256').update(this.password).digest();
     const userHandle = this.username + '@' + this.hostname;
     await this.storage.load(userHandle, hash);
     await Promise.all([
