@@ -46,8 +46,6 @@
   <mat-menu #menu="matMenu">
     <button mat-menu-item>Profile</button>
     <button mat-menu-item>Settings</button>
-    <span mat-menu-item>Connected to:</span>
-    <span mat-menu-item>{{titp.client?.username().split('@', 2)[1]}}</span>
   </mat-menu>
   <button (click)="logout()" id="logout-btn">
     <mat-icon>exit_to_app</mat-icon>
