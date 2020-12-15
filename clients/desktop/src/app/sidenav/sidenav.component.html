@@ -12,7 +12,7 @@
           <div class="username" style="text-align: left;">
             <div>
               Logged in as:<br>
-              {{username}}
+               @{{username}}
             </div>
           </div>
         </section>
@@ -40,7 +40,7 @@
               </div>
               <div class="username">
                 <div>
-                  {{chat.displayName || ('@' + chat.username)}}
+                  {{chat.displayName || chat.username}}
                 </div>
                 <div *ngIf="chat.lastMessage" class="last-message">
                   {{chat.lastMessage.message | slice: 0:15}}
