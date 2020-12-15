@@ -32,3 +32,27 @@
   margin: 10px auto 0;
   z-index: 100;
 }
+
+#record-button {
+  height: 58px;
+  width: 55px;
+  color: $plainWhite;
+  background-color: #ed3330;
+  position: relative;
+  bottom: 111px;
+  border: none;
+  border-radius: 50%;
+  z-index: 100;
+}
+
+#record-button:hover {
+  cursor: pointer;
+}
+#audioButton {
+  border: none;
+  bottom: 806px;
+  z-index: 100;
+}
+#audioButton:hover {
+  cursor: pointer;
+}

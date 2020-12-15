@@ -13,6 +13,7 @@ import {filter}                                                    from 'rxjs/op
 import {take}                                                      from '../../lib/functional';
 import {CdkVirtualScrollViewport}                                  from '@angular/cdk/scrolling';
 import {delay}                                                     from "@socialstuff/utilities/common";
+import { ElementRef } from '@angular/core';
 
 const log = prefix('clients/desktop/component/chat-view');
 
@@ -28,12 +29,15 @@ export class ChatViewComponent implements OnInit, OnDestroy {
   @ViewChild(CdkVirtualScrollViewport)
   public virtualScroll?: CdkVirtualScrollViewport;
 
+  private recordingBuffer: any[] = [];
+  //Playback Variables
+  private recordingFinishedEvent : BlobEvent;
+  @ViewChild('audioPlayer')
+  private audioPlayer: ElementRef<HTMLAudioElement>;
 
   public messages: ChatMessage[] = [];
   public chat: TextRecordStorage;
   private chatConsumer: (n: number) => Promise<Buffer[]>
-
-  // public contact: Contact;
 
   constructor(
     private utils: UtilService,
@@ -45,12 +49,15 @@ export class ChatViewComponent implements OnInit, OnDestroy {
   ) {
     debug.loadSession();
   }
+  //Set MediaRecorder for Microphone
+  public recordOption: 'Start' | 'Stop' = 'Start';
+  private recorder: MediaRecorder;
 
   ngOnDestroy(): void {
     this.chat?.close();
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     const _a = this.storage.isLoaded.subscribe(async () => {
       _a.unsubscribe();
       const contact = await this.contacts.load(this.route.snapshot.params.username);
@@ -75,6 +82,13 @@ export class ChatViewComponent implements OnInit, OnDestroy {
         )
         .subscribe(this.handleIncomingMessage.bind(this));
     });
+
+    const microphone = await navigator.mediaDevices.getUserMedia({audio: true});
+    this.recorder = new MediaRecorder(microphone);
+    this.recorder.addEventListener('dataavailable', data => {
+      // this.recordingBuffer.push(data);
+      this.recordingFinishedEvent = data;
+    });
   }
 
   async handleIncomingMessage(message: ChatMessage): Promise<void> {
@@ -88,5 +102,18 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     log('message', message);
     await this.titp.client.sendChatMessageTo(message, [this.contact.username]);
     await this.handleIncomingMessage(message);
+  }
+
+  async toggleRecording() {
+    if (this.recordOption === 'Start') {
+      this.recorder.start();
+      this.recordOption = 'Stop';
+    } else {
+      this.recorder.stop();
+      this.recordOption = 'Start';
+      await delay(0);
+      this.audioPlayer.nativeElement.src = URL.createObjectURL(this.recordingFinishedEvent.data);
+      this.recordingFinishedEvent = undefined;
+    }
   }
 }
