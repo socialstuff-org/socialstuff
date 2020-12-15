@@ -56,6 +56,10 @@ export class TitpClient extends CommonTitpClient {
     return this._hostname;
   }
 
+  public get userHandle(): string {
+    return this._username + '@' + this._hostname;
+  }
+
   /**
    *
    * @param username
@@ -124,7 +128,7 @@ export class TitpClient extends CommonTitpClient {
    * @param groupId Optional: An identifier, which indicates the association of a message to a group chat.
    */
   public async sendChatMessageTo(message: ChatMessage, recipients: string[], groupId?: string) {
-    message.senderName = this._username + '@' + this._hostname;
+    message.senderName = this.userHandle;
     log('sending chat message', message, 'to recipients', recipients);
     if (recipients.length < 1) {
       throw new Error('Please provide at least one recipient for the message!');
@@ -191,7 +195,7 @@ export class TitpClient extends CommonTitpClient {
       .sign(this._rsa.priv);
     const e = Buffer.concat([this._ecdh.getPublicKey(), ecdhSig]);
     const message: ChatMessage = {
-      senderName:  this._username,
+      senderName:  this.userHandle,
       sentAt:      new Date(),
       attachments: [],
       type:        type,
@@ -199,7 +203,7 @@ export class TitpClient extends CommonTitpClient {
     };
     const recipient = [{name: username, publicKey: recipientRsaPublicKey}];
     const serverMessage = buildServerMessage(message, this._rsa.priv, Buffer.alloc(0), recipient, ServerMessageType.initialHandshake, x => encryptRsa(x, recipientRsaPublicKey));
-    log('saving ecdh key for later common key computation');
+    log('saving ecdh key for later common key computation; server message:', serverMessage);
     await this._keyRegistry.saveEcdhForHandshake(username, this._ecdh);
     log('sending server message');
     await this.write(serializeServerMessage(serverMessage));

@@ -94,13 +94,12 @@ export function buildServerMessage(
   _encrypt: (data: Buffer, key: Buffer) => Buffer = encrypt,
 ): ServerMessage {
   // TODO encode participants
-  const senderServer = message.senderName.split('@')[1];
+  const senderServer = '@' + message.senderName.split('@')[1];
   const localRecipients: { [name: string]: Buffer } = {};
   const remoteRecipients: { [server: string]: Buffer } = {};
   for (const r of recipients) {
-    const server = r.name.split('@')[1];
-    if (server === senderServer || server === undefined) {
-      localRecipients[r.name.split('@')[0]] =
+    if (r.name.endsWith(senderServer)) {
+      localRecipients[r.name] =
         makeSenderNameSignature(message.senderName, senderPrivateKey, r.publicKey);
     } else {
       // TODO populate remoteRecipients
