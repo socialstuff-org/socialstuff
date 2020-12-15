@@ -9,6 +9,8 @@ import { prefix } from '@trale/transport/log';
 
 const log = prefix('clients/desktop/component/chat-app');
 
+declare let particlesJS: any;
+
 /**
  * Chat app component
  *
@@ -44,6 +46,10 @@ export class ChatAppComponent implements OnInit {
    * @return {Promise<void>}
    */
   async ngOnInit(): Promise<void> {
+    particlesJS.load('particles-js', '../assets/particles.json', function() {
+      console.log('callback - particles.js config loaded');
+    });
+
     const debugSession = await this.debug.loadSession();
     if (debugSession === false && this.titp.connected === false) {
       this.router.navigate(['/', 'login']);

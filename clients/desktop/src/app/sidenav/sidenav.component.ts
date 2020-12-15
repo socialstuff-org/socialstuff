@@ -1,13 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import { UtilService }            from '../services/util.service';
-import { ContactService } from '../services/contact.service';
+import {Component, Input, OnInit}     from '@angular/core';
+import { UtilService }                from '../services/util.service';
+import { ContactService }             from '../services/contact.service';
 import { acronymOfName, searchMatch } from '../../lib/helpers';
-import { TitpServiceService } from '../services/titp-service.service';
-import { prefix } from '@trale/transport/log';
-import { ContactWithLastMessage } from '../models/Contact';
-import { ChatMessage } from '@trale/transport/message';
-import { KeyRegistryService } from 'app/services/key-registry.service';
-import { ApiService } from 'app/services/api.service';
+import { TitpServiceService }         from '../services/titp-service.service';
+import { prefix }                     from '@trale/transport/log';
+import { ContactWithLastMessage }     from '../models/Contact';
+import { ChatMessage }                from '@trale/transport/message';
+import { KeyRegistryService }         from 'app/services/key-registry.service';
+import { ApiService }                 from 'app/services/api.service';
 
 const log = prefix('clients/desktop/app/sidenav-component');
 
