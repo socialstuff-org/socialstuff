@@ -6,7 +6,7 @@ import {TitpService}          from '../services/titp.service';
 import {CryptoStorageService} from '../services/crypto-storage.service';
 import {DebugService}         from '../services/debug.service';
 import { prefix } from '@trale/transport/log';
-import { ChatMessage, ChatMessageType } from '@trale/transport/message';
+import { ChatMessage, ChatMessageType, serializeChatMessage } from '@trale/transport/message';
 import { Observable, Subject } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 import * as moment from 'moment';
@@ -106,6 +106,13 @@ export class ChatAppComponent implements OnInit, OnDestroy {
     if (message.senderName === this.chatPartner.username) {
       this.currentChatNewMessageStream.next(message);
     }
+    const contact = await this.contacts.load(message.senderName);
+    if (contact === false) {
+      return;
+    }
+    const chat = await this.contacts.openChat(contact);
+    await chat.addRecord(serializeChatMessage(message));
+    await chat.close();
   }
 
   /**
