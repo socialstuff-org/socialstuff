@@ -2,11 +2,10 @@ import {Request, Response, Router} from 'express';
 import secSettings from '../res/security_settings.json';
 //import instantiate = WebAssembly.instantiate;
 import {ErrorResponse} from '@socialstuff/utilities/responses';
-import {body, check, validationResult} from 'express-validator';
+import {check, validationResult} from 'express-validator';
 import {findSecuritySettings, setSecuritySettings} from '../mysql/mysql';
 import {injectDatabaseConnectionIntoRequest} from '../mysql/utilities';
 import {RequestWithDependencies} from '../mysql/request-with-dependencies';
-import {CANCELLED} from 'dns';
 
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
