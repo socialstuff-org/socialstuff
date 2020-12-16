@@ -31,7 +31,7 @@ export class ReportReasonEntryComponent implements OnInit {
   @Input() reportReason = defaultReportReason();
   @Input() editable = false;
   @Input() newEntry = false;
-  @Input() reload: EventEmitter<any> = new EventEmitter<any>();
+  @Input() reload: EventEmitter<any>;
 
   editReportReason () {
     this.backUpReportReason = _.cloneDeep(this.reportReason);
@@ -53,6 +53,7 @@ export class ReportReasonEntryComponent implements OnInit {
   }
 
   cancelEditing () {
+    this.reload.emit();
     this.reportReason = _.cloneDeep(this.backUpReportReason);
     this.editable = false;
   }
@@ -62,7 +63,6 @@ export class ReportReasonEntryComponent implements OnInit {
     this.adminSettings.deleteReportReason(this.reportReason).then(response => {
       this.reload.emit(null);
     });
-    console.log('DELETED');
   }
 
   openDialog() {

@@ -32,6 +32,7 @@ export class ReportReasonsComponent implements OnInit {
   }
 
   public getReportReasons(): any {
+    console.log('reload');
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     return this.adminSettings.getReportReasons().then((reportReasons) => {
       this.reportReasons = reportReasons;

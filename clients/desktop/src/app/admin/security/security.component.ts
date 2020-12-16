@@ -4,6 +4,13 @@ import {ApiService}          from '../../services/api.service';
 import { SecuritySettings, defaultSettings } from '../interfaces/SecuritySettings';
 import *as _ from 'lodash';
 
+/**
+ * This component give the admins of the SocialStuff server the possibility to change the behavior of the SocialStuff server in regards to the security standards.
+ * With the function getSettings which calls another function in the admin-panel service acting as a gateway to the backend, the component catch the current settings
+ * of the server and presents them with switch buttons to the user. The user is able to change the settings and sending them through the gateway to the backend.
+ * These settings will have influence on other functions asking the setting service for the current settings.
+ */
+
 @Component({
   selector: 'app-security',
   templateUrl: './security.component.html',
