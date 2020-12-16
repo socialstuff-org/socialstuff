@@ -20,7 +20,7 @@ const reportingHandler = Router();
  * @param res
  */
 async function reportUser(req: Request, res: Response) {
-  const sql = 'SELECT count(*) >= 1 AS alreadyReportedFROM report WHERE reported_by = ? AND timestamp >= NOW() - INTERVAL 15 MINUTE;';
+  const sql = 'SELECT count(*) >= 1 AS alreadyReported FROM report WHERE reported_by = ? AND timestamp >= NOW() - INTERVAL 15 MINUTE;';
   try {
     const db = (req as RequestWithDependencies).dbHandle;
     const [[{alreadyReported}]] = await db.query<RowDataPacket[]>(sql, [req.headers.user_token]);
