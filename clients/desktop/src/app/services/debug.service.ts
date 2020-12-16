@@ -28,7 +28,7 @@ export class DebugService {
   }
 
   private async connectWithAnimation(session: any) {
-    let now = new Date().toLocaleTimeString();
+    const now = new Date().toLocaleTimeString();
     const html = '<p>Please wait until we can connect you...</p>' +
       '<p>Please check your internet connection. If you are connected properly, please reach out to your server administrator.</p>' +
       '<p>Reconnecting since: ' + now + '<br>\n</p>' +
