@@ -3,6 +3,7 @@ import {getReportReasons, editReasonRequest} from '../mysql/mysql';
 import {insertReportReason} from '../mysql/mysql'
 import {body, header, ValidationChain} from 'express-validator';
 import {rejectOnValidationError} from '@socialstuff/utilities/express';
+import axios, { AxiosRequestConfig } from 'axios';
 
 const reportCreationInterface = Router();
 
@@ -60,9 +61,7 @@ async function updateReportReason(req: Request, res: Response) {
 async function deleteReportReason(req: Request, res: Response) {
   try {
 
-  const axios = require('axios');
-
-  const config = {
+  const config:AxiosRequestConfig = {
     method: 'delete',
     url: process.env.SOCIALSTUFF_REPORTING_ENDPOINT + '/reporting/report-reasons/',
     headers: {
