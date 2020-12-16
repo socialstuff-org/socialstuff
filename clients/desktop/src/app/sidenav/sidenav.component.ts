@@ -9,6 +9,9 @@ import {ApiService}                 from 'app/services/api.service';
 import {ChatMessageType}            from '@trale/transport/message';
 import { Observable } from 'rxjs';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/app/sidenav-component');
 
 @Component({
