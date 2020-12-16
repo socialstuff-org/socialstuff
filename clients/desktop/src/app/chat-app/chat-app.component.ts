@@ -6,6 +6,11 @@ import {TitpService}          from '../services/titp.service';
 import {CryptoStorageService} from '../services/crypto-storage.service';
 import {DebugService}         from '../services/debug.service';
 import { prefix } from '@trale/transport/log';
+import { ChatMessage, ChatMessageType } from '@trale/transport/message';
+import { Observable, Subject } from 'rxjs';
+import { throttleTime } from 'rxjs/operators';
+import * as moment from 'moment';
+import { webmBlobDuration } from 'lib/helpers';
 
 const log = prefix('clients/desktop/component/chat-app');
 
@@ -26,6 +31,8 @@ export class ChatAppComponent implements OnInit, OnDestroy {
 
   public chatPartner: Contact;
   public username = '';
+  public currentChatNewMessageStream = new Subject<ChatMessage>();
+  public newMessageSent = new Subject<{recipient: string, message: ChatMessage}>();
 
   constructor(
     private titp: TitpService,
@@ -75,13 +82,50 @@ export class ChatAppComponent implements OnInit, OnDestroy {
     });
 
     this.titp.onConnectionStateChanged.subscribe(isConnected => {
+      let _sub: any;
+      let notifySub: any;
       if (isConnected) {
-        const _sub = this.titp.client.incomingMessage().subscribe(message => {
-          log('got message', message);
-        });
+        _sub = this.titp.client.incomingMessage().subscribe(this.onIncomingMessage.bind(this));
+        // @ts-ignore
+        notifySub = this.titp.client.incomingMessage().pipe(throttleTime(5000)).subscribe(this.messagePushNotify.bind(this));
+      } else {
+        _sub?.unsubscribe();
+        notifySub?.unsubscribe();
       }
-    })
+    });
 
+  }
+
+  async onIncomingMessage(message: ChatMessage) {
+    if (message.senderName === this.chatPartner.username) {
+      this.currentChatNewMessageStream.next(message);
+    }
+  }
+
+  async messagePushNotify(message: ChatMessage) {
+    let body = message.senderName;
+    switch (message.type) {
+      case ChatMessageType.text:
+        let textContent = message.content.toString('utf8');
+        if (textContent.length < 30) {
+          textContent = textContent.substr(0, 30) + '…';
+        }
+        body += ' wrote: ' + textContent;
+        break;
+      case ChatMessageType.voice:
+        const voiceBlob = new Blob([message.content], { type: 'audio/webm;codecs=opus' });
+        const voiceMessageDuration = await webmBlobDuration(voiceBlob);
+        body += 'send a voice message (' + moment.duration(voiceMessageDuration) + ')';
+        break;
+    }
+    new Notification('Trale', {
+      body
+    });
+  }
+
+  public onMessageSent(message: {recipient: string, message: ChatMessage}) {
+    log('message has been propagated properly')
+    this.newMessageSent.next(message);
   }
 
 }
