@@ -14,6 +14,9 @@ import {delay}                                                     from "@social
 import { DebugService } from 'app/services/debug.service';
 import { Observable } from 'rxjs';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/component/chat-view');
 
 @Component({

@@ -12,6 +12,9 @@ import { throttleTime } from 'rxjs/operators';
 import * as moment from 'moment';
 import { webmBlobDuration } from 'lib/helpers';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/component/chat-app');
 
 declare let particlesJS: any;
