@@ -15,9 +15,12 @@
 
 import {createSign}     from "crypto";
 import {SIGN}           from '../../../constants/crypto-algorithms';
+import { prefix } from "../../../log";
 import {Handshake}      from '../index';
 import {HandshakeState} from '../state';
 import {WaitForEcdh}    from './wait-for-ecdh';
+
+const log = prefix('@trale/transport/client/handshake/states/initial');
 
 export class Initial extends HandshakeState {
   enter(handshake: Handshake) {
@@ -28,6 +31,7 @@ export class Initial extends HandshakeState {
     messageBuffer.push(handshake.ecdh.getPublicKey());
     messageBuffer.push(signedEcdh);
     const message = Buffer.concat(messageBuffer);
+    log('send ecdh data');
     handshake._write(message)
       .then(() => {
         handshake._goToState(new WaitForEcdh());

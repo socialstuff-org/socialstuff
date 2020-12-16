@@ -1,8 +1,8 @@
-import {AppConfig} from '../environments/environment';
-import {ChatMenuItem, createEmptyChatMenuItem} from './models/ChatMenuItem';
+import {AppConfig}         from '../environments/environment';
 import {Component, OnInit} from '@angular/core';
-import {ElectronService} from './core/services';
-import {TranslateService} from '@ngx-translate/core';
+import {ElectronService}   from './core/services';
+import {TranslateService}  from '@ngx-translate/core';
+import {remote}            from 'electron';
 
 @Component({
   selector: 'app-root',
@@ -31,4 +31,22 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+  public minimize(): void {
+    remote.getCurrentWindow().minimize();
+  }
+
+  public maximize(): void {
+    const window = remote.getCurrentWindow();
+    if (!window.isMaximized()) {
+      window.maximize();
+    } else {
+      window.unmaximize();
+    }
+  }
+
+  public close(): void {
+    remote.getCurrentWindow().close();
+  }
+
 }

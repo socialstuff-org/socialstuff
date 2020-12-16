@@ -1,4 +1,4 @@
-<div id="wrapper">
+<div id="wrapper" *ngIf="chatPartner">
 
   <div style="margin-top: 75px;"><!-- SPACER --></div>
 
@@ -9,11 +9,11 @@
   </div>
 
   <div id="image-section">
-    <img src="{{data.partner.imageUrl}}" alt="IMG unavailable" id="contactImage">
+    <img src="" alt="IMG unavailable" id="contactImage">
     <div style="margin-top: 20px;"><!-- SPACER --></div>
-    <div id="realName" *ngIf="data.partner.realName">{{data.partner.realName}}</div>
+    <div id="realName" *ngIf="chatPartner.displayName">{{chatPartner.displayName}}</div>
     <br>
-    <div id="username">{{data.partner.username}}</div>
+    <div id="username">{{chatPartner.username}}</div>
   </div>
 
   <div style="margin-top: 20px;"><!-- SPACER --></div>
@@ -54,11 +54,22 @@
 
 
   <div id="information">
+
     <span>Username</span>
     <div style="margin-top: 10px;"><!-- SPACER --></div>
     <span>
-      {{data.partner.username}}@domain.com
+      {{chatPartner.username}}
     </span>
+
+    <p></p>
+
+    <span>Display Name</span>
+    <div style="margin-top: 10px;"><!-- SPACER --></div>
+    <span>
+      {{chatPartner.displayName}}
+    </span>
+    <button class="custom-button" (click)="changeDisplayName(chatPartner)">Change display name</button>
+
   </div>
 
 </div>

@@ -1,0 +1,14 @@
+@import "~app/styles/colors";
+
+.recorder-button {
+  width: 40px;
+  color: $plainWhite;
+  background-color: transparent;
+  position: relative;
+  bottom: 10px;
+  border: none;
+}
+
+.recorder-button:hover {
+  cursor: pointer;
+}

@@ -14,7 +14,7 @@ export class AdminSettings {
   }
 
   public getSettings(): void {
-    this.http.get<any>((this.api.remoteEndpoint() + '/security-settings'))
+    this.http.get<any>((this.api.remoteEndpoint + '/security-settings'))
       .subscribe((response: HttpResponse) => {
         console.log(response.body);
         alert('logged in!');

@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.2.3",
+  "version": "0.3.2",
   "description": "The Trale transport/communication protocol.",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "@socialstuff/utilities": "^0.6.0",
+    "chalk": "^3.0.0",
     "rxjs": "^6.6.3",
     "uuid": "^8.3.0"
   },

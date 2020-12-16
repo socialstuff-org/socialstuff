@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ChatMessage, ChatMessageType} from "@trale/transport/message";
-import {TitpServiceService} from "../services/titp-service.service";
+import { webmBlobDuration } from 'lib/helpers';
 
 @Component({
   selector: 'app-message-box',
@@ -14,7 +14,6 @@ export class MessageBoxComponent implements OnInit {
   @Output() messageSent: EventEmitter<ChatMessage> = new EventEmitter();
 
   constructor(
-    private titp: TitpServiceService,
   ) {
     this.message = '';
   }
@@ -31,12 +30,24 @@ export class MessageBoxComponent implements OnInit {
     const message: ChatMessage = {
       content: Buffer.from(this.message),
       attachments: [],
-      senderName: 'this.titp.client.username()',
+      senderName: '',
       sentAt: new Date(),
       type: ChatMessageType.text,
     };
     this.messageSent.emit(message);
     this.message = '';
     console.log('textarea cleared!');
+  }
+
+  public async sendVoidMessage(voiceRecording: Blob) {
+    console.log('got recording!', voiceRecording);
+    const message: ChatMessage = {
+      content: Buffer.from(await voiceRecording.arrayBuffer()),
+      attachments: [],
+      senderName: '',
+      sentAt: new Date(),
+      type: ChatMessageType.voice,
+    };
+    this.messageSent.emit(message);
   }
 }

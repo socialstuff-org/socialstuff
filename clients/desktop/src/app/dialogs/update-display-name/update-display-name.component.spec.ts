@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChatListComponent } from './chat-list.component';
+import { UpdateDisplayNameComponent } from './update-display-name.component';
 
-describe('ChatListComponent', () => {
-  let component: ChatListComponent;
-  let fixture: ComponentFixture<ChatListComponent>;
+describe('UpdateDisplayNameComponent', () => {
+  let component: UpdateDisplayNameComponent;
+  let fixture: ComponentFixture<UpdateDisplayNameComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ChatListComponent ]
+      declarations: [ UpdateDisplayNameComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ChatListComponent);
+    fixture = TestBed.createComponent(UpdateDisplayNameComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
