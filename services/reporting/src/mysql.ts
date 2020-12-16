@@ -19,6 +19,10 @@ import migrate             from 'migrate';
 import {promisify}         from 'util';
 import {ConnectionOptions} from 'mysql2';
 
+/**
+ * sets up the db Connection by accessing the .env file and injectiong its attributes
+ * @param config
+ */
 export function createConnection(config: ConnectionOptions = {}) {
   config = {
     ...config,
@@ -32,6 +36,9 @@ export function createConnection(config: ConnectionOptions = {}) {
 
 let _sharedConnection: Promise<mysql.Connection> | undefined;
 
+/**
+ * sets up a shared connection that can be used everywhere
+ */
 export function sharedConnection() {
   if (!_sharedConnection) {
     _sharedConnection = createConnection();
