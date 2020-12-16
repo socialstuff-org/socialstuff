@@ -1,6 +1,4 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild}            from '@angular/core';
-import {UtilService}                                               from '../services/util.service';
-import {DebugService}                                              from '../services/debug.service';
+import {Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter}            from '@angular/core';
 import {ContactService}                                            from '../services/contact.service';
 import {ActivatedRoute}                                            from '@angular/router';
 import {TextRecordStorage}                                         from '@trale/persistence/crypto-storage';
@@ -13,6 +11,8 @@ import {filter}                                                    from 'rxjs/op
 import {take}                                                      from '../../lib/functional';
 import {CdkVirtualScrollViewport}                                  from '@angular/cdk/scrolling';
 import {delay}                                                     from "@socialstuff/utilities/common";
+import { DebugService } from 'app/services/debug.service';
+import { Observable } from 'rxjs';
 
 const log = prefix('clients/desktop/component/chat-view');
 
@@ -24,19 +24,17 @@ const log = prefix('clients/desktop/component/chat-view');
 export class ChatViewComponent implements OnInit, OnDestroy {
 
   @Input('contact') contact: Contact;
+  @Input('newMessages') newMessages: Observable<ChatMessage>;
+  @Output('messageSent') messageSent = new EventEmitter<{ recipient: Contact, message: ChatMessage }>();
 
   @ViewChild(CdkVirtualScrollViewport)
   public virtualScroll?: CdkVirtualScrollViewport;
-
 
   public messages: ChatMessage[] = [];
   public chat: TextRecordStorage;
   private chatConsumer: (n: number) => Promise<Buffer[]>
 
-  // public contact: Contact;
-
   constructor(
-    private utils: UtilService,
     private debug: DebugService,
     private contacts: ContactService,
     private route: ActivatedRoute,
@@ -50,7 +48,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     this.chat?.close();
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     const _a = this.storage.isLoaded.subscribe(async () => {
       _a.unsubscribe();
       const contact = await this.contacts.load(this.route.snapshot.params.username);
@@ -67,14 +65,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
       console.log('contact', contact);
     });
 
-    this.titp.onConnectionStateChanged.subscribe(_ => {
-      this.titp.client.incomingMessage()
-        .pipe(
-          // @ts-ignore
-          filter<ChatMessage>(x => x.senderName === this.contact.username)
-        )
-        .subscribe(this.handleIncomingMessage.bind(this));
-    });
+    this.newMessages.subscribe(this.handleIncomingMessage.bind(this))
   }
 
   async handleIncomingMessage(message: ChatMessage): Promise<void> {
@@ -88,5 +79,6 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     log('message', message);
     await this.titp.client.sendChatMessageTo(message, [this.contact.username]);
     await this.handleIncomingMessage(message);
+    this.messageSent.emit({ message, recipient: this.contact });
   }
 }

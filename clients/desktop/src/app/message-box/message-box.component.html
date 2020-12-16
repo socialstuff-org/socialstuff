@@ -5,6 +5,8 @@
     <mat-icon>send</mat-icon>
   </button>
 
+  <app-voice-message (recordingReady)="sendVoidMessage($event)"></app-voice-message>
+
 </div>
 
 

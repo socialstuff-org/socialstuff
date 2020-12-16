@@ -98,6 +98,7 @@
     "custom-electron-titlebar": "3.2.5",
     "electron-titlebar": "0.0.3",
     "idb": "5.0.6",
+    "moment": "2.29.1",
     "particles.js": "2.0.0",
     "sweetalert2": "10.9.0",
     "systeminformation": "4.27.7",

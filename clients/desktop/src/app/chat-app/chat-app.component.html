@@ -1,6 +1,11 @@
-<app-header [username]="username" [chatPartner]="chatPartner"></app-header>
-<app-sidenav [username]="username"></app-sidenav>
-<app-chat-view *ngIf="chatPartner; else landing" [contact]="chatPartner"></app-chat-view>
+<app-header *ngIf="chatPartner" [username]="username" [chatPartner]="chatPartner"></app-header>
+<app-sidenav [username]="username" [newMessageSent]="newMessageSent"></app-sidenav>
+<app-chat-view
+  *ngIf="chatPartner; else landing"
+  [contact]="chatPartner"
+  [newMessages]="currentChatNewMessageStream"
+  (messageSent)="onMessageSent($event)"
+></app-chat-view>
 <ng-template #landing>
   <div id="landing-container">
     <!-- <app-particles></app-particles> -->

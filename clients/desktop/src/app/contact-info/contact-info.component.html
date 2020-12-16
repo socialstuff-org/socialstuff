@@ -54,11 +54,22 @@
 
 
   <div id="information">
+
     <span>Username</span>
     <div style="margin-top: 10px;"><!-- SPACER --></div>
     <span>
       {{chatPartner.username}}
     </span>
+
+    <p></p>
+
+    <span>Display Name</span>
+    <div style="margin-top: 10px;"><!-- SPACER --></div>
+    <span>
+      {{chatPartner.displayName}}
+    </span>
+    <button class="custom-button" (click)="changeDisplayName(chatPartner)">Change display name</button>
+
   </div>
 
 </div>

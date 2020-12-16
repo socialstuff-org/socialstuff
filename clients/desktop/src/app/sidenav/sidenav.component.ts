@@ -3,10 +3,11 @@ import {ContactService}             from '../services/contact.service';
 import {acronymOfName, searchMatch} from '../../lib/helpers';
 import {TitpService}                from '../services/titp.service';
 import {prefix}                     from '@trale/transport/log';
-import {ContactWithLastMessage}     from '../models/Contact';
+import {Contact, ContactWithLastMessage}     from '../models/Contact';
 import {ChatMessage}                from '@trale/transport/message';
 import {ApiService}                 from 'app/services/api.service';
 import {ChatMessageType}            from '@trale/transport/message';
+import { Observable } from 'rxjs';
 
 const log = prefix('clients/desktop/app/sidenav-component');
 
@@ -18,6 +19,7 @@ const log = prefix('clients/desktop/app/sidenav-component');
 export class SidenavComponent implements OnInit {
 
   @Input() username: string;
+  @Input() newMessageSent: Observable<{ recipient: Contact, message: ChatMessage }>;
 
   public ChatMessageType = ChatMessageType;
   public chats: ContactWithLastMessage[] = [];
@@ -37,18 +39,33 @@ export class SidenavComponent implements OnInit {
       log('got the following chats with last messages:', this.chats);
     });
 
-    let sub;
-
     this.titp.onConnectionStateChanged.subscribe(isConnected => {
-      if (isConnected) {
-        sub = this.titp.client.incomingMessage().subscribe(this._handleIncomingMessage.bind(this));
-      } else {
-        sub.unsubscribe();
-      }
       if (isConnected && this.loadingContacts) {
         this.loadingContacts = false;
         this.contacts.load(this.titp.client.username() + '@' + this.api.hostname);
       }
+    });
+
+    this.titp.onConnectionStateChanged.subscribe(isConnected => {
+      if (!isConnected) {
+        return;
+      }
+      this.titp.client.incomingMessage().subscribe(message => {
+        const senderChat = this.chats.filter(x => x.username === message.senderName)[0];
+        if (!senderChat) {
+          console.warn('could not load chat for user', message.senderName);
+          return;
+        }
+        senderChat.lastMessage = message;
+      });
+    });
+
+    this.newMessageSent.subscribe(message => {
+      const senderChat = this.chats.filter(x => x.username === message.recipient.username)[0];
+        if (!senderChat) {
+          return;
+        }
+        senderChat.lastMessage = message.message;
     });
   }
 
