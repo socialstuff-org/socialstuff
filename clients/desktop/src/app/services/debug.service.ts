@@ -29,8 +29,9 @@ export class DebugService {
 
   private async connectWithAnimation(session: any) {
     let now = new Date().toLocaleTimeString();
-    const html = 'Please wait until we can connect you...<br>Reconnecting since: ' + now + '<br>\n' +
-      '\n' +
+    const html = '<p>Please wait until we can connect you...</p>' +
+      '<p>Please check your internet connection. If you are connected properly, please reach out to your server administrator.</p>' +
+      '<p>Reconnecting since: ' + now + '<br>\n</p>' +
       '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="100px" height="100px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">\n' +
       '  <g transform="rotate(0 50 50)">\n' +
       '    <rect x="0" y="30.5" rx="0" ry="0" width="100" height="3" fill="#ee4540">\n' +
