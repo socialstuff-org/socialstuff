@@ -97,12 +97,21 @@ export class ChatAppComponent implements OnInit, OnDestroy {
 
   }
 
+  /**
+   * Handler for newly incoming messages.
+   * This handler may be used to forward messages to other parts of the application.
+   * @param message The newly received message.
+   */
   async onIncomingMessage(message: ChatMessage) {
     if (message.senderName === this.chatPartner.username) {
       this.currentChatNewMessageStream.next(message);
     }
   }
 
+  /**
+   * Handler the triggers the creation of a push notification for the supplied message.
+   * @param message The message, which shall be shown in a push notification.
+   */
   async messagePushNotify(message: ChatMessage) {
     let body = message.senderName;
     switch (message.type) {
@@ -124,6 +133,10 @@ export class ChatAppComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * A handler which is triggered, if the logged-in user sends a message.
+   * @param message 
+   */
   public onMessageSent(message: {recipient: string, message: ChatMessage}) {
     log('message has been propagated properly')
     this.newMessageSent.next(message);

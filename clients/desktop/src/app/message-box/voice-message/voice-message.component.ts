@@ -33,11 +33,17 @@ export class VoiceMessageComponent implements OnInit {
     }
   }
 
+  /**
+   * Starts the recording of a voice message.
+   */
   public startRecording() {
     this.recordingState = true;
     this.recorder.start();
   }
 
+  /**
+   * Stops the recording of a voice message and emits the recorded message.
+   */
   public async stopRecording() {
     this.recordingState = false;
     this.recorder.stop();
@@ -45,6 +51,9 @@ export class VoiceMessageComponent implements OnInit {
     this.recordingReady.emit(this.voiceRecording)
   }
 
+  /**
+   * Cancels the current voice recording and discards that recording.
+   */
   public async cancel() {
     this.recordingState = false;
     this.recorder.stop();

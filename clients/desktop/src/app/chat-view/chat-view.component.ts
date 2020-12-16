@@ -48,6 +48,9 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     this.chat?.close();
   }
 
+  /**
+   * Initialized the model.
+   */
   async ngOnInit() {
     const _a = this.storage.isLoaded.subscribe(async () => {
       _a.unsubscribe();
@@ -68,12 +71,19 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     this.newMessages.subscribe(this.handleIncomingMessage.bind(this))
   }
 
+  /**
+   * Handler for incoming messages, that is responsible for loading these messages into the list of chat messages.
+   * @param message 
+   */
   async handleIncomingMessage(message: ChatMessage): Promise<void> {
     this.messages = [...this.messages, message];
-    await this.chat.addRecord(serializeChatMessage(message));
     this.virtualScroll.scrollTo({bottom: 0});
   }
 
+  /**
+   * Handler that is invoked when the logged-in user sends a message in the opened chat.
+   * @param message 
+   */
   public async messageSentHandler(message: ChatMessage): Promise<void> {
     message.senderName = this.titp.client.userHandle;
     log('message', message);

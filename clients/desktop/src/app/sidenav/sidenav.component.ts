@@ -85,6 +85,9 @@ export class SidenavComponent implements OnInit {
     return acronymOfName(name);
   }
 
+  /**
+   * Filter the contacts based on a search term given in the {searchTerm} field.
+   */
   searchContacts() {
     if (this.searchTerm === '') {
       return this.contacts.readContacts();
