@@ -41,42 +41,7 @@ export const deleteMiddleware: ValidationChain[] = [
 export const headerMiddleware: ValidationChain[] = [
   header('rows_per_page').notEmpty().isInt(),
   header('current_page').notEmpty().isInt(),
-  header('sort_param').optional().isString()/*,
-  header('user_token')
-        //TODO Ask jörn why the validation is not working:
-    .isString()
-    .custom(async token => {
-      const axios = require('axios');
-      console.log('validating request');
-      const config = {
-        method: 'get',
-        url: 'http://[::1]:3002/settings/security',
-        headers: { }
-      };
-      let secSettingsInvOnlyByAdmin = null;
-      try {
-        secSettingsInvOnlyByAdmin = await axios(config);
-      } catch (e) {
-        throw new Error('Admin settings could not be fetched!');
-      }
-      console.log('is an admin active: ', secSettingsInvOnlyByAdmin.data);
-      if (secSettingsInvOnlyByAdmin.data) {
-
-
-        const db = await sharedConnection();
-        const sql = 'SELECT is_admin AS isAdmin FROM socialstuff_identity.users INNER JOIN tokens t WHERE t.token = ?;';
-        const [[{isAdmin}]] = await db.query<RowDataPacket[]>(sql, [token]);
-        console.log('User admin: ', isAdmin);
-        if (isAdmin) {
-          return;
-        } else {
-          throw new Error('Invite code not validated by admin, please provide a valid invite code!');
-        }
-      } else{
-        console.log('secSettingsInvOnlyByAdmin was false');
-        return;
-      }
-    })*/
+  header('sort_param').optional().isString()
 ];
 
 
