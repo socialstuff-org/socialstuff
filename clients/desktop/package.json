@@ -1,6 +1,7 @@
 {
   "name": "socialstuff-desktop",
   "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
   "description": "SocialStuff client for desktop machines.",
   "homepage": "https://github.com/socialstuff-org/socialstuff",
   "author": {
