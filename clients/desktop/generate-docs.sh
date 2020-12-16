@@ -3,7 +3,7 @@
 echo '{' > tsconfig.compodoc.json
 echo '  "extends": "./tsconfig.json",' >> tsconfig.compodoc.json
 echo '  "files": [' >> tsconfig.compodoc.json
-for i in $(find src/ -name "*.ts")
+for i in $(find src/app/ src/lib/ -name "*.ts")
 do
    echo '    "'$i'",' >> tsconfig.compodoc.json
 done
