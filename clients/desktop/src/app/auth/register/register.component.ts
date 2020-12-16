@@ -1,4 +1,4 @@
-import {Component, OnInit}           from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {
   createHash,
   createPrivateKey,
@@ -6,7 +6,7 @@ import {
   generateKeyPair,
   KeyObject,
   privateDecrypt,
-}                                    from 'crypto';
+}                                         from 'crypto';
 import {HttpClient}                  from '@angular/common/http';
 import {ApiService}                  from '../../services/api.service';
 import {CryptoStorageService}        from '../../services/crypto-storage.service';
@@ -49,7 +49,7 @@ function newKeyPair(mod) {
   templateUrl: './register.component.html',
   styleUrls:   ['./register.component.scss'],
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, AfterViewInit {
 
   public username = '';
   public password = '';
@@ -65,6 +65,13 @@ export class RegisterComponent implements OnInit {
     private storage: CryptoStorageService,
     private router: Router
   ) {
+  }
+
+  /**
+   * After component initialization request whether default server requires an invite token
+   */
+  async ngAfterViewInit(): Promise<void> {
+    await this.checkForInviteTokenRequired();
   }
 
   /**
