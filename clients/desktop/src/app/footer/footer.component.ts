@@ -1,19 +1,23 @@
-import {Component, OnInit} from '@angular/core';
+import {Component}          from '@angular/core';
+import {UtilService} from '../services/util.service';
+import {TitpService} from "../services/titp.service";
 
+/**
+ * Footer component
+ *
+ * Responsible for displaying the footer
+ */
 @Component({
-  selector: 'app-footer',
+  selector:    'app-footer',
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss']
+  styleUrls:   ['./footer.component.scss']
 })
-export class FooterComponent implements OnInit {
+export class FooterComponent {
 
   constructor(
-  ) { }
-
-  ngOnInit(): void {
+    public util: UtilService,
+    public titp: TitpService,
+  ) {
   }
 
-  public navigate(url: string) {
-    window.open(url);
-  }
 }

@@ -1,9 +1,11 @@
+import {Routes, RouterModule}    from '@angular/router';
+import {CallFunctionComponent}   from './voice-communication/call-function/call-function.component';
+import {ChatAppComponent}        from './chat-app/chat-app.component';
 import {NgModule}             from '@angular/core';
-import {Routes, RouterModule} from '@angular/router';
 import {RegisterComponent}    from './auth/register/register.component';
 import {LoginComponent}       from './auth/login/login.component';
 import {ChatViewComponent}    from './chat-view/chat-view.component';
-import {ChatAppComponent}     from './chat-app/chat-app.component';
+import {LogoutComponent}         from './auth/logout/logout.component';
 import {ForgotPasswordComponent} from './auth/forgot-password/forgot-password.component';
 import {SettingsViewComponent} from './admin/settings-view/settings-view.component';
 import {SecurityComponent} from './admin/security/security.component';
@@ -12,28 +14,21 @@ import {UsersComponent} from './admin/usersManagement/users/users.component';
 import {ReportSettingsComponent} from './admin/usersManagement/ReportSystem/ReportSettings/report-settings/report-settings.component';
 import {ReportedUsersComponent} from './admin/usersManagement/ReportSystem/ReportedUsers/reported-users/reported-users.component';
 import {BlockedUsersComponent} from './admin/usersManagement/blocked-users/blocked-users.component';
-import {LogoutComponent} from './auth/logout/logout.component';
-import {LandingComponent} from './landing/landing.component';
 import {DashboardViewComponent} from './admin/Dashboard/dashboard-view/dashboard-view.component';
-import {CallFunctionComponent}   from './voice-communication/call-function/call-function.component';
 import {MicrophoneTestComponent} from './microphone-test/microphone-test.component';
 
-export const routesShared: Routes = [
+const routes: Routes = [
   {
-    path:       '',
-    redirectTo: 'chatview/1',
-    pathMatch:  'full',
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full',
   },
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'forgot-password', component: ForgotPasswordComponent},
   {path: 'logout', component: LogoutComponent},
-];
-
-export const routesChat: Routes = [
-  {path: 'landing', component: LandingComponent},
-  {path: 'chatview/:id', component: ChatViewComponent},
-  {path: 'chap-app', component: ChatAppComponent},
+  {path: 'chat-app', redirectTo: 'chat-app/', pathMatch: 'full'},
+  {path: 'chat-app/:username', component: ChatAppComponent},
   {path: 'call-function', component: CallFunctionComponent},
   {path: 'microphone-test', component: MicrophoneTestComponent}
   // {
@@ -120,11 +115,9 @@ export const routesSettings: Routes = [
   },
 ];
 
-const routes = routesChat.concat(routesSettings).concat(routesShared);
-
 @NgModule({
   imports: [
-    RouterModule.forRoot(routesSettings),
+    RouterModule.forRoot(routes),
   ],
   exports: [RouterModule],
 })

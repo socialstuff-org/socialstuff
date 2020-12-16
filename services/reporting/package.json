@@ -24,7 +24,6 @@
     "custom-env": "^2.0.1",
     "express": "^4.17.1",
     "express-validator": "^6.6.0",
-    "loin": "^0.2.0",
     "migrate": "^1.7.0",
     "mongodb": "^3.6.2",
     "mysql2": "^2.1.0",

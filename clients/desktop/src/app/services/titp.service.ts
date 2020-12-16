@@ -11,7 +11,7 @@ import {Subject}                                       from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class TitpServiceService {
+export class TitpService {
   get connected(): boolean {
     return this._connected;
   }
@@ -21,9 +21,13 @@ export class TitpServiceService {
   get client(): TitpClient {
     return this._client;
   }
+  get host(): string {
+    return this._host;
+  }
 
   private _onConnectionStateChanged = new Subject<boolean>();
   private _connected = false;
+  private _host: string;
 
   private _client: TitpClient;
 
@@ -43,12 +47,13 @@ export class TitpServiceService {
     const client = new TitpClient(username, rsa, ecdh, this.keys);
     await client.connect(hostRsa, host, port);
     this._client = client;
-    this.keys.serverAddress = this.api.hostname + ':' + this.api.port;
+    this.keys.serverAddress = this.api.hostname;
     client.onDisconnect().subscribe(() => {
       this._onConnectionStateChanged.next(false);
       this._connected = false;
     });
     this._onConnectionStateChanged.next(true);
     this._connected = true;
+    this._host = host;
   }
 }

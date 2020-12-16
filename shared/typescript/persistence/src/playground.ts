@@ -1,4 +1,4 @@
-import {CryptoProvider, CryptoStorage}                from './crypto-storage';
+import {CryptoProvider, CryptoStorage}                from '../crypto-storage';
 import {BinaryLike, createCipheriv, createDecipheriv} from 'crypto';
 import fs                                             from 'fs';
 import path                                           from 'path';
@@ -42,9 +42,10 @@ const samples = [
   // const records = await take(f.records(), 2);
   // console.log(records.map(x => x.toString('utf8')));
   // await f.close();
-  const infInt = await fs.promises.readFile(path.join(__dirname, 'inf-int.h'));
-  console.log('inf length:', infInt.length);
-  await s.persistFileContent(['enc-int.h'], infInt);
-  const content = await s.loadFileContent(['enc-int.h']);
-  console.log(content.toString('utf8'));
+  const r = await s.openTextRecordStorage(['foo.txt']);
+  // await r.addRecord(Buffer.from('Hello World!'));
+  await r.addRecord(Buffer.from('foobar!'));
+  for await (const rec of r.records()) {
+    console.log(rec.toString('utf8'));
+  }
 })();

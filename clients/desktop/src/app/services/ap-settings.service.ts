@@ -17,11 +17,11 @@ export class AdminSettings {
   }
 
   public getSecuritySettings(): Promise<SecuritySettings> {
-    return this.http.get<any>(this.api.remoteEndpoint() + '/settings/security').toPromise();
+    return this.http.get<any>(this.api.remoteEndpoint + '/settings/security').toPromise();
   }
 
   public setSecuritySettings(currentSettings): Promise<SecuritySettings> {
-    return this.http.put<any>((this.api.remoteEndpoint() + '/settings/security'), currentSettings).toPromise();
+    return this.http.put<any>((this.api.remoteEndpoint + '/settings/security'), currentSettings).toPromise();
   }
 
   public getInviteCodes(): Promise<any> {
@@ -29,7 +29,7 @@ export class AdminSettings {
     let headers = new HttpHeaders().set('rows_per_page', '100');
     headers = headers.append('current_page', '1');
 
-    return this.http.get<any>(this.api.remoteEndpoint() + '/invitations', {headers: headers}).toPromise();
+    return this.http.get<any>(this.api.remoteEndpoint + '/invitations', {headers: headers}).toPromise();
   }
 
   /**
@@ -38,12 +38,12 @@ export class AdminSettings {
    */
 
   public addInviteCode(inviteCode: InviteCode): Promise<any> {
-    return this.http.post<any>((this.api.remoteEndpoint() + '/invitations'), inviteCode).toPromise();
+    return this.http.post<any>((this.api.remoteEndpoint + '/invitations'), inviteCode).toPromise();
   }
 
   public deleteInviteCode(id: number): Promise<any> {
     const headers = new HttpHeaders().set('id', id.toString());
-    return this.http.delete<any>((this.api.remoteEndpoint() + '/invitations'), {headers: headers}).toPromise();
+    return this.http.delete<any>((this.api.remoteEndpoint + '/invitations'), {headers: headers}).toPromise();
   }
 
   public getReportReasons(): Promise<Array<ReportReason>> {
@@ -51,20 +51,20 @@ export class AdminSettings {
     let headers = new HttpHeaders().set('rows_per_page', '100');
     headers = headers.append('current_page', '1');
 
-    return this.http.get<any>(this.api.remoteEndpoint() + '/settings/report-reasons', {headers: headers}).toPromise();
+    return this.http.get<any>(this.api.remoteEndpoint + '/settings/report-reasons', {headers: headers}).toPromise();
   }
 
   public createReportReason(reportReason): Promise<ReportReason> {
-    return this.http.post<any>((this.api.remoteEndpoint() + '/settings/report-reasons'), reportReason).toPromise();
+    return this.http.post<any>((this.api.remoteEndpoint + '/settings/report-reasons'), reportReason).toPromise();
   }
 
   public editReportReason(reportReason): Promise<ReportReason> {
-    return this.http.put<any>((this.api.remoteEndpoint() + '/settings/report-reasons'), reportReason).toPromise();
+    return this.http.put<any>((this.api.remoteEndpoint + '/settings/report-reasons'), reportReason).toPromise();
   }
 
   public deleteReportReason(reportReason): Promise<any> {
     const headers = new HttpHeaders().set('id', reportReason.id.toString());
-    return this.http.delete<any>((this.api.remoteEndpoint() + '/settings/report-reasons'), {headers: headers}).toPromise();
+    return this.http.delete<any>((this.api.remoteEndpoint + '/settings/report-reasons'), {headers: headers}).toPromise();
   }
 
 

@@ -4,13 +4,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import {CryptoStorageService} from './crypto-storage.service';
-import {TitpServiceService} from './titp-service.service';
-import {ContactService} from './contact.service';
+import {TitpService}          from './titp.service';
+import {ContactService}       from './contact.service';
 import {ApiService} from './api.service';
-import {Router} from '@angular/router';
 import Swal from 'sweetalert2';
-import {delay} from '@socialstuff/utilities/common';
-import {interval} from 'rxjs';
+import {timer} from 'rxjs';
+import { prefix } from '@trale/transport/log';
+
+const log = prefix('clients/desktop/services/debug-service');
 
 @Injectable({
   providedIn: 'root',
@@ -20,14 +21,13 @@ export class DebugService {
 
   constructor(
     private storage: CryptoStorageService,
-    private titp: TitpServiceService,
+    private titp: TitpService,
     private contacts: ContactService,
     private api: ApiService,
-    private router: Router,
   ) {
   }
 
-  private connectWithAnimation(session: any) {
+  private async connectWithAnimation(session: any) {
     let now = new Date().toLocaleTimeString();
     const html = 'Please wait until we can connect you...<br>Reconnecting since: ' + now + '<br>\n' +
       '\n' +
@@ -47,74 +47,63 @@ export class DebugService {
       '</g>\n' +
       '</svg>\n';
 
-    return new Promise(async (res) => {
-      Swal.fire({
-        title: 'Disconnected!',
-        html: html,
-        allowOutsideClick: false,
-        showCloseButton: false,
-        showConfirmButton: false,
-      });
-      const attempt = async () => {
+    Swal.fire({
+      title: 'Disconnected!',
+      html,
+      allowOutsideClick: false,
+      showCloseButton: false,
+      showConfirmButton: false,
+    });
+
+    return new Promise<void>((res) => {
+      const a = timer(0, 5000).subscribe(async n => {
+        log('trying to connect...');
         try {
           await this.titp.connect(session.username, this.api.hostname, this.api.tralePort);
-          return true;
-        } catch {
-          return false;
-        }
-      }
-      const worked = await attempt();
-      if (worked) {
-        console.log('worked');
-        Swal.close();
-        res();
-        return;
-      }
-      console.log('after worked');
-      let attempts = 1;
-      const intervalSub = interval(5000).subscribe(async () => {
-        const connected = await attempt();
-        console.log('connected', connected);
-
-        if (connected) {
-          intervalSub.unsubscribe();
+          a.unsubscribe();
           Swal.close();
+          log('success!');
           res();
-        } else {
-          console.info('failed trale connect attempt #', (++attempts));
+        } catch (e) {
+          log('failed', n, ';error:', e);
         }
-      });
-    })
+      })
+    });
   }
 
   public async loadSession() {
     if (AppConfig.environment === 'PROD') {
       return false;
     }
+    log('loading session');
     const sessionPath = path.join(this.basePath, '.debug_session');
     try {
       await fs.promises.stat(sessionPath);
     } catch {
+      log('no debug session file found');
       return false;
     }
     const sessionString = (await fs.promises.readFile(sessionPath)).toString('utf8');
     const session = JSON.parse(sessionString);
+    log('session data:', session);
     const result = {username: session.username, key: Buffer.from(session.key.data)};
-    await this.storage.load(result.username, result.key);
+    await this.storage.load(`${session.username}@${session.hostname}`, result.key);
+    log('storage loaded');
     session.hostname && (this.api.hostname = session.hostname);
     session.port && (this.api.port = session.port);
     session.tralePort && (this.api.tralePort = session.tralePort);
     console.log('connecting to chat service...');
-    this.connectWithAnimation(session);
     this.titp.onConnectionStateChanged.subscribe(isConnected => {
       if (isConnected) {
-        console.log('did connect!');
-        this.titp.client.onDisconnect().subscribe(async hadError => {
+        log('connected; listening for disconnects.');
+        const _a = this.titp.client.onDisconnect().subscribe(hadError => {
           this.connectWithAnimation(session);
+          _a.unsubscribe();
         });
       }
-    })
-
+    });
+    await this.connectWithAnimation(session);
+    log('done with session loading');
     return result;
   }
 

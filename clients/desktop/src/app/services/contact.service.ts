@@ -2,12 +2,16 @@ import {Injectable}                      from '@angular/core';
 import {Message}                         from '../models/Message';
 import {CryptoStorageService}            from './crypto-storage.service';
 import {Contact, ContactWithLastMessage} from '../models/Contact';
-import {createHash, createPublicKey}     from 'crypto';
+import {createPublicKey}     from 'crypto';
 import {ChatProperties}                  from '../models/ChatProperties';
 import * as fs                           from 'fs';
 import * as path                         from 'path';
 import {Observable, Subject}             from 'rxjs';
 import {hashUsernameHmac}                from '../../lib/helpers';
+import { prefix }                        from '@trale/transport/log';
+import {deserializeChatMessage}          from '@trale/transport/message';
+
+const log = prefix('clients/desktop/app/contact-service');
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +24,9 @@ export class ContactService {
     private storage: CryptoStorageService,
   ) {
     storage.isLoaded.subscribe(async () => {
+      log('starting to load contacts');
       await this._loadContacts();
+      log('loaded contacts');
     });
   }
 
@@ -56,7 +62,8 @@ export class ContactService {
       rsaPublicKey:    createPublicKey(props.rsaPublicKey),
     }));
     this._contacts = contacts;
-    this._onContactListUpdated.next(contacts);
+    this._onContactListUpdated.next([...contacts]);
+    log('contacts:', contacts);
   }
 
   /**
@@ -66,19 +73,20 @@ export class ContactService {
    */
   public async loadLastMessages(contacts: Contact[]): Promise<ContactWithLastMessage[]> {
     const foo = contacts.map(async contact => {
-      const records = await this.storage.storage.openTextRecordStorage([contact.usernameHash, 'chat.log']);
+      const records = await this.storage.storage.openTextRecordStorage(['chats', contact.usernameHash, 'chat.log']);
       const lastMessageString = await records.records().next();
       await records.close();
 
       const lastMessage =
               lastMessageString.done
               ? null
-              : JSON.parse((lastMessageString.value as Buffer).toString('utf-8')) as Message;
+              : deserializeChatMessage(lastMessageString.value as Buffer);
       return {
         ...contact,
         lastMessage,
       };
     });
+    log('nr of last messages loading:', foo.length);
     return Promise.all(foo);
   }
 
@@ -89,10 +97,7 @@ export class ContactService {
    * @param username
    */
   public async exists(username: string): Promise<string | false> {
-    const usernameHash = createHash('sha512')
-      .update(username)
-      .digest()
-      .toString('hex');
+    const usernameHash = hashUsernameHmac(username, this.storage.masterKey);
     try {
       await fs.promises.stat(path.join(this.storage.storage.storageDirectory, 'chats', usernameHash));
       return usernameHash;
@@ -115,6 +120,7 @@ export class ContactService {
     const properties: ChatProperties = JSON.parse(propertiesStr.toString('utf-8'));
     return {
       username,
+      displayName: properties.customDisplayName,
       usernameHash,
       rsaPublicKey:    createPublicKey(properties.rsaPublicKey),
       conversationKey: Buffer.from(properties.conversationKey, 'base64'),
@@ -127,7 +133,7 @@ export class ContactService {
    * @param contact
    */
   public async openChat(contact: Contact) {
-    return this.storage.storage.openTextRecordStorage(['chats', contact.usernameHash, 'chat.log']);
+    return this.storage.storage.openTextRecordStorage(['chats', contact.usernameHash, 'chat.log'], 1024);
   }
 
   /**
@@ -159,7 +165,7 @@ export class ContactService {
     };
     const serializedProperties = Buffer.from(JSON.stringify(properties), 'utf8');
     await this.storage.storage.persistFileContent(['chats', usernameHash, 'chat.properties'], serializedProperties);
-    this._onContactListUpdated.next(this._contacts);
+    this._onContactListUpdated.next([...this._contacts]);
   }
 
   /**
@@ -181,7 +187,7 @@ export class ContactService {
     await this.storage.storage.persistFileContent(['chats', contact.usernameHash, 'chat.properties'], serializedProperties);
     const userIndex = this._contacts.map(x => x.username).indexOf(contact.username);
     this._contacts[userIndex] = contact;
-    this._onContactListUpdated.next(this._contacts);
+    this._onContactListUpdated.next([...this._contacts]);
   }
 
   /**
