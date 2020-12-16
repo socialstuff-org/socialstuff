@@ -30,6 +30,9 @@ export class ContactService {
     });
   }
 
+  /**
+   * An {@link Observable} which emits each time to local contact list is uodated/changed.
+   */
   public onContactListUpdated(): Observable<Contact[]> {
     return this._onContactListUpdated;
   }
@@ -128,7 +131,7 @@ export class ContactService {
   }
 
   /**
-   * Opens a {TextRecordStorage}, via which chat messages can be loaded.
+   * Opens a {@link TextRecordStorage}, via which chat messages can be loaded.
    * After opening the chat, it has to be closed by the component issuing access to the chat in the first place!
    * @param contact
    */
