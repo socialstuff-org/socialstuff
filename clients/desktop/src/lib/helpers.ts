@@ -43,3 +43,25 @@ export function searchMatch(needle: string, haystack: string) {
 export function acronymOfName(name: string) {
   return name.split(' ').map(x => x[0]).join('');
 }
+
+export function webmBlobDuration(b: Blob | string) {
+  const vid: HTMLVideoElement = document.createElement('video');
+  const duration = new Promise((res, rej) => {
+    const listener = () => {
+      if (vid.duration === Infinity) {
+        vid.currentTime = Number.MAX_SAFE_INTEGER;
+        vid.ontimeupdate = () => {
+          vid.ontimeupdate = undefined;
+          res(vid.duration);
+          vid.removeEventListener('loadedmetadata', listener);
+        };
+      } else {
+        res(vid.duration);
+        vid.removeEventListener('loadedmetadata', listener);
+      }
+    };
+    vid.addEventListener('loadedmetadata', listener);
+  });
+  vid.src = typeof b === 'string' ? b : window.URL.createObjectURL(b);
+  return duration;
+}
