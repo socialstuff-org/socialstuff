@@ -2,6 +2,7 @@
 
 # documentation
 /documentation
+tsconfig.compodoc.json
 
 # compiled output
 /dist
