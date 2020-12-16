@@ -34,7 +34,7 @@ export async function editReasonRequest(newReason:any) {
     const axios = require('axios');
     const config = {
       method : 'put',
-      url: 'http://[::]:3003/reporting/report-reasons',
+      url: process.env.SOCIALSTUFF_REPORTING_ENDPOINT + '/reporting/report-reasons',
       headers:{
       },
       data: newReason
@@ -54,7 +54,7 @@ export async function getReportReasons() {
 
   const config = {
     method: 'get',
-    url: 'http://[::]:3003/reporting/report-reasons',
+    url: process.env.SOCIALSTUFF_REPORTING_ENDPOINT + '/reporting/report-reasons',
     headers: {
     }
   };

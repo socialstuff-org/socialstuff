@@ -64,7 +64,7 @@ async function deleteReportReason(req: Request, res: Response) {
 
   const config = {
     method: 'delete',
-    url: 'http://[::1]:3003/reporting/report-reasons/',
+    url: process.env.SOCIALSTUFF_REPORTING_ENDPOINT + '/reporting/report-reasons/',
     headers: {
       'id': req.headers.id,
       'Content-Type': 'application/json'
