@@ -1,4 +1,4 @@
-<app-header *ngIf="chatPartner" [username]="username" [chatPartner]="chatPartner"></app-header>
+<app-header [username]="username" [chatPartner]="chatPartner"></app-header>
 <app-sidenav [username]="username" [newMessageSent]="newMessageSent"></app-sidenav>
 <app-chat-view
   *ngIf="chatPartner; else landing"
