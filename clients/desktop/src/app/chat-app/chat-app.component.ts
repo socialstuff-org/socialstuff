@@ -72,6 +72,7 @@ export class ChatAppComponent implements OnInit, OnDestroy {
         return;
       }
       this.chatPartner = loadedContact;
+      log(this.chatPartner);
     });
 
     this.titp.onConnectionStateChanged.subscribe(isConnected => {

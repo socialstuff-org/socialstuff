@@ -12,6 +12,7 @@ import {ChatMessage, ChatMessageType, serializeChatMessage} from '@trale/transpo
 import {CryptoStorageService}                               from '../services/crypto-storage.service';
 import {prefix}                                             from '@trale/transport/log';
 import {ApiService}                                         from 'app/services/api.service';
+import {UtilService}                                        from '../services/util.service';
 
 const log = prefix('clients/desktop/components/header-component');
 
@@ -22,8 +23,8 @@ const log = prefix('clients/desktop/components/header-component');
 })
 export class HeaderComponent implements OnInit {
 
-  @Input() chatPartner: Contact;
-  @Input() username: string;
+  @Input('chatPartner') chatPartner: Contact;
+  @Input('username') username: string;
   private contactInfoIsOpen = false;
 
   constructor(
@@ -34,10 +35,12 @@ export class HeaderComponent implements OnInit {
     private keys: KeyRegistryService,
     private storage: CryptoStorageService,
     private api: ApiService,
+    public util: UtilService,
   ) {
   }
 
   ngOnInit(): void {
+    log('chat partner', this.chatPartner);
   }
 
   public logout() {

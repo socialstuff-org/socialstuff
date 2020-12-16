@@ -24,12 +24,7 @@ export class UpdateDisplayNameComponent implements OnInit {
   }
 
   public async updateDisplayName(): Promise<void> {
-    const contact = await this.contact.load(this.chatPartner.username);
-    if (contact === false) {
-      return;
-    }
-    contact.displayName = this.chatPartner.displayName;
-    await this.contact.update(contact);
+    await this.contact.update(this.chatPartner);
     this.dialogRef.close();
   }
 

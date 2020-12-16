@@ -2,14 +2,14 @@ import {Injectable}                      from '@angular/core';
 import {Message}                         from '../models/Message';
 import {CryptoStorageService}            from './crypto-storage.service';
 import {Contact, ContactWithLastMessage} from '../models/Contact';
-import {createHash, createPublicKey}     from 'crypto';
+import {createPublicKey}     from 'crypto';
 import {ChatProperties}                  from '../models/ChatProperties';
 import * as fs                           from 'fs';
 import * as path                         from 'path';
 import {Observable, Subject}             from 'rxjs';
 import {hashUsernameHmac}                from '../../lib/helpers';
 import { prefix }                        from '@trale/transport/log';
-import {deserializeChatMessage}          from "@trale/transport/message";
+import {deserializeChatMessage}          from '@trale/transport/message';
 
 const log = prefix('clients/desktop/app/contact-service');
 
@@ -120,6 +120,7 @@ export class ContactService {
     const properties: ChatProperties = JSON.parse(propertiesStr.toString('utf-8'));
     return {
       username,
+      displayName: properties.customDisplayName,
       usernameHash,
       rsaPublicKey:    createPublicKey(properties.rsaPublicKey),
       conversationKey: Buffer.from(properties.conversationKey, 'base64'),
