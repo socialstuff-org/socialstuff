@@ -27,6 +27,7 @@ import {TitpServer}                                               from '../serve
 import {TitpClientBus}                                            from '../server/client-bus';
 import {UserKeyRegistry}                                          from '../user-key-registry';
 import {ConversationKeyRegistry}                                  from '../conversation-key-registry';
+import { enableLogging } from '../log';
 
 async function loadOrGenerateKeys(name: string, mod: number = 4096) {
   let exists;
@@ -51,6 +52,8 @@ async function loadOrGenerateKeys(name: string, mod: number = 4096) {
     return keys;
   }
 }
+
+enableLogging();
 
 (async () => {
   const userRsaKeys: { [key: string]: KeyObject } = {};
