@@ -34,46 +34,14 @@ export const middleware: ValidationChain[] = [
     }),
 ];
 
+export const deleteMiddleware: ValidationChain[] = [
+  header('id').notEmpty().isInt()
+];
 
 export const headerMiddleware: ValidationChain[] = [
   header('rows_per_page').notEmpty().isInt(),
   header('current_page').notEmpty().isInt(),
-  header('sort_param').optional().isString(),
-  header('user_token')
-    .isString()
-    .custom(async token => {
-      const axios = require('axios');
-      console.log('validating request');
-      const config = {
-        method: 'get',
-        url: 'http://[::1]:3002/settings/security',
-        headers: { }
-      };
-      let secSettingsInvOnlyByAdmin = null;
-      try {
-        secSettingsInvOnlyByAdmin = await axios(config);
-      } catch (e) {
-        throw new Error('Admin settings could not be fetched!');
-      }
-      console.log('is an admin active: ', secSettingsInvOnlyByAdmin);
-      if (secSettingsInvOnlyByAdmin) {
-
-        //TODO check if user is admin for now just throw error:
-
-        const db = await sharedConnection();
-        const sql = 'SELECT is_admin AS isAdmin FROM users INNER JOIN tokens t WHERE t.token = ?';
-        const [[{isAdmin}]] = await db.query<RowDataPacket[]>(sql, [token]);
-        console.log('User admin: ', isAdmin);
-        if (isAdmin) {
-          return;
-        } else {
-          throw new Error('Invite code not validated by admin, please provide a valid invite code!');
-        }
-      } else{
-        console.log('secSettingsInvOnlyByAdmin was false');
-        return;
-      }
-    })
+  header('sort_param').optional().isString()
 ];
 
 
@@ -155,7 +123,7 @@ inviteManagementInterface.use(injectDatabaseConnectionIntoRequest);
 
 inviteManagementInterface.get('/', headerMiddleware, rejectOnValidationError, getAllInvitations);
 inviteManagementInterface.post('/', middleware, rejectOnValidationError, addInviteCode);
-inviteManagementInterface.delete('/', deleteInviteCode);
+inviteManagementInterface.delete('/', deleteMiddleware, deleteInviteCode);
 
 //const final: any[] = [];
 //final.push(middleware, rejectOnValidationError, injectDatabaseConnectionIntoRequest, addInviteCode);
