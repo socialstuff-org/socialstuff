@@ -1,17 +1,14 @@
 <div id="chat-view-container">
   <div class="chat-message-list">
-    <audio id="audioButton" controls #audioPlayer type="audio/webm;codecs=opus" ></audio>
+
     <app-message-box style="z-index: 100;" (messageSent)="messageSentHandler($event)"></app-message-box>
 
     <cdk-virtual-scroll-viewport [itemSize]="100" class="example-viewport" #virtualScroll>
-      <div *ngFor="let message of messages;">
+      <div *ngFor="let message of messages;" style="padding-right: 10px;">
         <div class="message-row list-item">
           <app-chat-bubble [message]="message"></app-chat-bubble>
         </div>
       </div>
     </cdk-virtual-scroll-viewport>
-    <div>
-      <button (click)="toggleRecording()" id="record-button">{{recordOption}} Audio </button>
-    </div>
   </div>
 </div>

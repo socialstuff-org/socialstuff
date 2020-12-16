@@ -40,9 +40,11 @@ import {CallFunctionComponent}     from './voice-communication/call-function/cal
 import { MicrophoneTestComponent } from './microphone-test/microphone-test.component';
 import {MatMenuModule}             from "@angular/material/menu";
 import { LanguageselectComponent } from './utils/languageselect/languageselect.component';
-import { ParticlesComponent } from './utils/particles/particles.component';
-import { LoadingComponent } from './utils/loading/loading.component';
-import { VoiceMessageComponent } from './message-box/voice-message/voice-message.component';
+import { ParticlesComponent }      from './utils/particles/particles.component';
+import { LoadingComponent }        from './utils/loading/loading.component';
+import { VoiceMessageComponent }   from './message-box/voice-message/voice-message.component';
+import {MatTooltipModule}          from "@angular/material/tooltip";
+import { UpdateDisplayNameComponent } from './dialogs/update-display-name/update-display-name.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -70,8 +72,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ParticlesComponent,
     LoadingComponent,
     VoiceMessageComponent,
+    UpdateDisplayNameComponent,
   ],
-  imports:      [
+  imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
@@ -95,6 +98,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MatCheckboxModule,
     ScrollingModule,
     MatMenuModule,
+    MatTooltipModule,
   ],
   providers:    [],
   bootstrap:    [AppComponent],

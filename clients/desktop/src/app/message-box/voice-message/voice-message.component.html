@@ -1,7 +1,14 @@
-<button (click)="toggleRecording()" id="toggle-recording-btn">
-  <mat-icon *ngIf="recordingState">mic</mat-icon>
-  <mat-icon *ngIf="!recordingState">mic_none</mat-icon>
+<button
+  (click)="toggleRecording()"
+  class="recorder-button"
+>
+  <mat-icon *ngIf="!recordingState" matTooltip="Start recording">mic_none</mat-icon>
+  <mat-icon *ngIf="recordingState" matTooltip="Stop recording">mic</mat-icon>
 </button>
-<button (click)="cancel()" *ngIf="recordingState">
-  <mat-icon>cancel</mat-icon>
+<button
+  (click)="cancel()"
+  class="recorder-button"
+  *ngIf="recordingState"
+>
+  <mat-icon matTooltip="Cancel recording">cancel</mat-icon>
 </button>
