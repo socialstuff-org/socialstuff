@@ -7,6 +7,9 @@ import * as os                                                                 f
 import * as path                                                               from 'path';
 import {Observable, Subject}                                                   from 'rxjs';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/services/crypto-storage');
 
 /**

@@ -11,6 +11,9 @@ import {hashUsernameHmac}                from '../../lib/helpers';
 import { prefix }                        from '@trale/transport/log';
 import {deserializeChatMessage}          from '@trale/transport/message';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/app/contact-service');
 
 @Injectable({

@@ -11,6 +11,9 @@ import Swal from 'sweetalert2';
 import {timer} from 'rxjs';
 import { prefix } from '@trale/transport/log';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/services/debug-service');
 
 @Injectable({
