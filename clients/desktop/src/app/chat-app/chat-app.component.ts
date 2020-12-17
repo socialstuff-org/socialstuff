@@ -34,7 +34,6 @@ export class ChatAppComponent implements OnInit, OnDestroy {
 
   public chatPartner: Contact;
   public username = '';
-  public currentChatNewMessageStream = new Subject<ChatMessage>();
   public newMessageSent = new Subject<{recipient: string, message: ChatMessage}>();
 
   constructor(
@@ -106,9 +105,9 @@ export class ChatAppComponent implements OnInit, OnDestroy {
    * @param message The newly received message.
    */
   async onIncomingMessage(message: ChatMessage) {
-    if (message.senderName === this.chatPartner.username) {
-      this.currentChatNewMessageStream.next(message);
-    }
+    // if (message.senderName === this.chatPartner.username) {
+    //   this.currentChatNewMessageStream.next(message);
+    // }
     const contact = await this.contacts.load(message.senderName);
     if (contact === false) {
       return;

@@ -10,9 +10,8 @@ import {prefix}                                                    from '@trale/
 import {filter}                                                    from 'rxjs/operators';
 import {take}                                                      from '../../lib/functional';
 import {CdkVirtualScrollViewport}                                  from '@angular/cdk/scrolling';
-import {delay}                                                     from "@socialstuff/utilities/common";
+import {delay}                                                     from '@socialstuff/utilities/common';
 import { DebugService } from 'app/services/debug.service';
-import { Observable } from 'rxjs';
 
 /**
  * Logger for debugging.
@@ -27,7 +26,6 @@ const log = prefix('clients/desktop/component/chat-view');
 export class ChatViewComponent implements OnInit, OnDestroy {
 
   @Input('contact') contact: Contact;
-  @Input('newMessages') newMessages: Observable<ChatMessage>;
   @Output('messageSent') messageSent = new EventEmitter<{ recipient: Contact, message: ChatMessage }>();
 
   @ViewChild(CdkVirtualScrollViewport)
@@ -48,30 +46,48 @@ export class ChatViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.chat?.close();
+    this.deInit();
+  }
+
+  private async initForContact(contact: Contact) {
+    this.contact = contact;
+    this.chat = await this.contacts.openChat(contact);
+    this.chatConsumer = take(this.chat.records());
+    this.messages = (await this.chatConsumer(50)).reverse().map(deserializeChatMessage);
+    await delay(20);
+    this.virtualScroll.scrollTo({bottom: 0});
+    console.log('contact', contact);
+  }
+
+  private async deInit() {
+    await this.chat?.close();
   }
 
   /**
    * Initialized the model.
    */
   async ngOnInit() {
-    const _a = this.storage.isLoaded.subscribe(async () => {
-      _a.unsubscribe();
-      const contact = await this.contacts.load(this.route.snapshot.params.username);
-      if (contact === false) {
-        console.error('contact could not be loaded!');
-        return;
-      }
-      this.contact = contact;
-      this.chat = await this.contacts.openChat(contact);
-      this.chatConsumer = take(this.chat.records());
-      this.messages = (await this.chatConsumer(50)).reverse().map(deserializeChatMessage);
-      await delay(20);
-      this.virtualScroll.scrollTo({bottom: 0});
-      console.log('contact', contact);
+    this.route.params.subscribe(async params => {
+      await this.deInit();
+      const _a = this.storage.isLoaded.subscribe(async () => {
+        _a.unsubscribe();
+        const contact = await this.contacts.load(params.username);
+        if (contact === false) {
+          console.error('contact could not be loaded!');
+          return;
+        }
+        this.initForContact(contact);
+      });
     });
 
-    this.newMessages.subscribe(this.handleIncomingMessage.bind(this))
+    this.titp.client
+      .incomingMessage()
+      .pipe(filter(this._sameChatFilter.bind(this)) as any)
+      .subscribe(this.handleIncomingMessage.bind(this));
+  }
+
+  private _sameChatFilter(message: ChatMessage): boolean {
+    return message.senderName === this.contact.username;
   }
 
   /**
