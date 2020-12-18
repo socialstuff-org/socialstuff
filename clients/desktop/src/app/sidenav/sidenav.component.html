@@ -28,20 +28,28 @@
         <div style="margin-top: 10px"></div>
 
         <mat-divider class="contact-list-divider"></mat-divider>
+
         <mat-list-item routerLinkActive="active-list-item" class="contactListItem" *ngFor="let chat of chats">
           <mat-divider class="contact-list-divider"></mat-divider>
           <a class="sidenav-link" [routerLink]="['/chat-app', chat.username]" routerLinkActive="active-link-item">
             <div style="width: 100%;">
+
+              <!-- PROFILE PICTURE -->
               <div class="profile-picture">
                 <span *ngIf="chat.displayName; else noRealName">{{acronym(chat.displayName)}}</span>
                 <ng-template #noRealName>
                   <mat-icon style="margin-top: 7px;">person</mat-icon>
                 </ng-template>
               </div>
+
+              <!-- TEXT CONTAINER -->
               <div class="username">
+                <!-- USERNAME -->
                 <div>
                   {{chat.displayName || chat.username }}
                 </div>
+
+                <!-- LAST MESSAGE -->
                 <div *ngIf="chat.lastMessage">
                   <div [ngSwitch]="chat.lastMessage.type">
                     <div *ngSwitchCase="ChatMessageType.handshakeInitialization">
@@ -62,7 +70,17 @@
                     </div>
                     <div *ngSwitchDefault>Unknown message type</div>
                   </div>
+
+                  <div id="last-message-timestamp" style="position:absolute; right: 10px; bottom: 5px;">
+                    <div>
+                      {{chat.lastMessage.sentAt | date: 'HH:mm'}}
+                    </div>
+                    <div *ngIf="chat.lastMessage.sentAt.getDate() !== today.getDate()">
+                      {{this.chat.lastMessage.sentAt.toString() | timeAgo}}
+                    </div>
+                  </div>
                 </div>
+
               </div>
             </div>
           </a>

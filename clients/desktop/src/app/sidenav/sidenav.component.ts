@@ -25,6 +25,7 @@ export class SidenavComponent implements OnInit {
   public chats: ContactWithLastMessage[] = [];
   public loadingContacts = true;
   public searchTerm = '';
+  public today = new Date();
 
   constructor(
     public contacts: ContactService,
