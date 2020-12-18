@@ -11,6 +11,9 @@ import Swal from 'sweetalert2';
 import {timer} from 'rxjs';
 import { prefix } from '@trale/transport/log';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/services/debug-service');
 
 @Injectable({
@@ -27,6 +30,10 @@ export class DebugService {
   ) {
   }
 
+  /**
+   * Starts a series of automated reconnect attemps and displays an informational message.
+   * @param session The loaded data from the previous session.
+   */
   private async connectWithAnimation(session: any) {
     const now = new Date().toLocaleTimeString();
     const html = '<p>Please wait until we can connect you...</p>' +
@@ -72,6 +79,9 @@ export class DebugService {
     });
   }
 
+  /**
+   * If the app is not in production mode, this method loads a previously persisted login session from the storage.
+   */
   public async loadSession() {
     if (AppConfig.environment === 'PROD') {
       return false;
@@ -108,6 +118,11 @@ export class DebugService {
     return result;
   }
 
+  /**
+   * If not in production mode, this method persists a login session in order for hot-reloading to not be problematic/annoying.
+   * @param username The username of the user who logged in.
+   * @param key The pre-master key, generated on basis of the user password.
+   */
   public async persistSession(username: string, key: Buffer) {
     if (AppConfig.environment === 'PROD') {
       return;
@@ -124,6 +139,9 @@ export class DebugService {
     }));
   }
 
+  /**
+   * Removes the persisted session from the storage.
+   */
   public async destroySession() {
     await this.contacts.unLoad();
     await fs.promises.unlink(path.join(this.basePath, '.debug_session'));

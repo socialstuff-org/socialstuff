@@ -3,7 +3,6 @@
 <app-chat-view
   *ngIf="chatPartner; else landing"
   [contact]="chatPartner"
-  [newMessages]="currentChatNewMessageStream"
   (messageSent)="onMessageSent($event)"
 ></app-chat-view>
 <ng-template #landing>

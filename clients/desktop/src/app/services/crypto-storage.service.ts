@@ -7,8 +7,15 @@ import * as os                                                                 f
 import * as path                                                               from 'path';
 import {Observable, Subject}                                                   from 'rxjs';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/services/crypto-storage');
 
+/**
+ * Returns an implementation of the {@link CryptoProvider} interface, which is required by the {@link CryptoStorage} class.
+ * @param key The key to be used for cryprographic operations.
+ */
 function cryptoProviderFactory(key: Buffer): CryptoProvider {
   return {
     encrypt(data: BinaryLike) {
@@ -28,14 +35,23 @@ function cryptoProviderFactory(key: Buffer): CryptoProvider {
   providedIn: 'root',
 })
 export class CryptoStorageService {
+  /**
+   * The absolute path to the base directory from which the storage will perform its actions.
+   */
   get path(): string {
     return this._path;
   }
 
+  /**
+   * The master key used for all local encryption.
+   */
   get masterKey(): Buffer {
     return this._masterKey;
   }
 
+  /**
+   * An {@link Observable} which emits each time the {@link load} method is finished.
+   */
   get isLoaded(): Observable<void> {
     return this._isLoaded;
   }
@@ -46,6 +62,12 @@ export class CryptoStorageService {
   private _masterKey: Buffer;
   private _isLoaded = new Subject<void>();
 
+  /**
+   * Initializes the underlying {@link CryptoStorage} instance and loads data associated to the user.
+   * If relevant files are missing, this method will also create them.
+   * @param username The username of the user who logged in.
+   * @param key The key to decrypt the local master key.
+   */
   public async load(username: string, key: Buffer) {
     log('loading storage for user:', username);
     this._path = path.join(os.homedir(), '.trale');
@@ -99,6 +121,9 @@ export class CryptoStorageService {
     this._isLoaded.next();
   }
 
+  /**
+   * The {@link CryptoStorage} instance, which has beeen initialized for a specific user.
+   */
   get storage(): CryptoStorage {
     return this._storage;
   }

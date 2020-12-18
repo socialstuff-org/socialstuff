@@ -7,6 +7,9 @@ import migrate     from 'migrate';
 
 let _sharedConnection: Promise<mysql.Connection> | undefined;
 
+/**
+ * provides a shared connection that can be used for database access
+ */
 export function sharedConnection() {
   if (!_sharedConnection) {
     _sharedConnection = createConnection();

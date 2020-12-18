@@ -21,4 +21,7 @@ base-image:
 deploy:
 	make -C services/identity prod
 	make -C services/chat prod
-	docker-compose --project-directory . -f deployment/docker-compose.yml
+	docker-compose -f docker-compose.prod.yml up
+
+deploy-down:
+	docker-compose -f docker-compose.prod.yml down

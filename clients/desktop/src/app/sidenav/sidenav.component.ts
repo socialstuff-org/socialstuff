@@ -9,6 +9,9 @@ import {ApiService}                 from 'app/services/api.service';
 import {ChatMessageType}            from '@trale/transport/message';
 import { Observable } from 'rxjs';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/app/sidenav-component');
 
 @Component({
@@ -86,6 +89,9 @@ export class SidenavComponent implements OnInit {
     return acronymOfName(name);
   }
 
+  /**
+   * Filter the contacts based on a search term given in the {searchTerm} field.
+   */
   searchContacts() {
     if (this.searchTerm === '') {
       return this.contacts.readContacts();

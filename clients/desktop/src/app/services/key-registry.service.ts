@@ -91,8 +91,8 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
   }
 
   /**
-   * TODO @joernneumeyer
-   * @param username
+   * Loads the ECDH private key used in a previously started e2e handshake.
+   * @param username The username of the user with whom the handshake has been initiated.
    */
   async loadEcdhForHandshake(username: string): Promise<ECDH | false> {
     try {
@@ -106,8 +106,8 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
   }
 
   /**
-   * TODO @joernneumeyer
-   * @param username
+   * Removes the ECDH private key used in a previously started e2e handshake.
+   * @param username The username of the user with whom the handshake has been initiated.
    */
   async removeEcdhForHandshake(username: string): Promise<void> {
     await fs.promises.unlink(path.join(this.storage.storage.storageDirectory, 'handshakes', hashUsername(username)));
@@ -137,9 +137,10 @@ export class KeyRegistryService implements ConversationKeyRegistry, UserKeyRegis
   }
 
   /**
-   * TODO @joernneumeyer
-   * @param username
-   * @param ecdh
+   * Persists an ECDH private key, which has been used to initiate an e2e handshake.
+   * This key may be loaded later to complete the handshake.
+   * @param username The username of the user with whom the handshake has been initialized.
+   * @param ecdh The ECDH private key which has been used for the handshake.
    */
   async saveEcdhForHandshake(username: string, ecdh: ECDH): Promise<void> {
     const serialized = Buffer.from(ecdh.getPrivateKey());

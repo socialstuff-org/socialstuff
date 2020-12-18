@@ -17,6 +17,12 @@ import {NextFunction, Request, Response} from 'express';
 import {sharedConnection}                from './mysql';
 import {RequestWithDependencies}         from './request-with-dependencies';
 
+/**
+ * injects database connection into a request
+ * @param req the request from the client
+ * @param _ the response being returned
+ * @param next NextFunction
+ */
 export async function injectDatabaseConnectionIntoRequest(req: Request, _: Response, next: NextFunction) {
   (req as RequestWithDependencies).dbHandle = await sharedConnection();
   next();

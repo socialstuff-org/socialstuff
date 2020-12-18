@@ -15,7 +15,7 @@ import {DataResponse, ErrorResponse} from '@socialstuff/utilities/responses';
 import { Router } from '@angular/router';
 
 /**
- * TODO @joernneumeyer
+ * Simple wrapper for RSA key generation.
  */
 function newKeyPair(mod) {
   return new Promise((res, rej) => {
@@ -100,8 +100,8 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * TODO @joernneumeyer
-   * TODO can this be outsourced to auth.service.ts? --> would be much tidier and registration is related to authentication
+   * Attempts a registration at a SocialStuff Identity server.
+   * TODO move to auth.service.ts
    *
    * @return{Promise<void>}
    */
