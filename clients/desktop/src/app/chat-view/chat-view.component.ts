@@ -1,6 +1,6 @@
 import {Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter}            from '@angular/core';
 import {ContactService}                                            from '../services/contact.service';
-import {ActivatedRoute}                                            from '@angular/router';
+import {ActivatedRoute, Params}                                            from '@angular/router';
 import {TextRecordStorage}                                         from '@trale/persistence/crypto-storage';
 import {CryptoStorageService}                                      from 'app/services/crypto-storage.service';
 import {ChatMessage, deserializeChatMessage, serializeChatMessage} from '@trale/transport/message';
@@ -25,7 +25,7 @@ const log = prefix('clients/desktop/component/chat-view');
 })
 export class ChatViewComponent implements OnInit, OnDestroy {
 
-  @Input('contact') contact: Contact;
+  contact: Contact;
   @Output('messageSent') messageSent = new EventEmitter<{ recipient: Contact, message: ChatMessage }>();
 
   @ViewChild(CdkVirtualScrollViewport)
@@ -53,7 +53,9 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     this.contact = contact;
     this.chat = await this.contacts.openChat(contact);
     this.chatConsumer = take(this.chat.records());
+    log('loaded some stuff');
     this.messages = (await this.chatConsumer(50)).reverse().map(deserializeChatMessage);
+    log('done loading chat messages', this.messages);
     await delay(20);
     this.virtualScroll.scrollTo({bottom: 0});
     console.log('contact', contact);
@@ -61,33 +63,40 @@ export class ChatViewComponent implements OnInit, OnDestroy {
 
   private async deInit() {
     await this.chat?.close();
+    this.chat = undefined;
   }
 
   /**
    * Initialized the model.
    */
   async ngOnInit() {
-    this.route.params.subscribe(async params => {
+    log('initialized');
+    const onChatPartnerChange = async (params: Params) => {
       await this.deInit();
-      const _a = this.storage.isLoaded.subscribe(async () => {
-        _a.unsubscribe();
+      if (this.storage.storage) {
         const contact = await this.contacts.load(params.username);
-        if (contact === false) {
-          console.error('contact could not be loaded!');
-          return;
-        }
-        this.initForContact(contact);
-      });
-    });
+          if (contact === false) {
+            console.error('contact could not be loaded!');
+            return;
+          }
+          this.initForContact(contact);
+      } else {
+        const _a = this.storage.isLoaded.subscribe(async () => {
+          _a.unsubscribe();
+          onChatPartnerChange(params);
+        });
+      }
+    };
+    this.route.params.subscribe(onChatPartnerChange);
 
-    this.titp.client
-      .incomingMessage()
-      .pipe(filter(this._sameChatFilter.bind(this)) as any)
-      .subscribe(this.handleIncomingMessage.bind(this));
-  }
-
-  private _sameChatFilter(message: ChatMessage): boolean {
-    return message.senderName === this.contact.username;
+    const sub = this.titp.onConnectionStateChanged.subscribe(isConnected => {
+      if (isConnected) {
+        sub.unsubscribe();
+        this.titp.client
+          .incomingMessage()
+          .subscribe(this.handleIncomingMessage.bind(this));
+      }
+    })
   }
 
   /**
@@ -95,6 +104,10 @@ export class ChatViewComponent implements OnInit, OnDestroy {
    * @param message 
    */
   async handleIncomingMessage(message: ChatMessage): Promise<void> {
+    log('got message:', message);
+    if (message.senderName !== this.contact.username) {
+      return;
+    }
     this.messages = [...this.messages, message];
     this.virtualScroll.scrollTo({bottom: 0});
   }
@@ -108,6 +121,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     log('message', message);
     await this.titp.client.sendChatMessageTo(message, [this.contact.username]);
     await this.handleIncomingMessage(message);
+    await this.chat.addRecord(serializeChatMessage(message));
     this.messageSent.emit({ message, recipient: this.contact });
   }
 }
