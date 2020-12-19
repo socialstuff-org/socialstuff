@@ -14,7 +14,7 @@ export class NavigationItemComponent implements OnInit {
   constructor(location: Location, router: Router) {
     router.events.subscribe(val => {
       if (location.path() !== '') {
-        this.currentRoute = location.path().split('/')[1];
+        this.currentRoute = location.path().split('/')[2];
       } else {
         this.currentRoute = 'Home';
       }

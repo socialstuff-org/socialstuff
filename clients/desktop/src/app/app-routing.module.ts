@@ -17,7 +17,7 @@ import {BlockedUsersComponent} from './admin/usersManagement/blocked-users/block
 import {DashboardViewComponent} from './admin/Dashboard/dashboard-view/dashboard-view.component';
 import {MicrophoneTestComponent} from './microphone-test/microphone-test.component';
 
-const routes: Routes = [
+const routesChat: Routes = [
   {
     path: '',
     redirectTo: 'login',
@@ -30,7 +30,7 @@ const routes: Routes = [
   {path: 'chat-app', redirectTo: 'chat-app/', pathMatch: 'full'},
   {path: 'chat-app/:username', component: ChatAppComponent},
   {path: 'call-function', component: CallFunctionComponent},
-  {path: 'microphone-test', component: MicrophoneTestComponent}
+  {path: 'microphone-test', component: MicrophoneTestComponent},
   // {
   //   path: '**',
   //   component: PageNotFoundComponent
@@ -39,11 +39,11 @@ const routes: Routes = [
 
 export const routesSettings: Routes = [
   {
-    path: '',
+    path: 'admin',
     component: SettingsViewComponent,
     children: [
       {
-        path: '',
+        path: 'dashboard',
         component: DashboardViewComponent,
         data: {
           name: 'Dashboard',
@@ -79,7 +79,7 @@ export const routesSettings: Routes = [
             data: {
               name: 'Create Invite',
               icon: 'add_to_que',
-              parent: 'users'
+              parent: 'users',
             },
           },
           {
@@ -114,6 +114,8 @@ export const routesSettings: Routes = [
     ]
   },
 ];
+
+const routes = routesChat.concat(routesSettings);
 
 @NgModule({
   imports: [

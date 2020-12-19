@@ -10,7 +10,7 @@ import {Route} from '@angular/router';
 
 export class NavigationContainerComponent implements OnInit {
 
-  private navigationItems = [];
+  public navigationItems = [];
 
 
 
@@ -22,9 +22,11 @@ export class NavigationContainerComponent implements OnInit {
         icon: route.data.icon,
         subRoutes: []
       };
+      console.log('1: ', navigationItem);
       if (route.children) {
         navigationItem.subRoutes = this.add(route.children);
       }
+      console.log('2: ', navigationItem);
       return navigationItem;
     });
   }
@@ -32,6 +34,7 @@ export class NavigationContainerComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    console.log(routesSettings[0]);
     this.navigationItems = this.add(routesSettings[0].children);
   }
 
