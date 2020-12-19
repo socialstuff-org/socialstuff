@@ -18,6 +18,8 @@ import {Request, response, Response} from 'express';
 import {RequestWithDependencies} from './request-with-dependencies';
 import {sharedConnection} from './client';
 import {RowDataPacket} from 'mysql2/promise';
+import axios, { AxiosRequestConfig } from 'axios';
+
 const prisma = new PrismaClient();
 
 /**
@@ -30,11 +32,9 @@ const prisma = new PrismaClient();
  * }
  */
 export async function editReasonRequest(newReason:any) {
-
-    const axios = require('axios');
-    const config = {
+   const config:AxiosRequestConfig = {
       method : 'put',
-      url: 'http://[::]:3003/reporting/report-reasons',
+      url: process.env.SOCIALSTUFF_REPORTING_ENDPOINT + '/reporting/report-reasons',
       headers:{
       },
       data: newReason
@@ -50,11 +50,9 @@ export async function editReasonRequest(newReason:any) {
  * Forwards request to reporting service and returns all report reasons
  */
 export async function getReportReasons() {
-  const axios = require('axios');
-
-  const config = {
+  const config:AxiosRequestConfig = {
     method: 'get',
-    url: 'http://[::]:3003/reporting/report-reasons',
+    url: process.env.SOCIALSTUFF_REPORTING_ENDPOINT + '/reporting/report-reasons',
     headers: {
     }
   };
@@ -76,11 +74,10 @@ export async function getReportReasons() {
  */
 //TODO use different signature
 export async function insertReportReason(data: any) {
-  const axios = require('axios');
 
-  const config = {
+  const config:AxiosRequestConfig = {
     method: 'post',
-    url: 'http://::1:3003/reporting/report-reasons',
+    url: process.env.SOCIALSTUFF_REPORTING_ENDPOINT + '/reporting/report-reasons',
     headers: {
       'Content-Type': 'application/json'
     },
@@ -185,25 +182,25 @@ export async function deleteInviteCodeFromSQL(invCodeId: number) {
  * @param db database connection
  * @return security settings in this format:
  * {
-  "two_factor_auth": {
-    "on" : true,
-    "phone": false,
-    "email": true
-  },
-  "confirmed_emails_only": true,
-  "individual_pwd_req": {
-    "on": true,
-    "upper_case": true,
-    "number": true,
-    "special_char": true,
-    "reg_ex": false,
-    "reg_ex_string": "[]"
-  },
-  "inv_only": {
-    "on": false,
-    "inv_only_by_adm": false
-  }
-}
+ *  "two_factor_auth": {
+ *    "on" : true,
+ *    "phone": false,
+ *    "email": true
+ *  },
+ *  "confirmed_emails_only": true,
+ *  "individual_pwd_req": {
+ *    "on": true,
+ *    "upper_case": true,
+ *    "number": true,
+ *    "special_char": true,
+ *    "reg_ex": false,
+ *    "reg_ex_string": "[]"
+ *  },
+ *  "inv_only": {
+ *    "on": false,
+ *    "inv_only_by_adm": false
+ *  }
+ * }
  */
 export async function findSecuritySettings(db: mysql.Connection) {
   await sharedConnection();
@@ -260,25 +257,25 @@ export function createConnection() {
  * Used for modifying the security settings
  * @param settings the new Settings following the following JSON format:
  * {
-  "two_factor_auth": {
-    "on" : true,
-    "phone": false,
-    "email": true
-  },
-  "confirmed_emails_only": true,
-  "individual_pwd_req": {
-    "on": true,
-    "upper_case": true,
-    "number": true,
-    "special_char": true,
-    "reg_ex": false,
-    "reg_ex_string": "[]"
-  },
-  "inv_only": {
-    "on": false,
-    "inv_only_by_adm": false
-  }
-}
+ *  "two_factor_auth": {
+ *    "on" : true,
+ *    "phone": false,
+ *    "email": true
+ *  },
+ *  "confirmed_emails_only": true,
+ *  "individual_pwd_req": {
+ *    "on": true,
+ *    "upper_case": true,
+ *    "number": true,
+ *    "special_char": true,
+ *    "reg_ex": false,
+ *    "reg_ex_string": "[]"
+ *  },
+ *  "inv_only": {
+ *    "on": false,
+ *    "inv_only_by_adm": false
+ *  }
+ * }
  * @param db the database connection
  */
 export async function setSecuritySettings(settings:any, db: mysql.Connection) {
