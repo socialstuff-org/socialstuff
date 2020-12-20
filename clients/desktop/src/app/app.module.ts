@@ -31,21 +31,22 @@ import {ChatAppComponent}           from './chat-app/chat-app.component';
 import {SidenavComponent}           from './sidenav/sidenav.component';
 import {ForgotPasswordComponent}    from './auth/forgot-password/forgot-password.component';
 import {ContactInfoComponent}       from './contact-info/contact-info.component';
-import {MatDialogModule}            from "@angular/material/dialog";
-import {MatCheckboxModule}          from "@angular/material/checkbox";
+import {MatDialogModule}            from '@angular/material/dialog';
+import {MatCheckboxModule}          from '@angular/material/checkbox';
 import {LogoutComponent}            from './auth/logout/logout.component';
-import {ScrollingModule}            from "@angular/cdk/scrolling";
+import {ScrollingModule}            from '@angular/cdk/scrolling';
 import {MessageBoxComponent}        from './message-box/message-box.component';
 import {CallFunctionComponent}      from './voice-communication/call-function/call-function.component';
 import {MicrophoneTestComponent}    from './microphone-test/microphone-test.component';
-import {MatMenuModule}              from "@angular/material/menu";
+import {MatMenuModule}              from '@angular/material/menu';
 import {LanguageselectComponent}    from './utils/languageselect/languageselect.component';
 import {ParticlesComponent}         from './utils/particles/particles.component';
 import {LoadingComponent}           from './utils/loading/loading.component';
 import {VoiceMessageComponent}      from './message-box/voice-message/voice-message.component';
-import {MatTooltipModule}           from "@angular/material/tooltip";
+import {MatTooltipModule}           from '@angular/material/tooltip';
 import {UpdateDisplayNameComponent} from './dialogs/update-display-name/update-display-name.component';
 import {TimeAgoPipe}                from 'time-ago-pipe';
+import {MatProgressSpinnerModule}   from '@angular/material/progress-spinner';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -76,7 +77,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     UpdateDisplayNameComponent,
     TimeAgoPipe,
   ],
-  imports:      [
+  imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
@@ -101,9 +102,14 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ScrollingModule,
     MatMenuModule,
     MatTooltipModule,
+    MatProgressSpinnerModule,
   ],
   providers:    [],
   bootstrap:    [AppComponent],
+  exports: [
+    MatIconModule,
+    TranslateModule,
+  ]
 })
 export class AppModule {
 }
