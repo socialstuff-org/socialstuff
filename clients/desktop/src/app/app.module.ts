@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import '../polyfills';
 
 import {BrowserModule}                from '@angular/platform-browser';
-import {NgModule}                     from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule}                     from '@angular/core';
 import {FormsModule}                  from '@angular/forms';
 import {HttpClientModule, HttpClient} from '@angular/common/http';
 import {CoreModule}                   from './core/core.module';
@@ -109,6 +109,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   exports: [
     MatIconModule,
     TranslateModule,
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 export class AppModule {

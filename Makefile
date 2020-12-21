@@ -18,10 +18,12 @@ start-chat:
 base-image:
 	docker build services/base-image -t socialstuff-node:base
 
-deploy:
-	make -C services/identity prod
-	make -C services/chat prod
-	docker-compose -f docker-compose.prod.yml up
+deploy: base-image
+	# make -C services/identity prod
+	# make -C services/chat prod
+	docker-compose -f docker-compose.prod.yml up -d --build
 
 deploy-down:
 	docker-compose -f docker-compose.prod.yml down
+
+deploy-again: deploy-down deploy

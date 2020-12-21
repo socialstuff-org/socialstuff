@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 /**
  * Simple wrapper for RSA key generation.
  */
-function newKeyPair(mod) {
+function newKeyPair(mod: number) {
   return new Promise((res, rej) => {
     generateKeyPair('rsa', {
       modulusLength:      mod,

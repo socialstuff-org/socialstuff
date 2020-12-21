@@ -184,6 +184,11 @@ export class TitpClient extends CommonTitpClient {
     return message;
   }
 
+  /**
+   * TODO
+   * @param username 
+   * @param type 
+   */
   public async negotiateKeyWith(username: string, type: ChatMessageType = ChatMessageType.handshakeInitialization) {
     if (!username.includes('@')) {
       username += '@' + this._hostname;
@@ -211,6 +216,10 @@ export class TitpClient extends CommonTitpClient {
     return message;
   }
 
+  /**
+   * Parses the content of a 
+   * @param data 
+   */
   private async _parseInitialHandshake(data: Buffer) {
     log('got initial handshake');
     const signatureLength = data.readUInt16BE(0);
@@ -253,8 +262,8 @@ export class TitpClient extends CommonTitpClient {
   }
 
   /**
-   *
-   * @param data
+   * Parse the incoming message and its content according to its type.
+   * @param data The  binary message to be parsed.
    * @private
    */
   private async _interpretIncomingData(data: Buffer) {

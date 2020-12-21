@@ -26,8 +26,12 @@ let rsa: {
   pub: KeyObject,
   priv: KeyObject,
 };
+const ENV = process.env.NODE_ENV || 'dev';
 
-const rsaPrivateKeyPath = path.join(__dirname, '..', '..', 'priv.pem');
+const rsaPrivateKeyPath =
+  ENV === 'prod'
+    ? '/keys/priv.pem'
+    : path.join(__dirname, '..', '..', 'priv.pem');
 
 const priv = fs.readFileSync(rsaPrivateKeyPath).toString('utf-8');
 rsa = {
