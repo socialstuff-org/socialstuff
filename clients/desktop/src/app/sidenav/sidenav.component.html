@@ -1,7 +1,9 @@
 <mat-sidenav-container id="sidenav-container">
   <mat-sidenav #sidenav mode="side" opened id="sidenav">
     <mat-list>
-      <div *ngIf="loadingContacts; else chatList">loading chats...</div>
+      <div *ngIf="loadingContacts; else chatList">
+        <mat-spinner style="margin-top: 25px;"></mat-spinner>
+      </div>
       <ng-template #chatList>
         <mat-divider class="contact-list-divider"></mat-divider>
 
