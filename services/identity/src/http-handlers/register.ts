@@ -136,7 +136,7 @@ if (hasChallenge(registrationChallenges.invite)) {
         if (validInvite === 0) {
           throw new Error();
         }
-        const increaseTimesUsedSQL = 'UPDATE invite_code SET times_used = (times_used + 1) WHERE code = ?';
+        const increaseTimesUsedSQL = 'UPDATE invite_code SET times_used = (times_used + 1) WHERE code = ?;';
         await db.query(increaseTimesUsedSQL, [inviteCode]);
       } catch (e) {
         throw new Error('Please provide a valid invite code!');
