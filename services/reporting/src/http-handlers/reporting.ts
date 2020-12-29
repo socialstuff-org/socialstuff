@@ -12,7 +12,7 @@ const reportingHandler = Router();
  * @param req request from the client. Follow this layout:
  *  Headers:
  *   - user_token
-**  Body:
+*  Body:
  * {
  *   "username": "userHashOfUserBeingReported",
  *   "reason_id": 123
@@ -44,3 +44,4 @@ export const validateRequest: ValidationChain[] = [
 
 //import {body, ValidationChain} from 'express-validator';
 reportingHandler.post('/', validateRequest,injectDatabaseConnectionIntoRequest, reportUser);
+export default reportingHandler;
