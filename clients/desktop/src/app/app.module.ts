@@ -51,17 +51,17 @@ import { NavigationContainerComponent } from './admin/SideNav/navigation-contain
 import { NavigationItemComponent } from './admin/SideNav/navigation-item/navigation-item.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { SecurityComponent } from './admin/security/security.component';
-import { CreateInviteComponent } from './admin/usersManagement/CreateInvites/create-invite/create-invite.component';
-import { ReportSettingsComponent } from './admin/usersManagement/ReportSystem/ReportSettings/report-settings/report-settings.component';
-import { ReportedUsersComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/reported-users/reported-users.component';
-import { BlockedUsersComponent } from './admin/usersManagement/blocked-users/blocked-users.component';
-import { UsersComponent } from './admin/usersManagement/users/users.component';
+import { CreateInviteComponent } from './admin/UsersManagement/CreateInvites/create-invite/create-invite.component';
+import { ReportSettingsComponent } from './admin/UsersManagement/ReportSystem/ReportSettings/report-settings/report-settings.component';
+import { ReportedUsersComponent } from './admin/UsersManagement/ReportSystem/ReportedUsers/reported-users/reported-users.component';
+import { BlockedUsersComponent } from './admin/UsersManagement/blocked-users/blocked-users.component';
+import { UsersComponent } from './admin/UsersManagement/users/users.component';
 import { HeadlineComponent } from './admin/core/headline/headline.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import { CreateNewInviteComponent } from './admin/usersManagement/CreateInvites/create-new-invite/create-new-invite.component';
-import { InviteCodeListComponent } from './admin/usersManagement/CreateInvites/InviteCodeList/invite-code-list/invite-code-list.component';
-import { InviteCodeRowComponent } from './admin/usersManagement/CreateInvites/InviteCodeList/invite-code-row/invite-code-row.component';
+import { CreateNewInviteComponent } from './admin/UsersManagement/CreateInvites/create-new-invite/create-new-invite.component';
+import { InviteCodeListComponent } from './admin/UsersManagement/CreateInvites/InviteCodeList/invite-code-list/invite-code-list.component';
+import { InviteCodeRowComponent } from './admin/UsersManagement/CreateInvites/InviteCodeList/invite-code-row/invite-code-row.component';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatNativeDateModule} from '@angular/material/core';
 import {
@@ -69,11 +69,11 @@ import {
   NgxMatTimepickerModule,
   NgxNativeDateModule
 } from '@angular-material-components/datetime-picker';
-import { ReportReasonsComponent } from './admin/usersManagement/ReportSystem/ReportSettings/ReportReasons/report-reasons/report-reasons.component';
-import { ReportReasonEntryComponent } from './admin/usersManagement/ReportSystem/ReportSettings/ReportReasons/report-reason-entry/report-reason-entry.component';
-import { ReportListComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/report-list/report-list.component';
-import { ReportRowComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/report-row/report-row.component';
-import { ReasonsForReportComponent } from './admin/usersManagement/ReportSystem/ReportedUsers/ReportList/reasons-for-report/reasons-for-report.component';
+import { ReportReasonsComponent } from './admin/UsersManagement/ReportSystem/ReportSettings/ReportReasons/report-reasons/report-reasons.component';
+import { ReportReasonEntryComponent } from './admin/UsersManagement/ReportSystem/ReportSettings/ReportReasons/report-reason-entry/report-reason-entry.component';
+import { ReportListComponent } from './admin/UsersManagement/ReportSystem/ReportedUsers/ReportList/report-list/report-list.component';
+import { ReportRowComponent } from './admin/UsersManagement/ReportSystem/ReportedUsers/ReportList/report-row/report-row.component';
+import { ReasonsForReportComponent } from './admin/UsersManagement/ReportSystem/ReportedUsers/ReportList/reasons-for-report/reasons-for-report.component';
 import { InformationTypeTileComponent } from './admin/Dashboard/information-type-tile/information-type-tile.component';
 import { DashboardViewComponent } from './admin/Dashboard/dashboard-view/dashboard-view.component';
 import { ConfirmDialogComponent } from './admin/core/confirm-dialog/confirm-dialog.component';
