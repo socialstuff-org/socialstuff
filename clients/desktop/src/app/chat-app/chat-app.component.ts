@@ -6,12 +6,15 @@ import {TitpService}          from '../services/titp.service';
 import {CryptoStorageService} from '../services/crypto-storage.service';
 import {DebugService}         from '../services/debug.service';
 import { prefix } from '@trale/transport/log';
-import { ChatMessage, ChatMessageType } from '@trale/transport/message';
+import { ChatMessage, ChatMessageType, serializeChatMessage } from '@trale/transport/message';
 import { Observable, Subject } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 import * as moment from 'moment';
 import { webmBlobDuration } from 'lib/helpers';
 
+/**
+ * Logger for debugging.
+ */
 const log = prefix('clients/desktop/component/chat-app');
 
 declare let particlesJS: any;
@@ -31,7 +34,6 @@ export class ChatAppComponent implements OnInit, OnDestroy {
 
   public chatPartner: Contact;
   public username = '';
-  public currentChatNewMessageStream = new Subject<ChatMessage>();
   public newMessageSent = new Subject<{recipient: string, message: ChatMessage}>();
 
   constructor(
@@ -97,12 +99,28 @@ export class ChatAppComponent implements OnInit, OnDestroy {
 
   }
 
+  /**
+   * Handler for newly incoming messages.
+   * This handler may be used to forward messages to other parts of the application.
+   * @param message The newly received message.
+   */
   async onIncomingMessage(message: ChatMessage) {
-    if (message.senderName === this.chatPartner.username) {
-      this.currentChatNewMessageStream.next(message);
+    // if (message.senderName === this.chatPartner.username) {
+    //   this.currentChatNewMessageStream.next(message);
+    // }
+    const contact = await this.contacts.load(message.senderName);
+    if (contact === false) {
+      return;
     }
+    const chat = await this.contacts.openChat(contact);
+    await chat.addRecord(serializeChatMessage(message));
+    await chat.close();
   }
 
+  /**
+   * Handler the triggers the creation of a push notification for the supplied message.
+   * @param message The message, which shall be shown in a push notification.
+   */
   async messagePushNotify(message: ChatMessage) {
     let body = message.senderName;
     switch (message.type) {
@@ -124,6 +142,10 @@ export class ChatAppComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * A handler which is triggered, if the logged-in user sends a message.
+   * @param message 
+   */
   public onMessageSent(message: {recipient: string, message: ChatMessage}) {
     log('message has been propagated properly')
     this.newMessageSent.next(message);

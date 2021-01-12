@@ -29,7 +29,9 @@ export function log(...items: any[]) {
   if (!ENABLE_DEBUG_LOGGING) {
     return;
   }
-  console.log(...items);
+  const t = new Date();
+  const logAt = `(${t.toISOString()})`;
+  console.log(chalk.bold(logAt), ...items);
 }
 
 export function prefix(p: string, prefixColor: chalk.Chalk = chalk.blueBright) {

@@ -5,6 +5,10 @@ mat-toolbar {
   background-color: $plumViolet;
 }
 
+.mat-toolbar #application-name {
+  line-height: 60px;
+}
+
 #socialstuff {
   text-decoration: none;
   color: $plainWhite;
@@ -21,7 +25,7 @@ mat-icon {
 #trale-logo {
   height: 40px;
   width: auto;
-  margin-top: 10px;
+  margin-top: 0;
   margin-right: 10px;
 }
 
@@ -35,7 +39,7 @@ mat-icon {
   float: left;
   background-color: $elderberry;
   position: absolute;
-  left: 275px;
+  left: 425px;
 }
 
 #profile-picture:hover {
@@ -44,7 +48,7 @@ mat-icon {
 
 #username {
   position: absolute;
-  left: 330px;
+  left: 480px;
 }
 
 #username:hover {

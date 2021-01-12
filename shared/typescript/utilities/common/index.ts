@@ -14,7 +14,7 @@
 // along with SocialStuff.  If not, see <https://www.gnu.org/licenses/>.
 
 export function delay(ms: number) {
-  return new Promise(res => {
+  return new Promise<void>(res => {
     setTimeout(() => res(), ms);
   });
 }

@@ -1,6 +1,9 @@
 import {createHash, createHmac} from 'crypto';
 
-
+/**
+ * A shortcut to generate the SHA512 hex representation of the provided username.
+ * @param username The username to be hashed.
+ */
 export function hashUsername(username: string) {
   return createHash('sha512')
     .update(username)
@@ -8,6 +11,10 @@ export function hashUsername(username: string) {
     .toString('hex');
 }
 
+/**
+ * A shortcut to generate the (HMAC) SHA512 hex representation of the provided username.
+ * @param username The username to be hashed.
+ */
 export function hashUsernameHmac(username: string, hmac: Buffer) {
   return createHmac('sha512', hmac)
     .update(username)
@@ -18,8 +25,8 @@ export function hashUsernameHmac(username: string, hmac: Buffer) {
 /**
  * Determines whether the needle sequence is contained inside the haystack.
  * The needle sequence does not have to be contained as a consecutive sequence!
- * @param needle
- * @param haystack
+ * @param needle The search sequence/term.
+ * @param haystack The text to be searched.
  */
 export function searchMatch(needle: string, haystack: string) {
   if (needle.length > haystack.length) {
@@ -40,10 +47,19 @@ export function searchMatch(needle: string, haystack: string) {
   }
 }
 
+/**
+ * Generates the acronym of a name (e.g. John Smith -> JS).
+ * @param name The name from which the acronym shall be generated.
+ */
 export function acronymOfName(name: string) {
   return name.split(' ').map(x => x[0]).join('');
 }
 
+/**
+ * Queries the length of a webm media Blob.
+ * @param b The media Blob to be queried.
+ * @returns The length of the Blob media in seconds.
+ */
 export function webmBlobDuration(b: Blob | string) {
   const vid: HTMLVideoElement = document.createElement('video');
   const duration = new Promise((res, rej) => {

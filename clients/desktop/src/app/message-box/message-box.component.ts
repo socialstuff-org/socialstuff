@@ -11,7 +11,11 @@ export class MessageBoxComponent implements OnInit {
 
   public message: string;
 
-  @Output() messageSent: EventEmitter<ChatMessage> = new EventEmitter();
+  @Output()
+  /**
+   * {@link EventEmitter} that emits as soon as a message from the message box component shall be sent.
+   */
+  messageSent: EventEmitter<ChatMessage> = new EventEmitter();
 
   constructor(
   ) {
@@ -21,6 +25,9 @@ export class MessageBoxComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  /**
+   * Handler that emits a new event, containing the composed chat message.
+   */
   public sendMessage() {
     this.message = this.message.trim();
     if (this.message.length === 0) {
@@ -39,6 +46,10 @@ export class MessageBoxComponent implements OnInit {
     console.log('textarea cleared!');
   }
 
+  /**
+   * Handler that emits a new event, containing the voice message recorded in the {@link VoiceMessageComponent}.
+   * @param voiceRecording The recorded voice message.
+   */
   public async sendVoidMessage(voiceRecording: Blob) {
     console.log('got recording!', voiceRecording);
     const message: ChatMessage = {

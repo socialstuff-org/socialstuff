@@ -14,6 +14,7 @@
 // along with SocialStuff Identity.  If not, see <https://www.gnu.org/licenses/>.
 
 import bodyParser                            from 'body-parser';
+import cors from 'cors';
 import express                               from 'express';
 import util                                  from 'util';
 import bootstrap                             from './bootstrap';
@@ -30,12 +31,7 @@ const APP_HOST = process.env.APP_HOST || '::1';
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(injectProcessEnvironmentIntoRequest as express.Handler);
-  app.use((_, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE');
-    next();
-  });
+  app.use(cors());
 
   app.use('/', router);
 

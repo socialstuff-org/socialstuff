@@ -4,7 +4,7 @@ import {ChatAppComponent}        from './chat-app/chat-app.component';
 import {ForgotPasswordComponent} from './auth/forgot-password/forgot-password.component';
 import {LoginComponent}          from './auth/login/login.component';
 import {LogoutComponent}         from './auth/logout/logout.component';
-import {NgModule}                from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule}                from '@angular/core';
 import {RegisterComponent}       from './auth/register/register.component';
 import {MicrophoneTestComponent} from './microphone-test/microphone-test.component';
 
@@ -33,6 +33,9 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
   ],
   exports: [RouterModule],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
+  ]
 })
 export class AppRoutingModule {
 }
