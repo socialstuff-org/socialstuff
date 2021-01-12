@@ -1,6 +1,8 @@
 <section *ngIf="message.type === ChatMessageType.handshakeInitialization
-                || message.type === ChatMessageType.handshakeReply; else noHandshake" style="background-color: blue;">
-  Handshake received on: {{message.sentAt | date: 'd.M.y h:m'}}
+                || message.type === ChatMessageType.handshakeReply; else noHandshake">
+  <div class="bubble bubble-general">
+    Handshake received on:<br>{{message.sentAt | date: 'y/M/d h:m'}}
+  </div>
 </section>
 
 <ng-template #noHandshake>

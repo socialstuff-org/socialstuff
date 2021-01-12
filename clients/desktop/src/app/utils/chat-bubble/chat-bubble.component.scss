@@ -7,6 +7,13 @@
   padding: 10px;
 }
 
+.bubble-general {
+  background-color: $plumViolet;
+  margin: 0 auto;
+  border: 1px solid $coralRed;
+  text-align: center;
+}
+
 .bubble-own {
   background-color: $coralRed;
   float: right;
