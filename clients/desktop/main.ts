@@ -24,6 +24,7 @@ function createWindow(): BrowserWindow {
       enableRemoteModule: true,
     },
     frame: false,
+    icon: `${__dirname}/icons/trale.ico`,
   });
 
   if (serve) {
