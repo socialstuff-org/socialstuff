@@ -15,6 +15,8 @@
 
 let ENABLE_DEBUG_LOGGING = false;
 
+import chalk from 'chalk';
+
 export function enableLogging() {
   ENABLE_DEBUG_LOGGING = true;
 }
@@ -27,9 +29,11 @@ export function log(...items: any[]) {
   if (!ENABLE_DEBUG_LOGGING) {
     return;
   }
-  console.log(...items);
+  const t = new Date();
+  const logAt = `(${t.toISOString()})`;
+  console.log(chalk.bold(logAt), ...items);
 }
 
-export function prefix(p: string) {
-  return log.bind(null, p);
+export function prefix(p: string, prefixColor: chalk.Chalk = chalk.blueBright) {
+  return log.bind(null, prefixColor.call(undefined, `[${p}]`));
 }

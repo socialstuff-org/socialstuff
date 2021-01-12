@@ -1,29 +1,116 @@
-import {Request, Response, Router} from 'express'
-import {getReportReasons} from '../mysql/mysql'
+import {json, Request, response, Response, Router} from 'express';
+import {getReportReasons, editReasonRequest} from '../mysql/mysql';
 import {insertReportReason} from '../mysql/mysql'
-import secSettings from '../res/security_settings.json';
-import {ErrorResponse} from '@socialstuff/utilities/responses';
-import {body} from 'express-validator';
+import {body, header, ValidationChain} from 'express-validator';
+import {rejectOnValidationError} from '@socialstuff/utilities/express';
+import axios, { AxiosRequestConfig } from 'axios';
 
 const reportCreationInterface = Router();
 
-
+/**
+ * gets all reports
+ * @param req request from client
+ * @param res response that is sent back to client. contains status code 200 if successful and 500 in case of error
+ */
 async function getAllReports(req:Request, res: Response) {
-  console.log("report creation has been called");
-  const reports = await getReportReasons();
-  res.json(reports).end();
+  try {
 
+    console.log("report creation has been called");
+    const reports = await getReportReasons();
+    res.status(200).json(reports);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({error: 'The report reasons couldn\'t be fetched, pleas notify the administrator'})
+  }
 }
-//TODO return correct error message
+
+/**
+ * adds a new report reason
+ * @param req request from client
+ * @param res response that is sent back to client. contains status code 200 if successful and 500 in case of error
+ */
 async function addAReportReason(req: Request, res: Response) {
-  const responseCode = await insertReportReason(req, res);
-  console.log("Status code addAReportReason: ", responseCode);
-  res.status(responseCode);
+  try {
+    const response = await insertReportReason(req.body);
+    res.status(200).json(response);
+  } catch (e) {
+    res.status(500).json({error: 'Couldn\'t add the reason, have you perhaps already defined it?'});
+  }
 }
 
-reportCreationInterface.post("/", addAReportReason);
+/**
+ * adds a new report reason
+ * @param req request from client
+ * @param res response that is sent back to client. contains status code 200 if successful and 500 in case of error
+ */
+async function updateReportReason(req: Request, res: Response) {
+  let response;
+  try {
+    response = await editReasonRequest(req.body);
+    res.status(200).json(response.data);
+  } catch (e) {
+    res.status(500).json({error: 'Couldn\'t update the reason, is there a already a reason with the same name?'});
+  }
+}
+
+/**
+ * deletes report reason
+ * @param req request from client
+ * @param res response that is sent back to client. contains status code 200 if successful and 500 in case of error
+ */
+async function deleteReportReason(req: Request, res: Response) {
+  try {
+
+  const config:AxiosRequestConfig = {
+    method: 'delete',
+    url: process.env.SOCIALSTUFF_REPORTING_ENDPOINT + '/reporting/report-reasons/',
+    headers: {
+      'id': req.headers.id,
+      'Content-Type': 'application/json'
+    }
+  };
+  const response = await axios(config);
+  res.status(200).json(response.data);
+  } catch (e) {
+    console.log(e);
+    res.status(500).end();
+  }
+}
+
+/**
+ * middleware for delete request. validates if:
+ * - id is integer
+ */
+export const deleteMiddleware:ValidationChain[] = [
+
+  header('id').isInt()
+]
+
+/**
+ * middleware for put request. validates if:
+ * - id is integer
+ */
+export const putMiddleware:ValidationChain[] = [
+  header('id').isInt()
+]
+
+/**
+ * middleware for post and put. Validates if:
+ * - max_report_violations is of type int
+ * - reason is of type string
+ */
+export const middleware:ValidationChain[] = [
+  body('max_report_violations').isInt(),
+  body('reason').isString()
+];
+
+
+
+
+reportCreationInterface.post("/", middleware, rejectOnValidationError, addAReportReason);
+reportCreationInterface.put('/', middleware, rejectOnValidationError, updateReportReason);
 reportCreationInterface.get("/", getAllReports);
-reportCreationInterface.delete("/");
+reportCreationInterface.delete("/", deleteMiddleware, rejectOnValidationError, deleteReportReason);
 
 export default reportCreationInterface;
 

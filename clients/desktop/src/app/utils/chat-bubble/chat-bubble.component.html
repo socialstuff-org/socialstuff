@@ -1,17 +1,30 @@
-<section *ngIf="message.type === ChatMessageType.handshake; else noHandshake" style="background-color: blue;">
+<section *ngIf="message.type === ChatMessageType.handshakeInitialization
+                || message.type === ChatMessageType.handshakeReply; else noHandshake" style="background-color: blue;">
   Handshake received on: {{message.sentAt | date: 'd.M.y h:m'}}
 </section>
 
 <ng-template #noHandshake>
   <div class="bubble bubble-{{ isSender ? 'own' : 'foreign' }}">
     <div class="message-container">
-      <section *ngIf="message.type === ChatMessageType.text">
-        {{message.content.toString('utf-8')}}
-      </section>
-      <section *ngIf="message.type === ChatMessageType.voice">
-        Voice message:<br>
-        <audio #audioPlayer controls></audio>
-      </section>
+      <div [ngSwitch]="message.type">
+        <div *ngSwitchCase="ChatMessageType.text">
+          {{message.content.toString('utf8')}}
+        </div>
+        <div *ngSwitchCase="ChatMessageType.voice">
+          Voice message
+          <!-- TODO calculate length of message and display value -->
+          <!-- TODO add voice content to audio player -->
+          <audio #audioPlayer controls></audio>
+        </div>
+        <div *ngSwitchCase="ChatMessageType.handshakeInitialization">
+          Handshake init sent
+        </div>
+        <div *ngSwitchCase="ChatMessageType.handshakeReply">
+          Handshake reply sent
+        </div>
+        <!-- TODO add cases for images, files, etc. -->
+        <div *ngSwitchDefault>Unknown message type</div>
+      </div>
     </div>
 
     <div class="status-container">

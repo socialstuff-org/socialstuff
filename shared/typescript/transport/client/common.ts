@@ -56,9 +56,20 @@ export abstract class CommonTitpClient {
    * @protected
    */
   protected _init(): void {
+    let size = -1;
+    let dataBuffer = Buffer.alloc(0);
     this._socket.on('data', data => {
-      const decrypted = decrypt(data, this._key);
-      this._onData.next(decrypted);
+      dataBuffer = Buffer.concat([dataBuffer, data]);
+      if (size === -1 && dataBuffer.length >= 4) {
+        size = dataBuffer.readUInt32BE(0);
+        dataBuffer = dataBuffer.slice(4);
+      }
+      if (dataBuffer.length >= size) {
+        const messageBuffer = dataBuffer.slice(0, size);
+        this._onData.next(decrypt(messageBuffer, this._key));
+        dataBuffer = dataBuffer.slice(size);
+        size = -1;
+      }
     });
   }
 
@@ -75,6 +86,9 @@ export abstract class CommonTitpClient {
    */
   public write(data: BinaryLike): Promise<void> {
     const enc = encrypt(data, this._key);
-    return this._write(enc);
+    const size = Buffer.alloc(4, 0);
+    size.writeUInt32BE(enc.length);
+    const message = Buffer.concat([size, enc]);
+    return this._write(message);
   }
 }

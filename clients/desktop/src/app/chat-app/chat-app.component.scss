@@ -1,0 +1,50 @@
+@import "../styles/colors";
+
+#landing-container {
+  height: calc(100vh - 120px);
+  width: calc(100% - 400px);
+  margin-left: 250px;
+  display: table;
+  text-align: center;
+}
+
+#sub-landing-container {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+#logo {
+  margin-bottom: 20px;
+}
+
+#landing-main-headline {
+  font-size: 2em;
+}
+
+#landing-sub-headline {
+  font-size: 1.5em;
+}
+
+#share-container {
+  text-transform: uppercase;
+  font-size: 0.75em;
+}
+
+.landing-text {
+  text-transform: uppercase;
+  color: $plainWhite;
+}
+
+.social-media-icon {
+  width: 20px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.social-media-icon:hover {
+  cursor: pointer;
+}
+
+.landingParticles {
+  width: calc(100% - 250px) !important;
+}

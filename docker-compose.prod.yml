@@ -1,0 +1,80 @@
+version: '3'
+
+services:
+  socialstuff_chat_web:
+    container_name: socialstuff_chat_web
+    hostname: socialstuff_chat_web
+    build:
+      context: ./services/chat
+      dockerfile: docker/prod/Dockerfile
+    networks:
+      - socialstuff_chat_network
+      - socialstuff_network
+    depends_on:
+      - socialstuff_identity_web
+      - socialstuff_chat_mongo
+    volumes:
+      - ./keys:/keys
+    environment:
+      NODE_ENV: prod
+      MONGO_HOST: socialstuff_chat_mongo
+      APP_HOST: 0.0.0.0
+    ports:
+      - "8087:3000"
+
+  socialstuff_chat_mongo:
+    container_name: socialstuff_chat_mongo
+    hostname: socialstuff_chat_mongo
+    image: mongo:4-bionic
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - socialstuff_chat_network
+  
+  socialstuff_identity_web:
+    container_name: socialstuff_identity_web
+    hostname: socialstuff_identity_web
+    build:
+      context: ./services/identity
+      dockerfile: docker/prod/Dockerfile
+    networks:
+      - socialstuff_identity_network
+      - socialstuff_network
+    depends_on:
+      - socialstuff_identity_mysql
+    volumes:
+      - ./keys:/keys
+    environment:
+      NODE_ENV: prod
+      MYSQL_HOST: socialstuff_identity_mysql
+      APP_HOST: 0.0.0.0
+
+  socialstuff_identity_mysql:
+    container_name: socialstuff_identity_mysql
+    hostname: socialstuff_identity_mysql
+    image: mariadb:10.1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: socialstuff_identity
+    networks:
+      - socialstuff_identity_network
+  
+  
+  socialstuff_nginx:
+    container_name: socialstuff_nginx
+    hostname: socialstuff_nginx
+    build:
+      context: deployment/reverse_proxy
+      dockerfile: Dockerfile
+    ports:
+      - "8086:80"
+    networks:
+      - socialstuff_network
+    environment:
+      - NGINX_PORT=80
+
+networks:
+  socialstuff_network:
+  socialstuff_chat_network:
+  socialstuff_identity_network:

@@ -1,4 +1,4 @@
-import {Component, OnInit}           from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {
   createHash,
   createPrivateKey,
@@ -6,14 +6,18 @@ import {
   generateKeyPair,
   KeyObject,
   privateDecrypt,
-}                                    from 'crypto';
+}                                         from 'crypto';
 import {HttpClient}                  from '@angular/common/http';
 import {ApiService}                  from '../../services/api.service';
 import {CryptoStorageService}        from '../../services/crypto-storage.service';
 import sweetalert                    from 'sweetalert2';
 import {DataResponse, ErrorResponse} from '@socialstuff/utilities/responses';
+import { Router } from '@angular/router';
 
-function newKeyPair(mod) {
+/**
+ * Simple wrapper for RSA key generation.
+ */
+function newKeyPair(mod: number) {
   return new Promise((res, rej) => {
     generateKeyPair('rsa', {
       modulusLength:      mod,
@@ -35,16 +39,21 @@ function newKeyPair(mod) {
   });
 }
 
+/**
+ * Register component
+ *
+ * Responsible for handling registration attempts
+ */
 @Component({
   selector:    'app-register',
   templateUrl: './register.component.html',
   styleUrls:   ['./register.component.scss'],
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, AfterViewInit {
 
   public username = '';
   public password = '';
-  public password_confirm = '';
+  public passwordConfirm = '';
   public hostname = '';
   public port = 8086;
   public inviteCodeRequired = false;
@@ -54,18 +63,35 @@ export class RegisterComponent implements OnInit {
     private http: HttpClient,
     private api: ApiService,
     private storage: CryptoStorageService,
+    private router: Router
   ) {
   }
 
+  /**
+   * After component initialization request whether default server requires an invite token
+   */
+  async ngAfterViewInit(): Promise<void> {
+    await this.checkForInviteTokenRequired();
+  }
+
+  /**
+   * Retrieve default API port and hostname from API service.
+   */
   ngOnInit(): void {
     this.hostname = this.api.hostname;
     this.port = this.api.port;
   }
 
-  async foo() {
+  /**
+   * Responsible for checking at the entered server address whether an invite code is required for registration. If so
+   * an input field asking for an invite token will be displayed.
+   *
+   * @return{Promise<void>}
+   */
+  async checkForInviteTokenRequired(): Promise<void> {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
     try {
-      await this.http.post<ErrorResponse>(this.api.remoteEndpoint() + '/identity/register', {}).toPromise();
+      await this.http.post<ErrorResponse>(this.api.remoteEndpoint + '/identity/register', {}).toPromise();
     } catch (e) {
       if (e.error.errors.invite) {
         this.inviteCodeRequired = true;
@@ -73,12 +99,18 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  public async register() {
+  /**
+   * Attempts a registration at a SocialStuff Identity server.
+   * TODO move to auth.service.ts
+   *
+   * @return{Promise<void>}
+   */
+  public async register(): Promise<void> {
     const keys = (await newKeyPair(4096)) as { pub: KeyObject, priv: KeyObject };
     let decryptedToken: Buffer;
     try {
       const response = await this.http.post<DataResponse<{ message: string, mfa_seed: string, token: string }>>
-      (this.api.remoteEndpoint() + '/identity/register', {
+      (this.api.remoteEndpoint + '/identity/register', {
         username:   this.username,
         password:   this.password,
         public_key: keys.pub.export({type: 'pkcs1', format: 'pem'}).toString(),
@@ -102,7 +134,7 @@ export class RegisterComponent implements OnInit {
       return;
     }
     try {
-      await this.http.post<DataResponse<{ message: string }>>(this.api.remoteEndpoint() + '/identity/register/confirm', {
+      await this.http.post<DataResponse<{ message: string }>>(this.api.remoteEndpoint + '/identity/register/confirm', {
         token: decryptedToken.toString('utf-8'),
       }).toPromise();
     } catch (e) {
@@ -114,12 +146,8 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    const hash = (() => {
-      const hash = createHash('sha256');
-      hash.update(this.password);
-      return hash.digest();
-    })();
-    const userHandle = this.username + '@' + this.hostname + ':' + this.port;
+    const hash = createHash('sha256').update(this.password).digest();
+    const userHandle = this.username + '@' + this.hostname;
     await this.storage.load(userHandle, hash);
     await Promise.all([
       this.storage.storage.persistFileContent(['priv.pem'], Buffer.from(keys.priv.export({
@@ -135,6 +163,7 @@ export class RegisterComponent implements OnInit {
       title:           'Registration confirmation successful!',
       showCloseButton: true,
     });
+    await this.router.navigate(['/', 'login']);
   }
 
 }
