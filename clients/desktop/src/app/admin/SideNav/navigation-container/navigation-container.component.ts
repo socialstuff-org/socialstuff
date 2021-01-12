@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {routesSettings} from '../../../app-routing.module';
+import {routesAdmin} from '../../../app-routing.module';
 import {Route} from '@angular/router';
 
 @Component({
@@ -34,8 +34,9 @@ export class NavigationContainerComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    console.log(routesSettings[0]);
-    this.navigationItems = this.add(routesSettings[0].children);
+    console.log(routesAdmin[0]);
+    this.navigationItems = this.add(routesAdmin[0].children);
+    console.log('HHH', this.navigationItems)
   }
 
 }

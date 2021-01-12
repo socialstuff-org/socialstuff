@@ -37,13 +37,13 @@ const routesChat: Routes = [
   // }
 ];
 
-export const routesSettings: Routes = [
+export const routesAdmin: Routes = [
   {
-    path: 'admin',
+    path: '',
     component: SettingsViewComponent,
     children: [
       {
-        path: 'dashboard',
+        path: '',
         component: DashboardViewComponent,
         data: {
           name: 'Dashboard',
@@ -115,11 +115,11 @@ export const routesSettings: Routes = [
   },
 ];
 
-const routes = routesChat.concat(routesSettings);
+const routes = routesChat.concat(routesAdmin);
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes),
+    RouterModule.forRoot(routesAdmin),
   ],
   exports: [RouterModule],
 })
