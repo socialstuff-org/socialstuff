@@ -1,0 +1,21 @@
+<div class="row">
+  <tr>
+    <td>
+      {{userReport.username_hash}}
+    </td>
+    <td (click)="setShowMore()" class="action-td clickable">
+      <span class="total-times-reported">{{totalTimesReported}}</span>
+      <div class="dropdown-icon">
+        <mat-icon *ngIf="!showMore">keyboard_arrow_down</mat-icon>
+      </div>
+    </td>
+  </tr>
+  <tr *ngIf="showMore">
+    <td>
+      <app-reasons-for-report [userReport]="userReport"></app-reasons-for-report>
+    </td>
+    <td (click)="setShowMore()" class="action-td clickable">
+      <mat-icon class="dropdown-icon">keyboard_arrow_up</mat-icon>
+    </td>
+  </tr>
+</div>

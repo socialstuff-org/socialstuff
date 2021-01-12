@@ -1,0 +1,113 @@
+@import "../../../../styles/colors";
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  color: $plainWhite;
+}
+
+.column {
+  text-align: left;
+  min-width: 200px;
+}
+
+.label-row {
+  height: 30px;
+}
+
+.mat-form-field-infix {
+    padding: 0 !important;
+    border-top: 0 solid transparent !important;
+    display: none !important;
+}
+
+.text-field {
+  border-radius: 50px;
+  background-color: $plumViolet;
+  padding: 15px;
+  color: $plainWhite;
+  width: 80%;
+  border: none;
+  height: 20px;
+}
+
+.date-time-field {
+  border-radius: 50px;
+  background-color: $plumViolet;
+  margin-bottom: 4px;
+  color: $plainWhite;
+  width: 80%;
+  border: none;
+  padding: 0 15px 0 15px;
+  height: 50px;
+
+  ::ng-deep .mat-form-field-suffix .mat-icon-button .mat-datepicker-toggle-default-icon {
+    color: $plainWhite !important;
+  }
+
+  ::ng-deep .mat-form-field-suffix .mat-form-field-label {
+    color: white !important;
+  }
+}
+
+.date-time-field::placeholder {
+  color: $plainWhite;
+}
+
+
+.text-field::placeholder {
+  color: $plainWhite;
+}
+
+.save-btn {
+  border-radius: 50px;
+  border: none;
+  float: right;
+  background-color: $coralRed;
+  color: $plainWhite;
+  height: 50px;
+  min-width: 150px;
+  text-transform: uppercase;
+}
+
+.invite-field {
+  position: relative;
+
+  input {
+    width: 100%;
+    margin-right: 150px;
+  }
+
+  button {
+    position: absolute;
+    right: -16px;
+    top: 12px;
+    border-radius: 50px;
+    border: none;
+    background-color: $coralRed;
+    color: $plainWhite;
+    height: 32px;
+    min-width: 70px;
+    text-transform: uppercase;
+  }
+}
+
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  border-top-color: #000000;
+  animation: spinner .8s linear infinite;
+}

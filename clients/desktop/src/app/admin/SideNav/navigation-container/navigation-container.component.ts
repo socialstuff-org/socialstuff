@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {routesSettings} from '../../../app-routing.module';
+import {routesAdmin} from '../../../app-routing.module';
 import {Route} from '@angular/router';
 
 @Component({
@@ -10,33 +10,33 @@ import {Route} from '@angular/router';
 
 export class NavigationContainerComponent implements OnInit {
 
-  navigationItems = [];
+  public navigationItems = [];
 
 
 
   private add(children: Array<Route>): Array<any> {
-    const items = [];
-    children.forEach(route => {
-      if (!route.data.ignore) {
-        const navigationItem = {
-          path: route.data.parent ? `${route.data.parent}/${route.path}` : route.path,
-          name: route.data.name,
-          icon: route.data.icon,
-          subRoutes: []
-        };
-        if (route.children) {
-          navigationItem.subRoutes = this.add(route.children);
-        }
-        items.push(navigationItem);
+    return children.filter(route => !route.data.ignore).map(route => {
+      const navigationItem = {
+        path: route.data.parent ? `${route.data.parent}/${route.path}` : route.path,
+        name: route.data.name,
+        icon: route.data.icon,
+        subRoutes: []
+      };
+      console.log('1: ', navigationItem);
+      if (route.children) {
+        navigationItem.subRoutes = this.add(route.children);
       }
+      console.log('2: ', navigationItem);
+      return navigationItem;
     });
-    return items;
   }
 
   constructor() { }
 
   ngOnInit(): void {
-    this.navigationItems = this.add(routesSettings[0].children);
+    console.log(routesAdmin[0]);
+    this.navigationItems = this.add(routesAdmin[0].children);
+    console.log('HHH', this.navigationItems)
   }
 
 }

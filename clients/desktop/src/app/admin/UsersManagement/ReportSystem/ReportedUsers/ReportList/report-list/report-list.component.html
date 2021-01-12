@@ -1,0 +1,13 @@
+<table>
+  <tr>
+    <td>
+      Username (sha-512)
+    </td>
+    <td style="float: right">
+      Times Reported
+    </td>
+  </tr>
+</table>
+<table>
+  <app-report-row *ngFor="let userReport of userReports" [userReport]="userReport"></app-report-row>
+</table>

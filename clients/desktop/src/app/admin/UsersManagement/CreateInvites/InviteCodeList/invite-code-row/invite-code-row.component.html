@@ -1,0 +1,17 @@
+<tr>
+  <td>
+    {{inviteCode.code}}
+  </td>
+  <td>
+    {{inviteCode.expiration_date}}
+  </td>
+  <td>
+    {{inviteCode.max_usage}}
+  </td>
+  <td>
+    {{inviteCode.times_used}}
+  </td>
+  <td class="action-td">
+    <button [class.spinner]="loading" (click)="openDialog(inviteCode.id)" class="delete-btn">Delete</button>
+  </td>
+</tr>

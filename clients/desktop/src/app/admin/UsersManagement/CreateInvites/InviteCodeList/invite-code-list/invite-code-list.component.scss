@@ -1,0 +1,65 @@
+@import "../../../../../styles/colors";
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0 !important;
+  width: 100%;
+  color: $plainWhite;
+  table-layout: auto;
+}
+
+tr {
+  width: 100%;
+}
+
+td {
+  text-align: left;
+  padding: 8px;
+  min-width: 200px;
+  width: 100%;
+}
+
+
+.text-field {
+  border-radius: 50px;
+  background-color: $plumViolet;
+  padding: 15px;
+  color: $plainWhite;
+  width: 80%;
+  border: none;
+  height: 20px;
+}
+
+.search-bar::placeholder {
+  color: $plainWhite;
+}
+
+.save-btn {
+  border-radius: 50px;
+  border: none;
+  background-color: $coralRed;
+  color: $plainWhite;
+  height: 50px;
+  min-width: 150px;
+  text-transform: uppercase;
+}
+
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  border-top-color: #000000;
+  animation: spinner .8s linear infinite;
+}

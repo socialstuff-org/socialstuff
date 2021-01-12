@@ -76,7 +76,7 @@ export class LoginComponent implements OnInit {
       await this.storage.storage.persistFileContent(['session.token'], Buffer.from(token, 'utf8'));
       await this.debug.persistSession(this.username, key);
       this.loggingIn = false;
-      this.router.navigateByUrl('/chat-app');
+      this.router.navigateByUrl('/admin');
     } catch (e) {
       this.loggingIn = false;
       if (typeof e === 'string') {

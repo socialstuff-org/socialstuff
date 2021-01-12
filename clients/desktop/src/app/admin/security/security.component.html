@@ -1,46 +1,46 @@
 <div>
-  <app-headline headerText="Security"></app-headline>
+  <app-headline [showSave]="detectedChanges" [loading]="loading" (revert)="revertChanges()" (save)="saveSettings()" headerText="Security"></app-headline>
   <div class="row">
-    <mat-slide-toggle [(ngModel)]="twoFactAuth">2 Factor authentication</mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="settings.two_factor_auth.on">2 Factor authentication</mat-slide-toggle>
     <div class="sub-row">
-      <mat-slide-toggle [(ngModel)]="twoFactAuthPhone">Phone</mat-slide-toggle>
+      <mat-slide-toggle [disabled]="!settings.two_factor_auth.on" [(ngModel)]="settings.two_factor_auth.phone">Phone</mat-slide-toggle>
     </div>
     <div class="sub-row">
-      <mat-slide-toggle [(ngModel)]="twoFactAuthMail">Email</mat-slide-toggle>
+      <mat-slide-toggle [disabled]="!settings.two_factor_auth.on" [(ngModel)]="settings.two_factor_auth.email">Email</mat-slide-toggle>
     </div>
   </div>
   <div class="row">
-    <mat-slide-toggle [(ngModel)]="confirmedMailOnly">Confirmed emails only</mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="settings.confirmed_emails_only">Confirmed emails only</mat-slide-toggle>
   </div>
   <div class="row">
-    <mat-slide-toggle [(ngModel)]="individualPassReq">Individual password requirements</mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="settings.individual_pwd_req.on">Individual password requirements</mat-slide-toggle>
     <div class="sub-group-container">
       <div>
         <div class="sub-row">
-          <mat-checkbox [(ngModel)]="reqUpperCase">Upper-case letter</mat-checkbox>
+          <mat-checkbox [disabled]="!settings.individual_pwd_req.on" [(ngModel)]="settings.individual_pwd_req.upper_case">Upper-case letter</mat-checkbox>
         </div>
         <div class="sub-row">
-          <mat-checkbox [(ngModel)]="reqNumber">Number</mat-checkbox>
+          <mat-checkbox [disabled]="!settings.individual_pwd_req.on" [(ngModel)]="settings.individual_pwd_req.number">Number</mat-checkbox>
         </div>
         <div class="sub-row">
-          <mat-checkbox [(ngModel)]="reqCharacter">Special character</mat-checkbox>
+          <mat-checkbox [disabled]="!settings.individual_pwd_req.on" [(ngModel)]="settings.individual_pwd_req.special_char">Special character</mat-checkbox>
         </div>
       </div>
       <div class="horizontal-divider"></div>
       <div>
         <div class="sub-row">
-          <mat-checkbox [(ngModel)]="ownRegex">Must-match regex</mat-checkbox>
+          <mat-checkbox [disabled]="!settings.individual_pwd_req.on" [(ngModel)]="settings.individual_pwd_req.reg_ex">Must-match regex</mat-checkbox>
         </div>
         <div class="sub-row">
-          <input type="text" [(ngModel)]="reqRegex" placeholder="/[.*+\-?^${}()|[\]\\]/g, '\\$&'" id="search-bar">
+          <input type="text" [disabled]="!settings.individual_pwd_req.reg_ex || !settings.individual_pwd_req.on" [(ngModel)]="settings.individual_pwd_req.reg_ex_string" placeholder="[]" id="search-bar">
         </div>
       </div>
     </div>
   </div>
   <div class="row">
-    <mat-slide-toggle [(ngModel)]="invitesOnly">Invites Only</mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="settings.inv_only.on">Invites Only</mat-slide-toggle>
     <div class="sub-row">
-      <mat-slide-toggle [(ngModel)]="invitesOnlyByAdmin">Only by Admin</mat-slide-toggle>
+      <mat-slide-toggle [disabled]="!settings.inv_only.on" [(ngModel)]="settings.inv_only.inv_only_by_admin">Only by Admin</mat-slide-toggle>
     </div>
   </div>
 </div>

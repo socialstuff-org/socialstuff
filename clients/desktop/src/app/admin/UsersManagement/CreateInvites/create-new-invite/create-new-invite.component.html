@@ -1,0 +1,35 @@
+<table class="table">
+  <tr class="label-row">
+    <td class="column">
+      <label *ngIf="inviteCode.expiration_date">Expiration Date</label>
+    </td>
+    <td class="column">
+      <label *ngIf="inviteCode.max_usage">Usage Limitation</label>
+    </td>
+    <td class="column">
+      <label *ngIf="inviteCode.code">Invite Code</label>
+    </td>
+    <td class="column">
+    </td>
+  </tr>
+  <tr>
+  <tr>
+    <td class="column">
+      <mat-form-field class="date-time-field" appearance="none">
+        <input (click)="picker.open()" [(ngModel)]="inviteCode.expiration_date" [min]="minDate" type="text"[ngxMatDatetimePicker]="picker" matInput placeholder="Expiration Date">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
+      </mat-form-field>
+    </td>
+    <td class="column">
+      <input type="text" [(ngModel)]="inviteCode.max_usage" placeholder="Usage Limitation" class="text-field">
+    </td>
+    <td class="column invite-field">
+      <input type="text" label="Invite Code" [(ngModel)]="inviteCode.code" placeholder="Invite Code" class="text-field form-control">
+      <button class="gen-inv-code-btn" (click)="genInvite()" >Generate</button>
+    </td>
+    <td class="column">
+      <button [class.spinner]="loading" (click)="addInviteCode()" class="save-btn">Save</button>
+    </td>
+  </tr>
+</table>

@@ -2,13 +2,14 @@ import {ApiService}        from './api.service';
 import {HttpClient}        from '@angular/common/http';
 import {HttpErrorResponse} from '../types';
 import {Injectable}        from '@angular/core';
-
 /**
  * Service responsible for managing authentication related tasks such as login, logout, registration etc.
  */
+
 @Injectable({
   providedIn: 'root',
 })
+
 export class AuthService {
   constructor(
     private api: ApiService,
@@ -25,11 +26,14 @@ export class AuthService {
     return new Promise<string>((res, rej) => {
       this.http.post<any>(this.api.remoteEndpoint + '/identity/login', {username, password})
         .subscribe(response => {
+          if (response.data.isAdmin) {
+          }
+
           res(response.data.token);
         }, (error: HttpErrorResponse) => {
           console.log(error);
           if (error.status === 400) {
-            rej('Invalid Credentials!')
+            rej('Invalid Credentials!');
           } else {
             rej(error.error.errors);
           }

@@ -48,6 +48,7 @@ async function editReportReason(req: Request, res: Response) {
   const maxReportViolations = req.body.max_report_violations;
   const reason = req.body.reason;
   const sql = 'UPDATE report_reason SET reason = ?, max_report_violations = ? WHERE id = ?;';
+  console.log(sql);
   const db = (req as RequestWithDependencies).dbHandle;
   console.log('Checking if reason already exists: ');
 
@@ -109,6 +110,7 @@ async function addReportReason(req: Request, res: Response) {
   const insertRR = 'INSERT INTO report_reason (reason, max_report_violations) VALUES (?, ?)';
   const lastID = 'SELECT LAST_INSERT_ID() as id;';
   await db.beginTransaction();
+  console.log('hi');
   try {
     await db.query(insertRR, [req.body.reason, req.body.max_report_violations]);
     const [[{id}]] = await db.query<RowDataPacket[]>(lastID);

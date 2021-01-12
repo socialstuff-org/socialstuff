@@ -1,6 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, KeyValueDiffer, OnInit} from '@angular/core';
 import {AdminSettings} from '../../services/ap-settings.service';
 import {ApiService}          from '../../services/api.service';
+import { SecuritySettings, defaultSettings } from '../interfaces/SecuritySettings';
+import *as _ from 'lodash';
+
+/**
+ * This component give the admins of the SocialStuff server the possibility to change the behavior of the SocialStuff server in regards to the security standards.
+ * With the function getSettings which calls another function in the admin-panel service acting as a gateway to the backend, the component catch the current settings
+ * of the server and presents them with switch buttons to the user. The user is able to change the settings and sending them through the gateway to the backend.
+ * These settings will have influence on other functions asking the setting service for the current settings.
+ */
 
 @Component({
   selector: 'app-security',
@@ -8,33 +17,56 @@ import {ApiService}          from '../../services/api.service';
   styleUrls: ['./security.component.scss']
 })
 export class SecurityComponent implements OnInit {
-  twoFactAuth: boolean;
-  twoFactAuthPhone: boolean;
-  twoFactAuthMail: boolean;
-  confirmedMailOnly: boolean;
-  individualPassReq: boolean;
-  reqUpperCase: boolean;
-  reqNumber: boolean;
-  reqCharacter: boolean;
-  ownRegex: boolean;
-  reqRegex: boolean;
-  invitesOnly: boolean;
-  invitesOnlyByAdmin: boolean;
 
-  public hostname = '127.0.0.1';
+  public settingsBackup = defaultSettings();
+  public settings = defaultSettings();
+  public loading = false;
+  public hostname = '[::1]';
   public port = 3002;
 
   constructor(
     private adminSettings: AdminSettings,
     private api: ApiService,
-  ) { }
-
-  ngOnInit(): void {
-    console.log(this.getCurrentSettings());
+  ) {
   }
 
-  public getCurrentSettings(): any {
+  get detectedChanges(): boolean {
+    return !_.isEqual(this.settings, this.settingsBackup);
+  }
+
+  ngOnInit(): void {
+    this.getSettings();
+  }
+
+  public getSettings(): any {
     this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
-    return this.adminSettings.getSettings();
+    return this.adminSettings.getSecuritySettings().then((setting: SecuritySettings) => {
+      this.settings = _.cloneDeep(setting);
+      this.settingsBackup  = _.cloneDeep(setting);
+      console.log(this.settings);
+    }).catch(error => {
+      console.log(error);
+    });
+  }
+
+  public saveSettings(): void {
+    this.loading = true;
+    this.api.updateRemoteEndpoint(`http://${this.hostname}:${this.port}`);
+    this.adminSettings.setSecuritySettings(this.settings).then(response => {
+      this.loading = false;
+      console.log(response);
+      this.settings = _.cloneDeep(response);
+      this.settingsBackup = _.cloneDeep(response);
+    });
+  }
+
+  public revertChanges(): void {
+    console.log(this.settingsBackup);
+    this.settings = _.cloneDeep(this.settingsBackup);
+  }
+
+  public printSettings(): void {
+    console.log('set', this.settings);
+    console.log('bu', this.settingsBackup);
   }
 }
