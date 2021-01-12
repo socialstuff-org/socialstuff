@@ -1,17 +1,17 @@
-import {Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter}            from '@angular/core';
-import {ContactService}                                            from '../services/contact.service';
-import {ActivatedRoute, Params}                                            from '@angular/router';
-import {TextRecordStorage}                                         from '@trale/persistence/crypto-storage';
-import {CryptoStorageService}                                      from 'app/services/crypto-storage.service';
-import {ChatMessage, deserializeChatMessage, serializeChatMessage} from '@trale/transport/message';
-import {TitpService}                                               from 'app/services/titp.service';
-import {Contact}                                                   from 'app/models/Contact';
-import {prefix}                                                    from '@trale/transport/log';
-import {filter}                                                    from 'rxjs/operators';
-import {take}                                                      from '../../lib/functional';
-import {CdkVirtualScrollViewport}                                  from '@angular/cdk/scrolling';
-import {delay}                                                     from '@socialstuff/utilities/common';
-import { DebugService } from 'app/services/debug.service';
+import {Component, Input, OnDestroy, OnInit, Output, ViewChild, EventEmitter} from '@angular/core';
+import {ContactService}                                                       from '../services/contact.service';
+import {ActivatedRoute, Params}                                               from '@angular/router';
+import {TextRecordStorage}                                                    from '@trale/persistence/crypto-storage';
+import {CryptoStorageService}                                                 from 'app/services/crypto-storage.service';
+import {ChatMessage, deserializeChatMessage, serializeChatMessage}            from '@trale/transport/message';
+import {TitpService}                                                          from 'app/services/titp.service';
+import {Contact}                                                              from 'app/models/Contact';
+import {prefix}                                                               from '@trale/transport/log';
+import {filter}                                                               from 'rxjs/operators';
+import {take}                                                                 from '../../lib/functional';
+import {CdkVirtualScrollViewport}                                             from '@angular/cdk/scrolling';
+import {delay}                                                                from '@socialstuff/utilities/common';
+import {DebugService}                                                         from 'app/services/debug.service';
 
 /**
  * Logger for debugging.
@@ -33,14 +33,14 @@ export class ChatViewComponent implements OnInit, OnDestroy {
 
   public messages: ChatMessage[] = [];
   public chat: TextRecordStorage;
-  private chatConsumer: (n: number) => Promise<Buffer[]>
+  private chatConsumer: (n: number) => Promise<Buffer[]>;
 
   constructor(
     private debug: DebugService,
     private contacts: ContactService,
     private route: ActivatedRoute,
     private storage: CryptoStorageService,
-    private titp: TitpService
+    private titp: TitpService,
   ) {
     debug.loadSession();
   }
@@ -54,7 +54,9 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     this.chat = await this.contacts.openChat(contact);
     this.chatConsumer = take(this.chat.records());
     log('loaded some stuff');
-    this.messages = (await this.chatConsumer(50)).reverse().map(deserializeChatMessage);
+    const r = (await this.chatConsumer(50));
+    this.messages = r.reverse().map(deserializeChatMessage);
+    console.log('[[MESSAGES]]', r);
     log('done loading chat messages', this.messages);
     await delay(20);
     this.virtualScroll.scrollTo({bottom: 0});
@@ -69,24 +71,25 @@ export class ChatViewComponent implements OnInit, OnDestroy {
   /**
    * Initialized the model.
    */
-  async ngOnInit() {
+  ngOnInit(): void {
     log('initialized');
     const onChatPartnerChange = async (params: Params) => {
       await this.deInit();
       if (this.storage.storage) {
         const contact = await this.contacts.load(params.username);
-          if (contact === false) {
-            console.error('contact could not be loaded!');
-            return;
-          }
-          this.initForContact(contact);
+        if (contact === false) {
+          console.error('contact could not be loaded!');
+          return;
+        }
+        this.initForContact(contact);
       } else {
-        const _a = this.storage.isLoaded.subscribe(async () => {
+        const _a = this.storage.isLoaded.subscribe(() => {
           _a.unsubscribe();
           onChatPartnerChange(params);
         });
       }
     };
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.route.params.subscribe(onChatPartnerChange);
 
     const sub = this.titp.onConnectionStateChanged.subscribe(isConnected => {
@@ -96,16 +99,16 @@ export class ChatViewComponent implements OnInit, OnDestroy {
           .incomingMessage()
           .subscribe(this.handleIncomingMessage.bind(this));
       }
-    })
+    });
   }
 
   /**
    * Handler for incoming messages, that is responsible for loading these messages into the list of chat messages.
-   * @param message 
+   * @param message
    */
-  async handleIncomingMessage(message: ChatMessage): Promise<void> {
+  handleIncomingMessage(message: ChatMessage): Promise<void> {
     log('got message:', message);
-    if (message.senderName !== this.contact.username) {
+    if (message.senderName !== this.contact.username && message.senderName !== this.titp.client.userHandle) {
       return;
     }
     this.messages = [...this.messages, message];
@@ -114,7 +117,7 @@ export class ChatViewComponent implements OnInit, OnDestroy {
 
   /**
    * Handler that is invoked when the logged-in user sends a message in the opened chat.
-   * @param message 
+   * @param message
    */
   public async messageSentHandler(message: ChatMessage): Promise<void> {
     message.senderName = this.titp.client.userHandle;
@@ -122,6 +125,6 @@ export class ChatViewComponent implements OnInit, OnDestroy {
     await this.titp.client.sendChatMessageTo(message, [this.contact.username]);
     await this.handleIncomingMessage(message);
     await this.chat.addRecord(serializeChatMessage(message));
-    this.messageSent.emit({ message, recipient: this.contact });
+    this.messageSent.emit({message, recipient: this.contact});
   }
 }
